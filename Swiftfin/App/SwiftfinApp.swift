@@ -26,8 +26,14 @@ struct SwiftfinApp: App {
 
         UIScrollView.appearance().keyboardDismissMode = .onDrag
 
-        // Sometimes the tab bar won't appear properly on push, always have material background.
-        UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance(idiom: .unspecified)
+        // On iOS 26+ the system's Liquid Glass renderer owns tab bar appearance.
+        // On older iOS the tab bar can disappear on push without an explicit
+        // appearance set, so force a material background there.
+        if #available(iOS 26, *) {
+            // no-op: let Liquid Glass apply
+        } else {
+            UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance(idiom: .unspecified)
+        }
 
         SwiftfinSpotlight().addSwiftfinToSpotlight()
     }
@@ -35,9 +41,17 @@ struct SwiftfinApp: App {
     var body: some Scene {
         WindowGroup {
             OverlayToastView {
-                PreferencesView {
+                // On iOS 26+, PreferencesView inserts a UIHostingController subclass
+                // between the root and UITabBarController, which breaks Liquid Glass
+                // compositing. AppDelegate already handles orientation for all OS versions,
+                // so PreferencesView is not needed at the root on iOS 26+.
+                if #available(iOS 26, *) {
                     RootView()
-                        .supportedOrientations(UIDevice.isPad ? .allButUpsideDown : .portrait)
+                } else {
+                    PreferencesView {
+                        RootView()
+                            .supportedOrientations(UIDevice.isPad ? .allButUpsideDown : .portrait)
+                    }
                 }
             }
             .ignoresSafeArea()

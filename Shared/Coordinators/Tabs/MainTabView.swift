@@ -6,7 +6,6 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
-import Factory
 import SwiftUI
 
 // TODO: move popup to router
@@ -44,6 +43,56 @@ struct MainTabView: View {
 
     @ViewBuilder
     var body: some View {
+        #if os(iOS)
+        if #available(iOS 18, *) {
+            if UIDevice.isPad {
+                ipadTabView
+            } else {
+                phoneTabView
+            }
+        } else {
+            legacyTabView
+        }
+        #else
+        legacyTabView
+        #endif
+    }
+
+    @available(iOS 18, *)
+    @ViewBuilder
+    private var ipadTabView: some View {
+        TabView(selection: $tabCoordinator.selectedTabID) {
+            ForEach(tabCoordinator.tabs, id: \.item.id) { tab in
+                Tab(tab.item.title, systemImage: tab.item.systemImage, value: tab.item.id) {
+                    NavigationInjectionView(coordinator: tab.coordinator) {
+                        tab.item.content
+                    }
+                    .environmentObject(tabCoordinator)
+                    .environment(\.tabItemSelected, tab.publisher)
+                }
+            }
+        }
+        .tabViewStyle(.sidebarAdaptable)
+    }
+
+    @available(iOS 18, *)
+    @ViewBuilder
+    private var phoneTabView: some View {
+        TabView(selection: $tabCoordinator.selectedTabID) {
+            ForEach(tabCoordinator.tabs, id: \.item.id) { tab in
+                Tab(tab.item.title, systemImage: tab.item.systemImage, value: tab.item.id) {
+                    NavigationInjectionView(coordinator: tab.coordinator) {
+                        tab.item.content
+                    }
+                    .environmentObject(tabCoordinator)
+                    .environment(\.tabItemSelected, tab.publisher)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var legacyTabView: some View {
         TabView(selection: $tabCoordinator.selectedTabID) {
             ForEach(tabCoordinator.tabs, id: \.item.id) { tab in
                 NavigationInjectionView(

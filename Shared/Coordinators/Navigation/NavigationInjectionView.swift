@@ -49,6 +49,7 @@ struct NavigationInjectionView: View {
                     route.destination
                 }
         }
+        .background(.clear)
         .environment(
             \.router,
             .init(
@@ -85,6 +86,7 @@ struct NavigationInjectionView: View {
                     route.destination
                 }
                 .environmentObject(rootCoordinator)
+                .presentationBackground(.regularMaterial)
             }
         #endif // <- End
         #if os(tvOS)
