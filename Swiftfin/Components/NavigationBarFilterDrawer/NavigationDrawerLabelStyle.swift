@@ -40,6 +40,9 @@ private struct FilterChipBackground: ViewModifier {
 
 struct NavigationDrawerLabelStyle: LabelStyle {
 
+    @Default(.accentColor)
+    private var accentColor
+
     @Environment(\.isHighlighted)
     private var isHighlighted
 
@@ -73,7 +76,7 @@ struct NavigationDrawerLabelStyle: LabelStyle {
         }
         .font(.footnote)
         .fontWeight(.semibold)
-        .foregroundStyle(.primary)
+        .foregroundStyle(isHighlighted ? accentColor.overlayColor : .primary)
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .modifier(FilterChipBackground(isHighlighted: isHighlighted))
