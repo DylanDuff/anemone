@@ -40,10 +40,8 @@ extension HomeView {
                         PosterButton.TitleSubtitleContentView(item: item)
                     }
                 }
-                .trailing {
-                    SeeAllButton {
-                        router.route(to: .library(viewModel: viewModel))
-                    }
+                .headerAction {
+                    router.route(to: .library(viewModel: viewModel))
                 }
                 .contextMenu(for: BaseItemDto.self) { item in
                     Button {

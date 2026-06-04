@@ -15,6 +15,7 @@ struct PosterHStack<Element: Poster, Data: Collection>: View where Data.Element 
 
     private var data: Data
     private var header: () -> any View
+    private var headerAction: (() -> Void)?
     private var title: String?
     private var type: PosterDisplayType
     private var label: (Element) -> any View
@@ -62,8 +63,16 @@ struct PosterHStack<Element: Poster, Data: Collection>: View where Data.Element 
         VStack(alignment: .leading) {
 
             HStack {
-                header()
-                    .eraseToAnyView()
+                if let headerAction {
+                    Button(action: headerAction) {
+                        header()
+                            .eraseToAnyView()
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    header()
+                        .eraseToAnyView()
+                }
 
                 Spacer()
 
@@ -88,7 +97,8 @@ extension PosterHStack {
     ) {
         self.init(
             data: items,
-            header: { DefaultHeader(title: title) },
+            header: { DefaultHeader(title: title, showChevron: false) },
+            headerAction: nil,
             title: title,
             type: type,
             label: label,
@@ -100,6 +110,12 @@ extension PosterHStack {
     func trailing(@ViewBuilder _ content: @escaping () -> any View) -> Self {
         copy(modifying: \.trailingContent, with: content)
     }
+
+    func headerAction(_ action: @escaping () -> Void) -> Self {
+        var copy = copy(modifying: \.headerAction, with: action)
+        copy.header = { DefaultHeader(title: title, showChevron: true) }
+        return copy
+    }
 }
 
 // MARK: Default Header
@@ -109,13 +125,22 @@ extension PosterHStack {
     struct DefaultHeader: View {
 
         let title: String?
+        var showChevron: Bool = false
 
         var body: some View {
             if let title {
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .accessibility(addTraits: [.isHeader])
+                HStack(spacing: 4) {
+                    Text(title)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+
+                    if showChevron {
+                        Image(systemName: "chevron.right")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .accessibility(addTraits: [.isHeader])
             }
         }
     }

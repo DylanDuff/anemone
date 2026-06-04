@@ -18,10 +18,6 @@ struct HomeView: View {
 
     @Default(.Customization.nextUpPosterType)
     private var nextUpPosterType
-    @Default(.Customization.Home.showRecentlyAdded)
-    private var showRecentlyAdded
-    @Default(.Customization.recentlyAddedPosterType)
-    private var recentlyAddedPosterType
 
     @Router
     private var router
@@ -29,30 +25,45 @@ struct HomeView: View {
     @StateObject
     private var viewModel = HomeViewModel()
 
+    @State
+    private var scrollViewOffset: CGFloat = 0
+
+    private var heroCarouselHeight: CGFloat {
+        UIDevice.isPhone ? 260 : 460
+    }
+
     @ViewBuilder
     private var contentView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 0) {
 
-                ContinueWatchingView(viewModel: viewModel)
+                HeroCarouselView(viewModel: viewModel.recentlyAddedViewModel)
 
-                NextUpView(viewModel: viewModel.nextUpViewModel) { item in
-                    viewModel.send(.setIsPlayed(true, item))
+                VStack(alignment: .leading, spacing: 10) {
+
+                    ContinueWatchingView(viewModel: viewModel)
+
+                    NextUpView(viewModel: viewModel.nextUpViewModel) { item in
+                        viewModel.send(.setIsPlayed(true, item))
+                    }
+
+                    ForEach(viewModel.libraries) { viewModel in
+                        LatestInLibraryView(viewModel: viewModel)
+                    }
                 }
-
-                if showRecentlyAdded {
-                    RecentlyAddedView(viewModel: viewModel.recentlyAddedViewModel)
-                }
-
-                ForEach(viewModel.libraries) { viewModel in
-                    LatestInLibraryView(viewModel: viewModel)
-                }
+                .edgePadding(.vertical)
             }
-            .edgePadding(.vertical)
         }
+        .ignoresSafeArea(edges: .top)
+        .scrollViewOffset($scrollViewOffset)
         .refreshable {
             viewModel.send(.refresh)
         }
+        .navigationBarOffset(
+            $scrollViewOffset,
+            start: heroCarouselHeight - 90,
+            end: heroCarouselHeight - 40
+        )
     }
 
     var body: some View {
@@ -70,7 +81,6 @@ struct HomeView: View {
         .onFirstAppear {
             viewModel.send(.refresh)
         }
-        .navigationTitle(L10n.home)
         .refreshable {
             viewModel.send(.refresh)
         }

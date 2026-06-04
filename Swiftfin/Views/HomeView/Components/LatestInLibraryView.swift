@@ -31,10 +31,8 @@ extension HomeView {
                 ) { item, namespace in
                     router.route(to: .item(item: item), in: namespace)
                 }
-                .trailing {
-                    SeeAllButton {
-                        router.route(to: .library(viewModel: viewModel))
-                    }
+                .headerAction {
+                    router.route(to: .library(viewModel: viewModel))
                 }
             }
         }
