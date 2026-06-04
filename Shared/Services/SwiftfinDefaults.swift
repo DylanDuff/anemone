@@ -115,7 +115,7 @@ extension Defaults.Keys {
         }
 
         static var showPosterLabels: Key<Bool> {
-            UserKey("showPosterLabels", default: true)
+            UserKey("showPosterLabels", default: false)
         }
 
         static var nextUpPosterType: Key<PosterDisplayType> {
@@ -172,7 +172,7 @@ extension Defaults.Keys {
             }
 
             static var showUnplayed: Key<UnplayedIndicatorType> {
-                UserKey("showUnplayedIndicator", default: .indicator)
+                UserKey("showUnplayedIndicator", default: .none)
             }
 
             static var showPlayed: Key<Bool> {
@@ -441,7 +441,7 @@ extension Defaults.Keys {
         Key(name, default: `default`, suite: .appSuite)
     }
 
-    static let isLiquidGlassEnabled: Key<Bool> = DebugKey("experimentalLiquidGlass", default: false)
+    static let isLiquidGlassEnabled: Key<Bool> = DebugKey("experimentalLiquidGlass", default: true)
     static let sendProgressReports: Key<Bool> = DebugKey("sendProgressReports", default: true)
 }
 #endif
