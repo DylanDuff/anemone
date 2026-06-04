@@ -39,12 +39,11 @@ struct SettingsView: View {
             customizeSection
             diagnosticsSection
         }
-        .scrollContentBackground(.hidden)
         #if os(iOS)
-            .navigationTitle(L10n.settings)
-            .navigationBarCloseButton {
-                router.dismiss()
-            }
+        .navigationTitle(L10n.settings)
+        .navigationBarCloseButton {
+            router.dismiss()
+        }
         #endif
     }
 

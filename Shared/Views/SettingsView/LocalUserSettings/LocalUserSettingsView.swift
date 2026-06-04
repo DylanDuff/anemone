@@ -72,34 +72,8 @@ struct LocalUserSettingsView: View {
                     router.route(to: .localUserSecurity)
                 }
             }
-
-            // TODO: Disabled as stored values and defaults
-            // settings need to be migrated to final destinations
-//            StateAdapter(initialValue: false) { isPresented in
-//                Section {
-//                    Button(L10n.resetSettings, role: .destructive) {
-//                        isPresented.wrappedValue = true
-//                    }
-//                } footer: {
-//                    Text(L10n.resetSettingsDescription)
-//                }
-//                .confirmationDialog(
-//                    L10n.resetSettings,
-//                    isPresented: isPresented,
-//                    titleVisibility: .visible
-//                ) {
-//                    Button(L10n.reset, role: .destructive) {
-//                        do {
-//                            try viewModel.userSession.user.deleteSettings()
-//                        } catch {
-//                            viewModel.logger.error("Unable to reset user settings: \(error.localizedDescription)")
-//                        }
-//                    }
-//                } message: {
-//                    Text(L10n.resetSettingsMessage)
-//                }
-//            }
-        } image: {
+        }
+        image: {
             UserProfileImage(
                 userID: imageViewModel.userSession.user.id,
                 source: imageViewModel.userSession.user.profileImageSource(
@@ -110,6 +84,7 @@ struct LocalUserSettingsView: View {
             .frame(maxWidth: 400)
         }
         .navigationTitle(L10n.user)
-        .errorMessage($imageViewModel.error)
+            .errorMessage($imageViewModel.error)
+            .scrollContentBackground(.hidden)
     }
 }

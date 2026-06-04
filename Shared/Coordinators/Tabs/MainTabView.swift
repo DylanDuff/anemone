@@ -16,11 +16,30 @@ struct MainTabView: View {
 
     #if os(iOS)
     @StateObject
-    private var tabCoordinator = TabCoordinator {
-        TabItem.home
-        TabItem.search
-        TabItem.media
-    }
+    private var tabCoordinator: TabCoordinator = {
+        guard UIDevice.isPad else {
+            return TabCoordinator {
+                TabItem.home
+                TabItem.search
+                TabItem.media
+            }
+        }
+        return TabCoordinator {
+            TabItem.home
+            TabItem.library(
+                title: L10n.tvShowsCapitalized,
+                systemName: "tv",
+                filters: .init(itemTypes: [.series])
+            )
+            TabItem.library(
+                title: L10n.movies,
+                systemName: "film",
+                filters: .init(itemTypes: [.movie])
+            )
+            TabItem.search
+            TabItem.media
+        }
+    }()
     #else
     @StateObject
     private var tabCoordinator = TabCoordinator {
