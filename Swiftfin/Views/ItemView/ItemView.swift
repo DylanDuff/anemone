@@ -26,6 +26,9 @@ struct ItemView: View {
     private var router
 
     @StateObject
+    private var navBarAlphaModel = NavBarAlphaModel()
+
+    @StateObject
     private var viewModel: ItemViewModel
 
     private static func typeViewModel(for item: BaseItemDto) -> ItemViewModel {
@@ -94,11 +97,32 @@ struct ItemView: View {
     }
 
     @ViewBuilder
+    private var navBarLogoView: some View {
+        let logoSource = viewModel.item.type == .episode
+            ? viewModel.item.seriesImageSource(.logo, maxHeight: 30)
+            : viewModel.item.imageSource(.logo, maxHeight: 30)
+
+        ImageView(logoSource)
+            .placeholder { _ in
+                Text(viewModel.item.displayTitle)
+                    .font(.headline)
+            }
+            .failure {
+                Text(viewModel.item.displayTitle)
+                    .font(.headline)
+            }
+            .scaledToFit()
+            .frame(width: 150, height: 30)
+            .opacity(navBarAlphaModel.alpha)
+    }
+
+    @ViewBuilder
     private var innerBody: some View {
         scrollContainerView(viewModel: viewModel) {
             scrollContentView
         }
         .eraseToAnyView()
+        .environment(\.navBarAlphaModel, navBarAlphaModel)
     }
 
     var body: some View {
@@ -107,6 +131,11 @@ struct ItemView: View {
             case .content:
                 innerBody
                     .navigationTitle(viewModel.item.displayTitle)
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            navBarLogoView
+                        }
+                    }
             case let .error(error):
                 ErrorView(error: error)
             case .initial, .refreshing:

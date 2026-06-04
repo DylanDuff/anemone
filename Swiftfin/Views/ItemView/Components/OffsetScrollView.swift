@@ -13,9 +13,21 @@ import SwiftUI
 // The fading values just "feel right" and is the same for iOS and iPadOS.
 // Adjust if necessary or if a more concrete design comes along.
 
+final class NavBarAlphaModel: ObservableObject {
+    @Published
+    var alpha: CGFloat = 0
+}
+
+extension EnvironmentValues {
+    @Entry var navBarAlphaModel: NavBarAlphaModel?
+}
+
 extension ItemView {
 
     struct OffsetScrollView<Header: View, Overlay: View, Content: View>: View {
+
+        @Environment(\.navBarAlphaModel)
+        private var navBarAlphaModel
 
         @State
         private var scrollViewOffset: CGFloat = 0
@@ -74,6 +86,11 @@ extension ItemView {
             .edgesIgnoringSafeArea(.top)
             .trackingSize($size, $safeAreaInsets)
             .scrollViewOffset($scrollViewOffset)
+            .onChange(of: scrollViewOffset) { offset in
+                let start = headerHeight - safeAreaInsets.top - 45
+                let end = headerHeight - safeAreaInsets.top - 5
+                navBarAlphaModel?.alpha = clamp((offset - start) / (end - start), min: 0, max: 1)
+            }
             .navigationBarOffset(
                 $scrollViewOffset,
                 start: headerHeight - safeAreaInsets.top - 45,
