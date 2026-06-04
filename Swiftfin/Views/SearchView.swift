@@ -39,12 +39,21 @@ struct SearchView: View {
 
     @ViewBuilder
     private var suggestionsView: some View {
-        VStack(spacing: 20) {
-            ForEach(viewModel.suggestions) { item in
-                Button(item.displayTitle) {
-                    searchQuery = item.displayTitle
+        ScrollView {
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: UIDevice.isPhone ? 3 : 5),
+                spacing: 10
+            ) {
+                ForEach(viewModel.suggestions) { item in
+                    PosterButton(item: item, type: .portrait) { namespace in
+                        select(item, in: namespace)
+                    } label: {
+                        PosterButton<BaseItemDto>.TitleContentView(title: item.displayTitle)
+                            .lineLimit(1, reservesSpace: true)
+                    }
                 }
             }
+            .edgePadding()
         }
     }
 

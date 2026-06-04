@@ -39,7 +39,7 @@ struct HomeView: View {
 
                 HeroCarouselView(viewModel: viewModel.recentlyAddedViewModel)
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 35) {
 
                     ContinueWatchingView(viewModel: viewModel)
 
