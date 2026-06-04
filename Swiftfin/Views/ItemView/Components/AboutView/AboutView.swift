@@ -23,21 +23,21 @@ extension ItemView {
     struct AboutView: View {
 
         private enum AboutViewItem: Identifiable {
-            case image
             case overview
             case mediaSource(MediaSourceInfo)
-            case ratings
+            case criticRating(Float)
+            case communityRating(Float)
 
             var id: String? {
                 switch self {
-                case .image:
-                    "image"
                 case .overview:
                     "overview"
                 case let .mediaSource(source):
                     source.id
-                case .ratings:
-                    "ratings"
+                case .criticRating:
+                    "criticRating"
+                case .communityRating:
+                    "communityRating"
                 }
             }
         }
@@ -49,17 +49,18 @@ extension ItemView {
         private var contentSize: CGSize = .zero
 
         private var items: [AboutViewItem] {
-            var items: [AboutViewItem] = [
-                .image,
-                .overview,
-            ]
+            var items: [AboutViewItem] = [.overview]
 
             if let mediaSources = viewModel.item.mediaSources {
                 items.append(contentsOf: mediaSources.map { AboutViewItem.mediaSource($0) })
             }
 
-            if viewModel.item.hasRatings {
-                items.append(.ratings)
+            if let criticRating = viewModel.item.criticRating {
+                items.append(.criticRating(criticRating))
+            }
+
+            if let communityRating = viewModel.item.communityRating {
+                items.append(.communityRating(communityRating))
             }
 
             return items
@@ -96,46 +97,54 @@ extension ItemView {
         }
 
         private var cardSize: CGSize {
-            let height = UIDevice.isPad ? padImageWidth * 3 / 2 : phoneImageWidth * 3 / 2
+            let height = UIDevice.isPad ? padImageWidth * 1.1 : phoneImageWidth * 1.1
             let width = height * 1.65
 
             return CGSize(width: width, height: height)
         }
 
-        var body: some View {
-            VStack(alignment: .leading) {
-                Text(L10n.about)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .accessibility(addTraits: [.isHeader])
-                    .edgePadding(.horizontal)
+        private var ratingCardWidth: CGFloat {
+            cardSize.height
+        }
 
-                CollectionHStack(
-                    uniqueElements: items,
-                    variadicWidths: true
-                ) { item in
-                    switch item {
-                    case .image:
-                        ImageCard(viewModel: viewModel)
-                            .frame(width: UIDevice.isPad ? padImageWidth : phoneImageWidth)
-                    case .overview:
-                        OverviewCard(item: viewModel.item)
+        var body: some View {
+            VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading) {
+                    Text(L10n.about)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .accessibility(addTraits: [.isHeader])
+                        .edgePadding(.horizontal)
+
+                    CollectionHStack(
+                        uniqueElements: items,
+                        variadicWidths: true
+                    ) { item in
+                        switch item {
+                        case .overview:
+                            OverviewCard(item: viewModel.item)
+                                .frame(width: cardSize.width, height: cardSize.height)
+                        case let .mediaSource(source):
+                            MediaSourcesCard(
+                                subtitle: (viewModel.item.mediaSources ?? []).count > 1 ? source.displayTitle : nil,
+                                source: source
+                            )
                             .frame(width: cardSize.width, height: cardSize.height)
-                    case let .mediaSource(source):
-                        MediaSourcesCard(
-                            subtitle: (viewModel.item.mediaSources ?? []).count > 1 ? source.displayTitle : nil,
-                            source: source
-                        )
-                        .frame(width: cardSize.width, height: cardSize.height)
-                    case .ratings:
-                        RatingsCard(item: viewModel.item)
-                            .frame(width: cardSize.width, height: cardSize.height)
+                        case let .criticRating(rating):
+                            CriticRatingCard(rating: rating)
+                                .frame(width: ratingCardWidth, height: cardSize.height)
+                        case let .communityRating(rating):
+                            CommunityRatingCard(rating: rating)
+                                .frame(width: ratingCardWidth, height: cardSize.height)
+                        }
                     }
+                    .clipsToBounds(false)
+                    .insets(horizontal: EdgeInsets.edgePadding)
+                    .itemSpacing(EdgeInsets.edgePadding / 2)
+                    .scrollBehavior(.continuousLeadingEdge)
                 }
-                .clipsToBounds(false)
-                .insets(horizontal: EdgeInsets.edgePadding)
-                .itemSpacing(EdgeInsets.edgePadding / 2)
-                .scrollBehavior(.continuousLeadingEdge)
+
+                InformationSection(item: viewModel.item)
             }
             .trackingSize($contentSize)
             .id(viewModel.item.hashValue)

@@ -32,18 +32,6 @@ extension ItemView {
                     externalTrailers: viewModel.item.remoteTrailers ?? []
                 )
 
-                // MARK: Genres
-
-                if let genres = viewModel.item.itemGenres, genres.isNotEmpty {
-                    ItemView.GenresHStack(genres: genres)
-                }
-
-                // MARK: Studios
-
-                if let studios = viewModel.item.studios, studios.isNotEmpty {
-                    ItemView.StudiosHStack(studios: studios)
-                }
-
                 // MARK: Cast and Crew
 
                 if let castAndCrew = viewModel.item.people,

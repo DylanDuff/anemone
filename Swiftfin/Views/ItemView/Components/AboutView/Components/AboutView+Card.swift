@@ -35,7 +35,7 @@ extension ItemView.AboutView {
 
                     Rectangle()
                         .fill(Color.systemFill)
-                        .cornerRadius(ratio: 1 / 45, of: \.height)
+                        .cornerRadius(ratio: 1 / 12, of: \.height)
 
                     VStack(alignment: .leading, spacing: 5) {
                         Text(title)

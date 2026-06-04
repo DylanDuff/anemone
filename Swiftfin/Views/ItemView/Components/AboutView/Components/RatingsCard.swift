@@ -9,48 +9,86 @@
 import JellyfinAPI
 import SwiftUI
 
+// MARK: - Critic Rating Card
+
 extension ItemView.AboutView {
 
-    struct RatingsCard: View {
+    struct CriticRatingCard: View {
 
-        let item: BaseItemDto
+        let rating: Float
 
         var body: some View {
-            Card(title: L10n.ratings, action: {}) {
-                HStack(alignment: .bottom, spacing: 20) {
-                    if let criticRating = item.criticRating {
-                        VStack {
-                            Group {
-                                if criticRating >= 60 {
-                                    Image(.tomatoFresh)
-                                        .symbolRenderingMode(.multicolor)
-                                        .foregroundStyle(.green, .red)
-                                } else {
-                                    Image(.tomatoRotten)
-                                        .symbolRenderingMode(.monochrome)
-                                        .foregroundColor(.green)
-                                }
-                            }
-                            .font(.largeTitle)
-
-                            // swiftlint:disable:next hard_coded_display_string
-                            Text("\(criticRating, specifier: "%.0f")")
-                        }
-                    }
-
-                    if let communityRating = item.communityRating {
-                        VStack {
-                            Image(systemName: "star.fill")
-                                .symbolRenderingMode(.multicolor)
-                                .foregroundStyle(.yellow)
-                                .font(.largeTitle)
-
-                            // swiftlint:disable:next hard_coded_display_string
-                            Text("\(communityRating, specifier: "%.1f")")
-                        }
-                    }
+            RatingCardLayout(
+                // swiftlint:disable:next hard_coded_display_string
+                score: String(format: "%.0f%%", rating),
+                label: L10n.criticRating.uppercased()
+            ) {
+                if rating >= 60 {
+                    Image(.tomatoFresh)
+                        .symbolRenderingMode(.multicolor)
+                } else {
+                    Image(.tomatoRotten)
+                        .symbolRenderingMode(.monochrome)
                 }
             }
+        }
+    }
+}
+
+// MARK: - Community Rating Card
+
+extension ItemView.AboutView {
+
+    struct CommunityRatingCard: View {
+
+        let rating: Float
+
+        var body: some View {
+            RatingCardLayout(
+                // swiftlint:disable:next hard_coded_display_string
+                score: String(format: "%.1f", rating),
+                label: L10n.communityRating.uppercased()
+            ) {
+                Image(systemName: "star.fill")
+                    .foregroundStyle(.yellow)
+            }
+        }
+    }
+}
+
+// MARK: - Shared Layout
+
+private struct RatingCardLayout<Icon: View>: View {
+
+    let score: String
+    let label: String
+    @ViewBuilder
+    let icon: Icon
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Rectangle()
+                .fill(Color.systemFill)
+                .cornerRadius(ratio: 1 / 12, of: \.height)
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    icon
+                        .font(.title)
+
+                    // swiftlint:disable:next hard_coded_display_string
+                    Text(score)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                }
+
+                Text(label)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                    .kerning(0.5)
+            }
+            .padding()
         }
     }
 }
