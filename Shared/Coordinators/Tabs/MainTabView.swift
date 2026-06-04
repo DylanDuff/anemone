@@ -77,6 +77,7 @@ struct MainTabView: View {
         #endif
     }
 
+    #if os(iOS)
     @available(iOS 18, *)
     @ViewBuilder
     private var ipadTabView: some View {
@@ -109,6 +110,7 @@ struct MainTabView: View {
             }
         }
     }
+    #endif
 
     @ViewBuilder
     private var legacyTabView: some View {

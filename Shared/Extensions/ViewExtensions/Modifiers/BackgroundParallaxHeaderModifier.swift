@@ -32,19 +32,37 @@ struct BackgroundParallaxHeaderModifier<Header: View>: ViewModifier {
         self.header = header
     }
 
+    // Full app window width — wider than contentSize.width when a sidebar is open.
+    private var windowWidth: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.keyWindow?.bounds.width ?? contentSize.width
+    }
+
+    @ViewBuilder
+    private func builtHeader() -> some View {
+        header()
+            .offset(y: scrollViewOffset > 0 ? -scrollViewOffset * multiplier : 0)
+            .scaleEffect(scrollViewOffset < 0 ? (height - scrollViewOffset) / height : 1, anchor: .top)
+            .frame(width: windowWidth)
+            .mask(alignment: .top) {
+                Color.black
+                    .frame(height: max(0, height - scrollViewOffset))
+            }
+    }
+
     func body(content: Content) -> some View {
         content
             .trackingSize($contentSize)
-            .background(alignment: .top) {
-                header()
-                    .offset(y: scrollViewOffset > 0 ? -scrollViewOffset * multiplier : 0)
-                    .scaleEffect(scrollViewOffset < 0 ? (height - scrollViewOffset) / height : 1, anchor: .top)
-                    .frame(width: contentSize.width)
-                    .mask(alignment: .top) {
-                        Color.black
-                            .frame(height: max(0, height - scrollViewOffset))
-                    }
-                    .ignoresSafeArea()
+            .background(alignment: .topLeading) {
+                if #available(iOS 26, *) {
+                    builtHeader()
+                        .backgroundExtensionEffect()
+                        .ignoresSafeArea()
+                } else {
+                    builtHeader()
+                        .ignoresSafeArea()
+                }
             }
     }
 }
