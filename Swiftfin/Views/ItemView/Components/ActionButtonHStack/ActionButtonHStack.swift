@@ -7,7 +7,6 @@
 //
 
 import Defaults
-import Factory
 import JellyfinAPI
 import SwiftUI
 
@@ -18,63 +17,15 @@ extension ItemView {
         @Default(.accentColor)
         private var accentColor
 
-        @StoredValue(.User.enabledTrailers)
-        private var enabledTrailers: TrailerSelection
-
         @ObservedObject
         var viewModel: ItemViewModel
 
         var equalSpacing: Bool = true
 
-        // MARK: - Has Trailers
-
-        private var hasTrailers: Bool {
-            if enabledTrailers.contains(.local), viewModel.localTrailers.isNotEmpty {
-                return true
-            }
-
-            if enabledTrailers.contains(.external), viewModel.item.remoteTrailers?.isNotEmpty == true {
-                return true
-            }
-
-            return false
-        }
-
         // MARK: - Body
 
         var body: some View {
             HStack(alignment: .center, spacing: 10) {
-
-                if viewModel.item.canBePlayed {
-
-                    // MARK: - Toggle Played
-
-                    let isCheckmarkSelected = viewModel.item.userData?.isPlayed == true
-
-                    Button(L10n.played, systemImage: "checkmark") {
-                        viewModel.send(.toggleIsPlayed)
-                    }
-                    .buttonStyle(.tintedMaterial(tint: .jellyfinPurple, foregroundColor: .white))
-                    .isSelected(isCheckmarkSelected)
-                    .frame(maxWidth: .infinity)
-                    .if(!equalSpacing) { view in
-                        view.aspectRatio(1, contentMode: .fit)
-                    }
-                }
-
-                // MARK: - Toggle Favorite
-
-                let isHeartSelected = viewModel.item.userData?.isFavorite == true
-
-                Button(L10n.favorite, systemImage: isHeartSelected ? "heart.fill" : "heart") {
-                    viewModel.send(.toggleIsFavorite)
-                }
-                .buttonStyle(.tintedMaterial(tint: .red, foregroundColor: .white))
-                .isSelected(isHeartSelected)
-                .frame(maxWidth: .infinity)
-                .if(!equalSpacing) { view in
-                    view.aspectRatio(1, contentMode: .fit)
-                }
 
                 // MARK: - Select a Version
 
@@ -84,20 +35,6 @@ extension ItemView {
                     VersionMenu(
                         viewModel: viewModel,
                         mediaSources: mediaSources
-                    )
-                    .menuStyle(.button)
-                    .frame(maxWidth: .infinity)
-                    .if(!equalSpacing) { view in
-                        view.aspectRatio(1, contentMode: .fit)
-                    }
-                }
-
-                // MARK: - Watch a Trailer
-
-                if hasTrailers {
-                    TrailerMenu(
-                        localTrailers: viewModel.localTrailers,
-                        externalTrailers: viewModel.item.remoteTrailers ?? []
                     )
                     .menuStyle(.button)
                     .frame(maxWidth: .infinity)

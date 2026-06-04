@@ -19,6 +19,9 @@ struct ItemView: View {
         init(viewModel: ItemViewModel, content: @escaping () -> Content)
     }
 
+    @Default(.accentColor)
+    private var accentColor
+
     @Default(.Customization.itemViewType)
     private var itemViewType
 
@@ -134,6 +137,28 @@ struct ItemView: View {
                     .toolbar {
                         ToolbarItem(placement: .principal) {
                             navBarLogoView
+                        }
+
+                        ToolbarItemGroup(placement: .topBarTrailing) {
+                            if viewModel.item.canBePlayed {
+                                let isPlayed = viewModel.item.userData?.isPlayed == true
+                                Button {
+                                    viewModel.send(.toggleIsPlayed)
+                                } label: {
+                                    Image(systemName: isPlayed ? "checkmark.circle.fill" : "checkmark.circle")
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(accentColor)
+                                }
+                            }
+
+                            let isFavorite = viewModel.item.userData?.isFavorite == true
+                            Button {
+                                viewModel.send(.toggleIsFavorite)
+                            } label: {
+                                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(accentColor)
+                            }
                         }
                     }
             case let .error(error):
