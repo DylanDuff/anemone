@@ -44,6 +44,11 @@ class UINavigationBarOffsetHostingController<Content: View>: UIHostingController
 
     private var lastAlpha: CGFloat = 0
 
+    private var usesLegacyBarBackground: Bool {
+        if #available(iOS 26, *) { return false }
+        return true
+    }
+
     private lazy var blurView: UIVisualEffectView = {
         let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
         blurView.translatesAutoresizingMaskIntoConstraints = false
@@ -54,6 +59,8 @@ class UINavigationBarOffsetHostingController<Content: View>: UIHostingController
         super.viewDidLoad()
 
         view.backgroundColor = nil
+
+        guard usesLegacyBarBackground else { return }
 
         view.addSubview(blurView)
         blurView.alpha = 0
@@ -74,7 +81,10 @@ class UINavigationBarOffsetHostingController<Content: View>: UIHostingController
 
         navigationController?.navigationBar
             .titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label.withAlphaComponent(alpha)]
-        blurView.alpha = alpha
+
+        if usesLegacyBarBackground {
+            blurView.alpha = alpha
+        }
         lastAlpha = alpha
     }
 
@@ -83,6 +93,8 @@ class UINavigationBarOffsetHostingController<Content: View>: UIHostingController
 
         navigationController?.navigationBar
             .titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label.withAlphaComponent(lastAlpha)]
+
+        guard usesLegacyBarBackground else { return }
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
     }
@@ -91,6 +103,8 @@ class UINavigationBarOffsetHostingController<Content: View>: UIHostingController
         super.viewWillDisappear(animated)
 
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
+
+        guard usesLegacyBarBackground else { return }
         navigationController?.navigationBar.setBackgroundImage(nil, for: .default)
         navigationController?.navigationBar.shadowImage = nil
     }
