@@ -85,6 +85,5 @@ struct LocalUserSettingsView: View {
         }
         .navigationTitle(L10n.user)
             .errorMessage($imageViewModel.error)
-            .scrollContentBackground(.hidden)
     }
 }

@@ -50,6 +50,8 @@ struct HomeView: View {
                     ForEach(viewModel.libraries) { viewModel in
                         LatestInLibraryView(viewModel: viewModel)
                     }
+
+                    GenresHStackView(genres: viewModel.genres)
                 }
                 .edgePadding(.vertical)
             }

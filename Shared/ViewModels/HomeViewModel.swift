@@ -41,6 +41,8 @@ final class HomeViewModel: ViewModel, Stateful {
     }
 
     @Published
+    private(set) var genres: [ItemGenre] = []
+    @Published
     private(set) var libraries: [LatestInLibraryViewModel] = []
     @Published
     var resumeItems: OrderedSet<BaseItemDto> = []
@@ -162,6 +164,7 @@ final class HomeViewModel: ViewModel, Stateful {
 
         let resumeItems = try await getResumeItems()
         let libraries = try await getLibraries()
+        let genres = await (try? getGenres()) ?? []
 
         for library in libraries {
             await library.send(.refresh)
@@ -170,6 +173,7 @@ final class HomeViewModel: ViewModel, Stateful {
         await MainActor.run {
             self.resumeItems.elements = resumeItems
             self.libraries = libraries
+            self.genres = genres
         }
     }
 
@@ -209,6 +213,14 @@ final class HomeViewModel: ViewModel, Stateful {
     }
 
     // TODO: use the more updated server/user data when implemented
+    private func getGenres() async throws -> [ItemGenre] {
+        var parameters = Paths.GetGenresParameters()
+        parameters.userID = userSession.user.id
+        let request = Paths.getGenres(parameters: parameters)
+        let response = try await userSession.client.send(request)
+        return (response.value.items ?? []).compactMap { $0.name.map { ItemGenre(stringLiteral: $0) } }
+    }
+
     private func getExcludedLibraries() async throws -> [String] {
         let currentUserPath = Paths.getCurrentUser
         let response = try await userSession.client.send(currentUserPath)
