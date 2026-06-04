@@ -17,10 +17,14 @@ extension ItemView {
         var viewModel: MovieItemViewModel
 
         var body: some View {
-            SeparatorVStack(alignment: .leading) {
-                RowDivider()
-                    .padding(.vertical, 10)
-            } content: {
+            VStack(alignment: .leading, spacing: 32) {
+
+                // MARK: Trailers
+
+                ItemView.TrailersHStack(
+                    localTrailers: viewModel.localTrailers,
+                    externalTrailers: viewModel.item.remoteTrailers ?? []
+                )
 
                 // MARK: Genres
 

@@ -17,16 +17,20 @@ extension ItemView {
         var viewModel: SeriesItemViewModel
 
         var body: some View {
-            SeparatorVStack(alignment: .leading) {
-                RowDivider()
-                    .padding(.vertical, 10)
-            } content: {
+            VStack(alignment: .leading, spacing: 32) {
 
                 // MARK: Episodes
 
                 if viewModel.seasons.isNotEmpty {
                     SeriesEpisodeSelector(viewModel: viewModel)
                 }
+
+                // MARK: Trailers
+
+                ItemView.TrailersHStack(
+                    localTrailers: viewModel.localTrailers,
+                    externalTrailers: viewModel.item.remoteTrailers ?? []
+                )
 
                 // MARK: Genres
 

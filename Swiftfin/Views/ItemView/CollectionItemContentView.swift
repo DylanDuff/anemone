@@ -63,10 +63,7 @@ extension ItemView {
         }
 
         var body: some View {
-            SeparatorVStack(alignment: .leading) {
-                RowDivider()
-                    .padding(.vertical, 10)
-            } content: {
+            VStack(alignment: .leading, spacing: 32) {
 
                 // MARK: - Items
 
