@@ -42,6 +42,11 @@ class UINavigationBarDrawerHostingController<Content: View, Drawer: View>: UIHos
         return blurView
     }()
 
+    private var usesLegacyBarBackground: Bool {
+        if #available(iOS 26, *) { return false }
+        return true
+    }
+
     private lazy var drawerButtonsView: UIHostingController<Drawer> = {
         let drawerButtonsView = UIHostingController(rootView: drawer())
         drawerButtonsView.view.translatesAutoresizingMaskIntoConstraints = false
@@ -69,7 +74,9 @@ class UINavigationBarDrawerHostingController<Content: View, Drawer: View>: UIHos
 
         view.backgroundColor = nil
 
-        view.addSubview(blurView)
+        if usesLegacyBarBackground {
+            view.addSubview(blurView)
+        }
 
         addChild(drawerButtonsView)
         view.addSubview(drawerButtonsView.view)
@@ -82,22 +89,26 @@ class UINavigationBarDrawerHostingController<Content: View, Drawer: View>: UIHos
             drawerButtonsView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
 
-        NSLayoutConstraint.activate([
-            blurView.topAnchor.constraint(equalTo: view.topAnchor),
-            blurView.bottomAnchor.constraint(equalTo: drawerButtonsView.view.bottomAnchor),
-            blurView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            blurView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ])
+        if usesLegacyBarBackground {
+            NSLayoutConstraint.activate([
+                blurView.topAnchor.constraint(equalTo: view.topAnchor),
+                blurView.bottomAnchor.constraint(equalTo: drawerButtonsView.view.bottomAnchor),
+                blurView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                blurView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            ])
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        guard usesLegacyBarBackground else { return }
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        guard usesLegacyBarBackground else { return }
         navigationController?.navigationBar.setBackgroundImage(nil, for: .default)
         navigationController?.navigationBar.shadowImage = nil
     }

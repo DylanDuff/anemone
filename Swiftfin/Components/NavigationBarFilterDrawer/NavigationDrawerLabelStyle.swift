@@ -9,6 +9,35 @@
 import Defaults
 import SwiftUI
 
+private struct FilterChipBackground: ViewModifier {
+
+    let isHighlighted: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+                .glassEffect(
+                    isHighlighted ? .regular.tint(.accentColor) : .regular,
+                    in: .capsule
+                )
+        } else {
+            content
+                .background {
+                    ContainerRelativeShape()
+                        .fill(isHighlighted ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(ComplexSecondaryShapeStyle()))
+                        .opacity(0.5)
+                }
+                .overlay {
+                    ContainerRelativeShape()
+                        .stroke(
+                            isHighlighted ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(ComplexSecondaryShapeStyle()),
+                            lineWidth: 2
+                        )
+                }
+        }
+    }
+}
+
 struct NavigationDrawerLabelStyle: LabelStyle {
 
     @Environment(\.isHighlighted)
@@ -47,15 +76,7 @@ struct NavigationDrawerLabelStyle: LabelStyle {
         .foregroundStyle(.primary)
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
-        .background {
-            ContainerRelativeShape()
-                .fill(isHighlighted ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(ComplexSecondaryShapeStyle()))
-                .opacity(0.5)
-        }
-        .overlay {
-            ContainerRelativeShape()
-                .stroke(isHighlighted ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(ComplexSecondaryShapeStyle()), lineWidth: 2)
-        }
+        .modifier(FilterChipBackground(isHighlighted: isHighlighted))
         .clipShape(.capsule)
         .containerShape(.capsule)
     }
