@@ -35,17 +35,12 @@ extension ItemView {
         // MARK: - Title
 
         private var title: String {
-            /// Use the Season/Episode label for the Series ItemView
             if let seriesViewModel = viewModel as? SeriesItemViewModel,
                let seasonEpisodeLabel = seriesViewModel.playButtonItem?.seasonEpisodeLabel
             {
                 seasonEpisodeLabel
-
-                /// Use a Play/Resume label for single Media Source items that are not Series
             } else if let playButtonLabel = viewModel.playButtonItem?.playButtonLabel {
                 playButtonLabel
-
-                /// Fallback to a generic `Play` label
             } else {
                 L10n.play
             }
@@ -59,48 +54,61 @@ extension ItemView {
             else {
                 return nil
             }
-
             return sourceLabel
+        }
+
+        // MARK: - Label
+
+        @ViewBuilder
+        private var buttonLabel: some View {
+            HStack {
+                Image(systemName: "play.fill")
+
+                VStack {
+                    Text(title)
+
+                    if let source {
+                        Marquee(source, speed: 40, delay: 3, fade: 5)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity)
+            .font(.callout)
+            .fontWeight(.semibold)
+        }
+
+        // MARK: - Context Menu
+
+        @ViewBuilder
+        private var menuItems: some View {
+            if viewModel.playButtonItem?.userData?.playbackPositionTicks != 0 {
+                Button(L10n.playFromBeginning, systemImage: "gobackward") {
+                    play(fromBeginning: true)
+                }
+            }
         }
 
         // MARK: - Body
 
         var body: some View {
-            Button {
-                play()
-            } label: {
-                HStack {
-                    Image(systemName: "play.fill")
-
-                    VStack {
-                        Text(title)
-
-                        if let source {
-                            Marquee(source, speed: 40, delay: 3, fade: 5)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                    }
-                }
-                .padding(.horizontal, 20)
-                .font(.callout)
-                .fontWeight(.semibold)
+            if #available(iOS 26, *) {
+                Button { play() } label: { buttonLabel }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.white)
+                    .glassEffect(.regular, in: .capsule)
+                    .enabled(isEnabled)
+                    .contextMenu { menuItems }
+            } else {
+                Button { play() } label: { buttonLabel }
+                    .buttonStyle(.tintedMaterial(tint: accentColor, foregroundColor: accentColor.overlayColor))
+                    .isSelected(true)
+                    .enabled(isEnabled)
+                    .contextMenu { menuItems }
             }
-            .buttonStyle(
-                .tintedMaterial(
-                    tint: accentColor,
-                    foregroundColor: accentColor.overlayColor
-                )
-            )
-            .contextMenu {
-                if viewModel.playButtonItem?.userData?.playbackPositionTicks != 0 {
-                    Button(L10n.playFromBeginning, systemImage: "gobackward") {
-                        play(fromBeginning: true)
-                    }
-                }
-            }
-            .isSelected(true)
-            .enabled(isEnabled)
         }
 
         // MARK: - Play Content

@@ -161,9 +161,9 @@ extension ItemView.CompactPosterScrollView {
         }
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .bottom, spacing: 12) {
+            HStack(alignment: .bottom, spacing: 12) {
 
+                VStack(alignment: .leading, spacing: 8) {
                     PosterImage(
                         item: viewModel.item,
                         type: .portrait,
@@ -173,23 +173,20 @@ extension ItemView.CompactPosterScrollView {
                     .frame(width: 130)
                     .accessibilityIgnoresInvertColors()
 
-                    rightShelfView
-                        .padding(.bottom)
-                }
-
-                HStack(alignment: .center) {
-
                     if viewModel.item.presentPlayButton {
                         ItemView.PlayButton(viewModel: viewModel)
-                            .frame(width: 130)
+                            .frame(height: 45)
                     }
+                }
 
-                    Spacer()
+                VStack(alignment: .leading, spacing: 10) {
+                    rightShelfView
 
                     ItemView.ActionButtonHStack(viewModel: viewModel, equalSpacing: false)
                         .foregroundStyle(.white)
+                        .frame(height: 45)
                 }
-                .frame(height: 45)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }

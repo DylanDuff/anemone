@@ -110,28 +110,24 @@ extension ItemView.iPadOSCinematicScrollView {
 
                     VStack(alignment: .leading, spacing: 20) {
 
-                        ImageView(viewModel.item.imageSource(
-                            .logo,
-                            maxHeight: 130
-                        ))
-                        .placeholder { _ in
-                            EmptyView()
-                        }
-                        .failure {
-                            Text(viewModel.item.displayTitle)
-                                .font(.largeTitle)
-                                .fontWeight(.semibold)
-                                .lineLimit(2)
-                                .multilineTextAlignment(.leading)
-                                .foregroundStyle(.white)
-                        }
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: geometry.size.width * 0.4, maxHeight: 130, alignment: .bottomLeading)
+                        ImageView(viewModel.item.imageSource(.logo, maxHeight: 130))
+                            .placeholder { _ in EmptyView() }
+                            .failure {
+                                Text(viewModel.item.displayTitle)
+                                    .font(.largeTitle)
+                                    .fontWeight(.semibold)
+                                    .lineLimit(2)
+                                    .multilineTextAlignment(.leading)
+                                    .foregroundStyle(.white)
+                            }
+                            .aspectRatio(contentMode: .fit)
+                            .frame(maxWidth: geometry.size.width * 0.4, maxHeight: 130, alignment: .bottomLeading)
 
                         ItemView.OverviewView(item: viewModel.item)
                             .overviewLineLimit(3)
                             .taglineLineLimit(2)
                             .foregroundStyle(.white)
+                            .frame(maxWidth: min(geometry.size.width * 0.45, 560))
 
                         if viewModel.item.type != .person {
                             FlowLayout(
@@ -149,7 +145,9 @@ extension ItemView.iPadOSCinematicScrollView {
                                         Text(premiereYear)
                                     }
 
-                                    if let playButtonitem = viewModel.playButtonItem, let runtime = playButtonitem.runTimeLabel {
+                                    if let playButtonitem = viewModel.playButtonItem,
+                                       let runtime = playButtonitem.runTimeLabel
+                                    {
                                         Text(runtime)
                                     }
                                 }
@@ -178,16 +176,20 @@ extension ItemView.iPadOSCinematicScrollView {
                                 .posterStyle(.portrait, contentMode: .fit)
                                 .frame(width: 200)
                                 .accessibilityIgnoresInvertColors()
-                        } else if viewModel.item.presentPlayButton {
-                            ItemView.PlayButton(viewModel: viewModel)
-                                .frame(height: 50)
-                        }
 
-                        ItemView.ActionButtonHStack(viewModel: viewModel)
-                            .foregroundStyle(.white)
-                            .frame(height: 50)
+                            ItemView.ActionButtonHStack(viewModel: viewModel)
+                                .foregroundStyle(.white)
+                                .frame(height: 50)
+                        } else {
+                            Spacer(minLength: 0)
+
+                            if viewModel.item.presentPlayButton {
+                                ItemView.PlayButton(viewModel: viewModel)
+                                    .frame(height: 50)
+                            }
+                        }
                     }
-                    .frame(width: 250)
+                    .frame(maxWidth: 250, maxHeight: .infinity)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             }
