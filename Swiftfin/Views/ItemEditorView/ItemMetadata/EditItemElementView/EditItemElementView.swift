@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Combine
 import Defaults
 import JellyfinAPI
@@ -205,3 +207,5 @@ struct EditItemElementView<Element: Hashable>: View {
         .environment(\.editMode, isReordering ? .constant(.active) : .constant(.inactive))
     }
 }
+
+#endif

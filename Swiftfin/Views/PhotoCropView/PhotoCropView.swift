@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Defaults
 import Mantis
 import SwiftUI
@@ -202,3 +204,5 @@ private struct _PhotoCropView: UIViewControllerRepresentable {
         coordinator
     }
 }
+
+#endif

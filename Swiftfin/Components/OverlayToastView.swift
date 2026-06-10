@@ -44,6 +44,20 @@ struct OverlayToastView<Content: View>: View {
     }
 
     var body: some View {
+        #if os(tvOS)
+        // Transmission's presentation system is iOS-only; use a plain overlay.
+        content
+            .overlay(alignment: .top) {
+                if toastProxy.isPresenting {
+                    OverlayToastContent()
+                        .environmentObject(toastProxy)
+                        .padding(.top, 60)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: toastProxy.isPresenting)
+            .environmentObject(toastProxy)
+        #else
         content
             .presentation(
                 transition: .toast(
@@ -57,6 +71,7 @@ struct OverlayToastView<Content: View>: View {
                     .environmentObject(toastProxy)
             }
             .environmentObject(toastProxy)
+        #endif
     }
 }
 

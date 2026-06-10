@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Mantis
 import PhotosUI
 import SwiftUI
@@ -83,3 +85,5 @@ struct PhotoPickerModifier: ViewModifier {
         isPresented = false
     }
 }
+
+#endif

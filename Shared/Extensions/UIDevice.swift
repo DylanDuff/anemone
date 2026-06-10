@@ -84,6 +84,8 @@ enum UIImpactFeedbackGenerator {
         case light
         case medium
         case heavy
+        case soft
+        case rigid
     }
 }
 #endif

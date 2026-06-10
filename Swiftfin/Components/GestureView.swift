@@ -25,9 +25,11 @@ struct GestureView: UIViewRepresentable {
 
         view.addGestureRecognizer(context.coordinator.longPressGesture)
         view.addGestureRecognizer(context.coordinator.panGesture)
-        view.addGestureRecognizer(context.coordinator.pinchGesture)
         view.addGestureRecognizer(context.coordinator.tapGesture)
+        #if os(iOS)
+        view.addGestureRecognizer(context.coordinator.pinchGesture)
         view.addGestureRecognizer(context.coordinator.doubleTouchGesture)
+        #endif
 
         view.backgroundColor = .clear
         return view
@@ -37,7 +39,9 @@ struct GestureView: UIViewRepresentable {
 
         context.coordinator.longPressAction = context.environment.longPressAction
         context.coordinator.panAction = context.environment.panAction
+        #if os(iOS)
         context.coordinator.pinchAction = context.environment.pinchAction
+        #endif
         context.coordinator.tapAction = context.environment.tapGestureAction
 
         context.coordinator.panGesture.direction = context.environment.panGestureDirection
@@ -49,6 +53,7 @@ struct GestureView: UIViewRepresentable {
 
     class Coordinator {
 
+        #if os(iOS)
         lazy var doubleTouchGesture: UITapGestureRecognizer! = {
             let recognizer = UITapGestureRecognizer(
                 target: self,
@@ -57,6 +62,7 @@ struct GestureView: UIViewRepresentable {
             recognizer.numberOfTouchesRequired = 2
             return recognizer
         }()
+        #endif
 
         lazy var longPressGesture: UILongPressGestureRecognizer! = {
             let recognizer = UILongPressGestureRecognizer(
@@ -75,12 +81,14 @@ struct GestureView: UIViewRepresentable {
             )
         }()
 
+        #if os(iOS)
         lazy var pinchGesture: UIPinchGestureRecognizer! = {
             .init(
                 target: self,
                 action: #selector(handlePinch)
             )
         }()
+        #endif
 
         lazy var tapGesture: UITapGestureRecognizer! = {
             .init(
@@ -97,13 +105,17 @@ struct GestureView: UIViewRepresentable {
             didSet { panGesture.isEnabled = panAction != nil }
         }
 
+        #if os(iOS)
         var pinchAction: PinchAction? {
             didSet { pinchGesture.isEnabled = pinchAction != nil }
         }
+        #endif
 
         var tapAction: TapAction? {
             didSet {
+                #if os(iOS)
                 doubleTouchGesture.isEnabled = tapAction != nil
+                #endif
                 tapGesture.isEnabled = tapAction != nil
             }
         }
@@ -148,6 +160,7 @@ struct GestureView: UIViewRepresentable {
             )
         }
 
+        #if os(iOS)
         @objc
         func handlePinch(_ gesture: UIPinchGestureRecognizer) {
             pinchAction?(
@@ -156,6 +169,7 @@ struct GestureView: UIViewRepresentable {
                 state: gesture.state
             )
         }
+        #endif
 
         @objc
         func handleTap(_ gesture: UITapGestureRecognizer) {

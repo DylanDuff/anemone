@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Engine
 import JellyfinAPI
 import SwiftUI
@@ -70,3 +72,5 @@ extension AddTaskTriggerView {
         }
     }
 }
+
+#endif

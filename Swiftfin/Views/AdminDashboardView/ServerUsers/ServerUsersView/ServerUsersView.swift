@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import CollectionVGrid
 import Defaults
 import JellyfinAPI
@@ -250,3 +252,5 @@ struct ServerUsersView: View {
         }
     }
 }
+
+#endif

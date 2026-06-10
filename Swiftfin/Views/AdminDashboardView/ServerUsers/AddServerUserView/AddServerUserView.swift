@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import SwiftUI
 
 struct AddServerUserView: View {
@@ -130,3 +132,5 @@ struct AddServerUserView: View {
         }
     }
 }
+
+#endif

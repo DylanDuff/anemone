@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import SwiftUI
 
 struct AdminDashboardView: View {
@@ -58,3 +60,5 @@ struct AdminDashboardView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+#endif

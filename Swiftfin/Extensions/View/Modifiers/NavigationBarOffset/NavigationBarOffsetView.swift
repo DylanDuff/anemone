@@ -50,7 +50,12 @@ class UINavigationBarOffsetHostingController<Content: View>: UIHostingController
     }
 
     private lazy var blurView: UIVisualEffectView = {
-        let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+        #if os(tvOS)
+        let style: UIBlurEffect.Style = .regular
+        #else
+        let style: UIBlurEffect.Style = .systemThinMaterial
+        #endif
+        let blurView = UIVisualEffectView(effect: UIBlurEffect(style: style))
         blurView.translatesAutoresizingMaskIntoConstraints = false
         return blurView
     }()

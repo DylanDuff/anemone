@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Foundation
 import JellyfinAPI
 import SwiftUI
@@ -125,3 +127,5 @@ struct ActiveSessionDetailView: View {
         .navigationTitle(L10n.session)
     }
 }
+
+#endif

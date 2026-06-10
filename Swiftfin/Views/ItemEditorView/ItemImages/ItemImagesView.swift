@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import CollectionHStack
 import Defaults
 import Engine
@@ -249,3 +251,5 @@ struct ItemImagesView: View {
         .buttonStyle(.plain)
     }
 }
+
+#endif

@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import CollectionVGrid
 import JellyfinAPI
 import SwiftUI
@@ -86,3 +88,5 @@ struct ServerActivityFilterView: View {
         }
     }
 }
+
+#endif

@@ -14,7 +14,7 @@ private struct FilterChipBackground: ViewModifier {
     let isHighlighted: Bool
 
     func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
+        if #available(iOS 26, tvOS 26, *) {
             content
                 .glassEffect(
                     isHighlighted ? .regular.tint(.accentColor) : .regular,

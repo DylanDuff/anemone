@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import JellyfinAPI
 import SwiftUI
 
@@ -37,3 +39,5 @@ extension AdminDashboardView {
         }
     }
 }
+
+#endif

@@ -6,10 +6,14 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Defaults
 import Engine
 import JellyfinAPI
+#if os(iOS)
 import Mantis
+#endif
 import SwiftUI
 
 struct ServerUserDetailsView: View {
@@ -147,3 +151,5 @@ struct ServerUserDetailsView: View {
         }
     }
 }
+
+#endif

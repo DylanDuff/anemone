@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import SwiftUI
 
 struct DetectOrientation: ViewModifier {
@@ -20,3 +22,5 @@ struct DetectOrientation: ViewModifier {
             }
     }
 }
+
+#endif

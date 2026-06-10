@@ -95,7 +95,7 @@ extension ItemView {
         // MARK: - Body
 
         var body: some View {
-            if #available(iOS 26, *) {
+            if #available(iOS 26, tvOS 26, *) {
                 Button { play() } label: { buttonLabel }
                     .buttonStyle(.plain)
                     .foregroundStyle(.white)

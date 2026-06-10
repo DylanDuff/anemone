@@ -85,7 +85,9 @@ extension VideoPlayer {
                     .isVisible(!isScrubbing && containerState.isPresentingPlaybackControls)
                     .offset(y: containerState.centerOffset / 2)
             }
+            #if os(iOS)
             .modifier(VideoPlayer.KeyCommandsModifier())
+            #endif
             .animation(.linear(duration: 0.1), value: isScrubbing)
             .animation(.bouncy(duration: 0.4), value: containerState.isPresentingSupplement)
             .animation(.bouncy(duration: 0.25), value: containerState.isPresentingOverlay)

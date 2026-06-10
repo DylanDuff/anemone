@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Foundation
 import LocalAuthentication
 
@@ -20,3 +22,5 @@ extension LAContext {
         }
     }
 }
+
+#endif

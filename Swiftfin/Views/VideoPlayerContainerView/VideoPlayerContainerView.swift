@@ -134,6 +134,7 @@ extension VideoPlayer {
                     // inject box explicitly
                     .environmentObject(containerState.scrubbedSeconds)
                 }
+                #if os(iOS)
                 .environment(
                     \.longPressAction,
                     .init(
@@ -180,6 +181,7 @@ extension VideoPlayer {
                         }
                     )
                 )
+                #endif
             }
         }
 

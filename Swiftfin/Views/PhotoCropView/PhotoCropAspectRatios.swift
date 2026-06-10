@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 enum AspectRatios: Identifiable, Displayable, CaseIterable {
 
     case free
@@ -69,3 +71,5 @@ enum AspectRatios: Identifiable, Displayable, CaseIterable {
         }
     }
 }
+
+#endif

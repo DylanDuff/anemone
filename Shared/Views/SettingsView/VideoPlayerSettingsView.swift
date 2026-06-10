@@ -326,7 +326,9 @@ struct VideoPlayerSettingsView: View {
                 }
             }
 
+            #if os(iOS)
             ColorPicker(L10n.subtitleColor, selection: $subtitleColor, supportsOpacity: false)
+            #endif
         } footer: {
             // TODO: better wording
             Text(L10n.subtitlesDisclaimer)

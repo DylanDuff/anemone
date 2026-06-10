@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import BlurHashKit
 import CollectionVGrid
 import JellyfinAPI
@@ -151,3 +153,5 @@ struct RemoteImageSearchView: View {
         }
     }
 }
+
+#endif

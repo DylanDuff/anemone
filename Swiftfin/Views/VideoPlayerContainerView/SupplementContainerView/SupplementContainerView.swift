@@ -120,6 +120,7 @@ extension VideoPlayer.UIVideoPlayerContainerViewController {
                 )
                 currentSupplements = newSupplements
             }
+            #if os(iOS)
             .environment(
                 \.panAction,
                 .init(
@@ -146,6 +147,7 @@ extension VideoPlayer.UIVideoPlayerContainerViewController {
                     }
                 )
             )
+            #endif
         }
     }
 }

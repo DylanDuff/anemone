@@ -7,12 +7,15 @@
 //
 
 import Defaults
+#if os(iOS)
 import Mantis
+#endif
 import SwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 
 extension View {
 
+    #if os(iOS)
     func detectOrientation(_ orientation: Binding<UIDeviceOrientation>) -> some View {
         modifier(DetectOrientation(orientation: orientation))
     }
@@ -21,6 +24,7 @@ extension View {
     func focusSection() -> some View {
         self
     }
+    #endif
 
     func navigationBarOffset(_ scrollViewOffset: Binding<CGFloat>, start: CGFloat, end: CGFloat) -> some View {
         modifier(NavigationBarOffsetModifier(scrollViewOffset: scrollViewOffset, start: start, end: end))
@@ -78,6 +82,7 @@ extension View {
 
     @ViewBuilder
     func listRowCornerRadius(_ radius: CGFloat) -> some View {
+        #if os(iOS)
         introspect(.listCell, on: .iOS(.v16...)) { cell in
             if #available(iOS 26, *) {
                 cell.cornerConfiguration = .uniformCorners(radius: .fixed(radius))
@@ -85,8 +90,12 @@ extension View {
                 cell.layer.cornerRadius = radius
             }
         }
+        #else
+        self
+        #endif
     }
 
+    #if os(iOS)
     /// Photo Picker with cropping after selection
     func photoPicker(
         isPresented: Binding<Bool>,
@@ -105,4 +114,5 @@ extension View {
             )
         )
     }
+    #endif
 }

@@ -129,9 +129,9 @@ struct SettingsView: View {
         Section {
             #if os(iOS)
             Picker(L10n.appearance, selection: $appearance)
-            #endif
 
             ColorPicker(L10n.accentColor, selection: $accentColor, supportsOpacity: false)
+            #endif
 
             ChevronButton(L10n.advanced) {
                 router.route(to: .customizeSettingsView)

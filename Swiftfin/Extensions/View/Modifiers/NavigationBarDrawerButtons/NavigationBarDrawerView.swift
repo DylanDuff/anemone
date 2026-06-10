@@ -37,7 +37,12 @@ class UINavigationBarDrawerHostingController<Content: View, Drawer: View>: UIHos
     private let drawerHeight: CGFloat = 36
 
     private lazy var blurView: UIVisualEffectView = {
-        let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+        #if os(tvOS)
+        let style: UIBlurEffect.Style = .regular
+        #else
+        let style: UIBlurEffect.Style = .systemThinMaterial
+        #endif
+        let blurView = UIVisualEffectView(effect: UIBlurEffect(style: style))
         blurView.translatesAutoresizingMaskIntoConstraints = false
         return blurView
     }()

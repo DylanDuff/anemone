@@ -73,7 +73,6 @@ extension MediaPeopleSupplement {
 
         @ViewBuilder
         private func personView(for person: BaseItemPerson) -> some View {
-            #if os(iOS)
             PosterButton(
                 item: person,
                 type: .portrait
@@ -81,14 +80,6 @@ extension MediaPeopleSupplement {
             } label: {
                 PosterButton<BaseItemPerson>.TitleSubtitleContentView(item: person)
             }
-            #else
-            PosterButton(
-                item: person,
-                type: .portrait
-            ) {} label: {
-                PosterButton<BaseItemPerson>.TitleSubtitleContentView(item: person)
-            }
-            #endif
         }
 
         @ViewBuilder

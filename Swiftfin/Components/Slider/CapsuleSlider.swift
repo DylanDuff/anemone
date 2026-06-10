@@ -42,6 +42,7 @@ struct CapsuleSlider<Value: BinaryFloatingPoint>: View {
     private let translationBinding: Binding<CGPoint>
     private let valueDamping: Double
 
+    #if os(iOS)
     private var dragGesture: some Gesture {
         DragGesture(coordinateSpace: .global)
             .onChanged { newValue in
@@ -74,6 +75,7 @@ struct CapsuleSlider<Value: BinaryFloatingPoint>: View {
                 value = clamp(newProgress, min: 0, max: total)
             }
     }
+    #endif
 
     var body: some View {
         ProgressView(value: value, total: total)
@@ -82,7 +84,9 @@ struct CapsuleSlider<Value: BinaryFloatingPoint>: View {
                 Color.clear
                     .frame(height: contentSize.height + gesturePadding)
                     .contentShape(Rectangle())
+                #if os(iOS)
                     .highPriorityGesture(dragGesture)
+                #endif
                     .onLongPressGesture(minimumDuration: 0.01, perform: {}) { isPressing in
                         if isPressing {
                             isEditing = true

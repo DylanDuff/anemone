@@ -30,6 +30,7 @@ struct ThumbSlider<V: BinaryFloatingPoint>: View {
     private let total: V
     private var trackMask: () -> any View
 
+    #if os(iOS)
     private var trackDrag: some Gesture {
         DragGesture(coordinateSpace: .global)
             .onChanged { newValue in
@@ -51,6 +52,7 @@ struct ThumbSlider<V: BinaryFloatingPoint>: View {
                 onEditingChanged(false)
             }
     }
+    #endif
 
     var body: some View {
         ProgressView(value: value, total: total)
@@ -59,7 +61,9 @@ struct ThumbSlider<V: BinaryFloatingPoint>: View {
                 Circle()
                     .foregroundStyle(.primary)
                     .frame(height: 20)
+                #if os(iOS)
                     .gesture(trackDrag)
+                #endif
                     .offset(x: Double(value / total) * contentSize.width - 10)
             }
             .trackingSize($contentSize)

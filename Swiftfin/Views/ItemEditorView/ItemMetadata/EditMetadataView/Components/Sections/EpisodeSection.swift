@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Combine
 import Engine
 import JellyfinAPI
@@ -68,3 +70,5 @@ extension EditMetadataView {
         }
     }
 }
+
+#endif

@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import CoreSpotlight
 import Foundation
 
@@ -27,3 +29,5 @@ struct SwiftfinSpotlight {
         }
     }
 }
+
+#endif

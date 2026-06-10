@@ -22,6 +22,11 @@ extension Color {
 
     // TODO: Correct and add colors
     #if os(tvOS)
+    static let systemBackground = Color.black
+    static let secondarySystemBackground = Color(UIColor.darkGray)
+    static let tertiarySystemBackground = Color(UIColor.darkGray)
+    static let secondarySystemGroupedBackground = Color(UIColor.darkGray)
+
     static let systemFill = Color.white
     static let secondarySystemFill = Color.gray
     static let tertiarySystemFill = Color.black
@@ -31,6 +36,7 @@ extension Color {
     static let systemBackground = Color(UIColor.systemBackground)
     static let secondarySystemBackground = Color(UIColor.secondarySystemBackground)
     static let tertiarySystemBackground = Color(UIColor.tertiarySystemBackground)
+    static let secondarySystemGroupedBackground = Color(UIColor.secondarySystemGroupedBackground)
 
     static let systemFill = Color(UIColor.systemFill)
     static let secondarySystemFill = Color(UIColor.secondarySystemFill)

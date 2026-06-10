@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import Defaults
 import Factory
 import JellyfinAPI
@@ -165,3 +167,5 @@ extension DownloadTaskView.ContentView {
         }
     }
 }
+
+#endif

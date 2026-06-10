@@ -229,17 +229,24 @@ struct SearchView: View {
         .onChange(of: searchQuery) { newValue in
             viewModel.search(query: newValue)
         }
+        #if os(tvOS)
         .searchable(
             text: $searchQuery,
-            placement: .navigationBarDrawer(displayMode: .always),
             prompt: L10n.search
         )
-        .backport
-        .searchFocused($isSearchFocused)
-        .onReceive(tabItemSelected) { event in
-            if event.isRepeat, event.isRoot {
-                isSearchFocused = true
+        #else
+        .searchable(
+                text: $searchQuery,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: L10n.search
+            )
+            .backport
+            .searchFocused($isSearchFocused)
+        #endif
+            .onReceive(tabItemSelected) { event in
+                if event.isRepeat, event.isRoot {
+                    isSearchFocused = true
+                }
             }
-        }
     }
 }

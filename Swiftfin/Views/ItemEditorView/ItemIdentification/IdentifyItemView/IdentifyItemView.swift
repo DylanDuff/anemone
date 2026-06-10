@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import JellyfinAPI
 import SwiftUI
 
@@ -109,3 +111,5 @@ struct IdentifyItemView: View {
         .errorMessage($viewModel.error)
     }
 }
+
+#endif

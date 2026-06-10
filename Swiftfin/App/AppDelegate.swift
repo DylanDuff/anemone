@@ -18,6 +18,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         true
     }
 
+    #if os(iOS)
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
 
         guard UIDevice.isPhone else {
@@ -32,4 +33,5 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         return .portrait
     }
+    #endif
 }

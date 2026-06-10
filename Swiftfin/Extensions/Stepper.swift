@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import SwiftUI
 
 extension Stepper {
@@ -20,3 +22,5 @@ extension Stepper {
         self.init(value: value, in: range, step: step, label: label)
     }
 }
+
+#endif

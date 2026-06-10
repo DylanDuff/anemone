@@ -35,7 +35,9 @@ struct SwiftfinApp: App {
             UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance(idiom: .unspecified)
         }
 
+        #if os(iOS)
         SwiftfinSpotlight().addSwiftfinToSpotlight()
+        #endif
     }
 
     var body: some Scene {
@@ -74,6 +76,7 @@ struct SwiftfinApp: App {
     }
 }
 
+#if os(iOS)
 extension UINavigationController {
 
     // Remove back button text
@@ -81,3 +84,4 @@ extension UINavigationController {
         navigationBar.topItem?.backButtonDisplayMode = .minimal
     }
 }
+#endif

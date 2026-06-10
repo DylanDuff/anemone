@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+#if os(iOS)
+
 import SwiftUI
 
 struct DownloadListView: View {
@@ -62,3 +64,5 @@ extension DownloadListView {
         }
     }
 }
+
+#endif

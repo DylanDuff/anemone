@@ -9,13 +9,16 @@
 import Defaults
 import SwiftUI
 
+#if os(iOS)
 /// - Important: On iOS, this is a `BorderlessButtonStyle` instead.
 /// This is only used to allow platform shared views.
+/// On tvOS the system `CardButtonStyle.card` applies.
 extension PrimitiveButtonStyle where Self == BorderlessButtonStyle {
     static var card: BorderlessButtonStyle {
         .init()
     }
 }
+#endif
 
 extension ButtonStyle where Self == ToolbarPillButtonStyle {
 

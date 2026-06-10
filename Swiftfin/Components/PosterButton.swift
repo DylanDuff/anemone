@@ -70,7 +70,7 @@ struct PosterButton<Item: Poster>: View {
                 .padding(20)
                 .background {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(uiColor: UIColor.secondarySystemGroupedBackground))
+                        .fill(Color.secondarySystemGroupedBackground)
                 }
         }
     }
