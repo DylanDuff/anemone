@@ -39,6 +39,15 @@ struct BackgroundParallaxHeaderModifier<Header: View>: ViewModifier {
             .first?.keyWindow?.bounds.width ?? contentSize.width
     }
 
+    // On iPhone, the header card starts below the notch.
+    private var topInset: CGFloat {
+        guard UIDevice.isPhone else { return 0 }
+        let raw = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.keyWindow?.safeAreaInsets.top ?? 0
+        return max(0, raw - 10)
+    }
+
     @ViewBuilder
     private func builtHeader() -> some View {
         header()
@@ -46,8 +55,19 @@ struct BackgroundParallaxHeaderModifier<Header: View>: ViewModifier {
             .scaleEffect(scrollViewOffset < 0 ? (height - scrollViewOffset) / height : 1, anchor: .top)
             .frame(width: windowWidth)
             .mask(alignment: .top) {
-                Color.black
-                    .frame(height: max(0, height - scrollViewOffset))
+                VStack(spacing: 0) {
+                    Color.clear
+                        .frame(height: topInset)
+                    Color.black
+                        .clipShape(.rect(
+                            topLeadingRadius: topInset > 0 ? 16 : 0,
+                            bottomLeadingRadius: 0,
+                            bottomTrailingRadius: 0,
+                            topTrailingRadius: topInset > 0 ? 16 : 0,
+                            style: .continuous
+                        ))
+                        .frame(height: max(0, height - scrollViewOffset - topInset))
+                }
             }
     }
 
@@ -55,7 +75,7 @@ struct BackgroundParallaxHeaderModifier<Header: View>: ViewModifier {
         content
             .trackingSize($contentSize)
             .background(alignment: .topLeading) {
-                if #available(iOS 26, *) {
+                if #available(iOS 26, tvOS 26, *) {
                     builtHeader()
                         .backgroundExtensionEffect()
                         .ignoresSafeArea()

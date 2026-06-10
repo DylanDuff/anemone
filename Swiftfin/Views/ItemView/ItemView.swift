@@ -147,7 +147,7 @@ struct ItemView: View {
                                 } label: {
                                     Image(systemName: isPlayed ? "checkmark.circle.fill" : "checkmark.circle")
                                         .fontWeight(.semibold)
-                                        .foregroundStyle(accentColor)
+                                        .foregroundStyle(isPlayed ? Color(red: 0.18, green: 0.8, blue: 0.44) : .white)
                                 }
                             }
 
@@ -157,7 +157,7 @@ struct ItemView: View {
                             } label: {
                                 Image(systemName: isFavorite ? "heart.fill" : "heart")
                                     .fontWeight(.semibold)
-                                    .foregroundStyle(accentColor)
+                                    .foregroundStyle(isFavorite ? Color(red: 0.98, green: 0.25, blue: 0.37) : .white)
                             }
                         }
                     }

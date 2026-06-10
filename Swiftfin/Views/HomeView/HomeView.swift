@@ -25,11 +25,14 @@ struct HomeView: View {
     @StateObject
     private var viewModel = HomeViewModel()
 
+    @Environment(\.safeAreaInsets)
+    private var safeAreaInsets
+
     @State
     private var scrollViewOffset: CGFloat = 0
 
     private var heroCarouselHeight: CGFloat {
-        UIDevice.isPhone ? 260 : 460
+        UIDevice.isPhone ? 260 + max(0, safeAreaInsets.top - 2) : 460
     }
 
     @ViewBuilder

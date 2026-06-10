@@ -21,17 +21,15 @@ extension ItemView {
         var viewModel: ItemViewModel
 
         var equalSpacing: Bool = true
+        var frameHeight: CGFloat = 50
 
         // MARK: - Body
 
         var body: some View {
-            HStack(alignment: .center, spacing: 10) {
-
-                // MARK: - Select a Version
-
-                if let mediaSources = viewModel.playButtonItem?.mediaSources,
-                   mediaSources.count > 1
-                {
+            if let mediaSources = viewModel.playButtonItem?.mediaSources,
+               mediaSources.count > 1
+            {
+                HStack(alignment: .center, spacing: 10) {
                     VersionMenu(
                         viewModel: viewModel,
                         mediaSources: mediaSources
@@ -42,11 +40,12 @@ extension ItemView {
                         view.aspectRatio(1, contentMode: .fit)
                     }
                 }
+                .frame(height: frameHeight)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .buttonStyle(.material)
+                .labelStyle(.iconOnly)
             }
-            .font(.title3)
-            .fontWeight(.semibold)
-            .buttonStyle(.material)
-            .labelStyle(.iconOnly)
         }
     }
 }

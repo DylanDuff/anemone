@@ -29,10 +29,7 @@ extension ItemView {
             self.viewModel = viewModel
         }
 
-        private func withHeaderImageItem(
-            @ViewBuilder content: @escaping (ImageSource, Color) -> some View
-        ) -> some View {
-
+        private func headerItem() -> (item: BaseItemDto, imageSource: ImageSource) {
             let item: BaseItemDto = if viewModel.item.type == .person || viewModel.item.type == .musicArtist,
                                        let typeViewModel = viewModel as? CollectionItemViewModel,
                                        let randomItem = typeViewModel.randomItem()
@@ -41,25 +38,20 @@ extension ItemView {
             } else {
                 viewModel.item
             }
-
             let imageType: ImageType = item.type == .episode ? .primary : .backdrop
-            let bottomColor = item.blurHash(for: imageType)?.averageLinearColor ?? Color.secondarySystemFill
-            let imageSource = item.imageSource(imageType, maxWidth: 1320)
-
-            return content(imageSource, bottomColor)
-                .id(imageSource.url?.hashValue)
-                .animation(.linear(duration: 0.1), value: imageSource.url?.hashValue)
+            return (item, item.imageSource(imageType, maxWidth: 1320))
         }
 
         @ViewBuilder
         private var headerView: some View {
+            let (_, imageSource) = headerItem()
+
             GeometryReader { proxy in
-                withHeaderImageItem { imageSource, bottomColor in
-                    ImageView(imageSource)
-                        .aspectRatio(1.77, contentMode: .fill)
-                        .frame(width: proxy.size.width, height: proxy.size.height * 0.78, alignment: .top)
-                        .bottomEdgeGradient(bottomColor: bottomColor)
-                }
+                ImageView(imageSource)
+                    .aspectRatio(1.77, contentMode: .fill)
+                    .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+                    .id(imageSource.url?.hashValue)
+                    .animation(.linear(duration: 0.1), value: imageSource.url?.hashValue)
             }
         }
 
@@ -72,12 +64,7 @@ extension ItemView {
                     .edgePadding(.bottom)
                     .frame(maxWidth: .infinity)
                     .background {
-                        BlurView(style: .systemThinMaterialDark)
-                            .maskLinearGradient {
-                                (location: 0.2, opacity: 0)
-                                (location: 0.3, opacity: 0.5)
-                                (location: 0.55, opacity: 1)
-                            }
+                        GradientBlurView()
                     }
             } content: {
                 SeparatorVStack(alignment: .leading) {
@@ -182,9 +169,8 @@ extension ItemView.CompactPosterScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     rightShelfView
 
-                    ItemView.ActionButtonHStack(viewModel: viewModel, equalSpacing: false)
+                    ItemView.ActionButtonHStack(viewModel: viewModel, equalSpacing: false, frameHeight: 45)
                         .foregroundStyle(.white)
-                        .frame(height: 45)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

@@ -39,20 +39,16 @@ extension ItemView {
 
         @ViewBuilder
         private var headerView: some View {
-
-            let bottomColor = viewModel.item.blurHash(for: imageType)?.averageLinearColor ?? Color.secondarySystemFill
-
             GeometryReader { proxy in
                 if proxy.size.height.isZero { EmptyView() }
                 else {
                     ImageView(viewModel.item.imageSource(
                         imageType,
                         maxWidth: usePrimaryImage ? proxy.size.width : 0,
-                        maxHeight: usePrimaryImage ? 0 : proxy.size.height * 0.6
+                        maxHeight: usePrimaryImage ? 0 : proxy.size.height
                     ))
                     .aspectRatio(usePrimaryImage ? (2 / 3) : 1.77, contentMode: .fill)
-                    .frame(width: proxy.size.width, height: proxy.size.height * 0.6)
-                    .bottomEdgeGradient(bottomColor: bottomColor)
+                    .frame(width: proxy.size.width, height: proxy.size.height)
                 }
             }
         }
@@ -66,12 +62,7 @@ extension ItemView {
                     .edgePadding(.bottom)
                     .frame(maxWidth: .infinity)
                     .background {
-                        BlurView(style: .systemThinMaterialDark)
-                            .maskLinearGradient {
-                                (location: 0, opacity: 0)
-                                (location: 0.3, opacity: 1)
-                                (location: 1, opacity: 1)
-                            }
+                        GradientBlurView()
                     }
             } content: {
                 content
@@ -141,7 +132,6 @@ extension ItemView.CinematicScrollView {
 
                         ItemView.ActionButtonHStack(viewModel: viewModel)
                             .foregroundStyle(.white)
-                            .frame(height: 50)
                     }
                     .frame(maxWidth: 300)
                 }

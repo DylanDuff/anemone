@@ -83,7 +83,6 @@ extension ItemView {
                     }
 
                     ItemView.ActionButtonHStack(viewModel: viewModel)
-                        .frame(height: 50)
                 }
                 .frame(maxWidth: 300)
             }

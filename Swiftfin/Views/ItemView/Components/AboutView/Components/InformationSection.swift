@@ -75,7 +75,7 @@ extension ItemView.AboutView {
                         .edgePadding(.horizontal)
 
                     LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible(), alignment: .top), count: 3),
+                        columns: Array(repeating: GridItem(.flexible(), alignment: .top), count: UIDevice.isPhone ? 2 : 3),
                         alignment: .leading,
                         spacing: 24
                     ) {

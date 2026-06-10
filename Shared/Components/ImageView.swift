@@ -26,6 +26,7 @@ struct ImageView<Failure: View>: View {
     private var sources: [ImageSource]
 
     private var image: (Image) -> any View
+    private var onImageLoaded: ((UIImage) -> Void)?
     private var pipeline: ImagePipeline
     private var placeholder: ((ImageSource) -> any View)?
     private var failure: Failure
@@ -51,6 +52,11 @@ struct ImageView<Failure: View>: View {
                     } else {
                         image(_image.resizable())
                             .eraseToAnyView()
+                            .onAppear {
+                                if let onImageLoaded, let uiImage = state.imageContainer?.image {
+                                    onImageLoaded(uiImage)
+                                }
+                            }
                     }
                 } else if state.error != nil {
                     failure
@@ -102,6 +108,10 @@ extension ImageView {
 
     func image(@ViewBuilder _ content: @escaping (Image) -> any View) -> Self {
         copy(modifying: \.image, with: content)
+    }
+
+    func onImageLoaded(_ handler: @escaping (UIImage) -> Void) -> Self {
+        copy(modifying: \.onImageLoaded, with: handler)
     }
 
     func pipeline(_ pipeline: ImagePipeline) -> Self {

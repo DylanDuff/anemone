@@ -13,6 +13,9 @@ extension HomeView {
 
     struct HeroCarouselView: View {
 
+        @Environment(\.safeAreaInsets)
+        private var safeAreaInsets
+
         @Router
         private var router
 
@@ -29,7 +32,7 @@ extension HomeView {
             Array(viewModel.elements.prefix(8))
         }
 
-        private var slideHeight: CGFloat {
+        private var cardHeight: CGFloat {
             UIDevice.isPhone ? 260 : 550
         }
 
@@ -37,21 +40,38 @@ extension HomeView {
             items.firstIndex(where: { $0.id == selectedID }) ?? 0
         }
 
-        var body: some View {
-            if !items.isEmpty {
-                ZStack(alignment: .bottom) {
-                    SupplementTabView(items: items, selection: $selectedID) { item in
-                        HeroSlide(item: item) {
-                            router.route(to: .item(item: item), in: namespace)
-                        }
+        private var card: some View {
+            ZStack(alignment: .bottom) {
+                SupplementTabView(items: items, selection: $selectedID) { item in
+                    HeroSlide(item: item) {
+                        router.route(to: .item(item: item), in: namespace)
                     }
-                    .frame(maxWidth: .infinity)
-
-                    PageDots(total: items.count, current: currentIndex)
-                        .padding(.bottom, 14)
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: slideHeight)
+
+                PageDots(total: items.count, current: currentIndex)
+                    .padding(.bottom, 14)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: cardHeight)
+            .clipShape(.rect(
+                topLeadingRadius: UIDevice.isPhone ? 16 : 0,
+                bottomLeadingRadius: 0,
+                bottomTrailingRadius: 0,
+                topTrailingRadius: UIDevice.isPhone ? 16 : 0,
+                style: .continuous
+            ))
+        }
+
+        var body: some View {
+            if !items.isEmpty {
+                VStack(spacing: 0) {
+                    if UIDevice.isPhone {
+                        Color.clear
+                            .frame(height: max(0, safeAreaInsets.top - 10))
+                    }
+                    card
+                }
                 .onAppear {
                     if selectedID == nil {
                         selectedID = items.first?.id

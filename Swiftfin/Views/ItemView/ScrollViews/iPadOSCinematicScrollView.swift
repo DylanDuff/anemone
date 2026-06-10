@@ -38,10 +38,7 @@ extension ItemView {
             }
         }
 
-        private func withHeaderImageItem(
-            @ViewBuilder content: @escaping (ImageSource, Color) -> some View
-        ) -> some View {
-
+        private func headerItem() -> (item: BaseItemDto, imageSource: ImageSource) {
             let item: BaseItemDto = if viewModel.item.type == .person || viewModel.item.type == .musicArtist,
                                        let typeViewModel = viewModel as? CollectionItemViewModel,
                                        let randomItem = typeViewModel.randomItem()
@@ -50,22 +47,17 @@ extension ItemView {
             } else {
                 viewModel.item
             }
-
-            let bottomColor = item.blurHash(for: imageType)?.averageLinearColor ?? Color.secondarySystemFill
-            let imageSource = item.imageSource(imageType, maxWidth: 1920)
-
-            return content(imageSource, bottomColor)
-                .id(imageSource.url?.hashValue)
-                .animation(.linear(duration: 0.1), value: imageSource.url?.hashValue)
+            return (item, item.imageSource(imageType, maxWidth: 1920))
         }
 
         @ViewBuilder
         private var headerView: some View {
-            withHeaderImageItem { imageSource, bottomColor in
-                ImageView(imageSource)
-                    .aspectRatio(1.77, contentMode: .fill)
-                    .bottomEdgeGradient(bottomColor: bottomColor)
-            }
+            let (_, imageSource) = headerItem()
+
+            ImageView(imageSource)
+                .aspectRatio(1.77, contentMode: .fill)
+                .id(imageSource.url?.hashValue)
+                .animation(.linear(duration: 0.1), value: imageSource.url?.hashValue)
         }
 
         var body: some View {
@@ -78,11 +70,7 @@ extension ItemView {
                     .edgePadding()
                     .frame(maxWidth: .infinity)
                     .background {
-                        BlurView(style: .systemThinMaterialDark)
-                            .maskLinearGradient {
-                                (location: 0.4, opacity: 0)
-                                (location: 0.8, opacity: 1)
-                            }
+                        GradientBlurView()
                     }
             } content: {
                 content

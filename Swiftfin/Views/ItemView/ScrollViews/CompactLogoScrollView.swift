@@ -30,14 +30,10 @@ extension ItemView {
 
         @ViewBuilder
         private var headerView: some View {
-
-            let bottomColor = viewModel.item.blurHash(for: .backdrop)?.averageLinearColor ?? Color.secondarySystemFill
-
             GeometryReader { proxy in
                 ImageView(viewModel.item.imageSource(.backdrop, maxWidth: 1320))
                     .aspectRatio(1.77, contentMode: .fill)
-                    .frame(width: proxy.size.width, height: proxy.size.height * 0.70, alignment: .top)
-                    .bottomEdgeGradient(bottomColor: bottomColor)
+                    .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
             }
         }
 
@@ -50,11 +46,7 @@ extension ItemView {
                     .edgePadding(.bottom)
                     .frame(maxWidth: .infinity)
                     .background {
-                        BlurView(style: .systemThinMaterialDark)
-                            .maskLinearGradient {
-                                (location: 0, opacity: 0)
-                                (location: 0.3, opacity: 1)
-                            }
+                        GradientBlurView()
                     }
             } content: {
                 SeparatorVStack(alignment: .leading) {
@@ -134,7 +126,6 @@ extension ItemView.CompactLogoScrollView {
 
                     ItemView.ActionButtonHStack(viewModel: viewModel)
                         .foregroundStyle(.white)
-                        .frame(height: 50)
                 }
                 .frame(maxWidth: 300)
             }
