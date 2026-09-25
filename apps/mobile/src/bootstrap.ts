@@ -10,13 +10,13 @@ import {
 } from "@anemone/core";
 import { Platform } from "react-native";
 import { createDatabase } from "./platform/database";
-import { MMKVKeyValueStore } from "./platform/keyValueStore";
-import { ExpoSecureStoreAdapter } from "./platform/secureStore";
+import { KeyValueStoreAdapter } from "./platform/keyValueStore";
+import { SecureStoreAdapter } from "./platform/secureStore";
 
 const DEVICE_ID_KEY = "anemone.deviceId";
 
 /** A stable per-install device id, generated once and persisted in the default settings suite. */
-function resolveDeviceID(keyValueStore: MMKVKeyValueStore): string {
+function resolveDeviceID(keyValueStore: KeyValueStoreAdapter): string {
     const existing = keyValueStore.getString(null, DEVICE_ID_KEY);
     if (existing) {
         return existing;
@@ -29,12 +29,15 @@ function resolveDeviceID(keyValueStore: MMKVKeyValueStore): string {
 }
 
 /**
- * Build the Expo platform adapters and configure the core container. Call once at app startup,
- * then render the app inside `<AnemoneProvider container={...}>`.
+ * Build the platform adapters and configure the core container. Call once at app startup, then
+ * render inside `<AnemoneProvider container={...}>`.
+ *
+ * On web there is no SQLite/MMKV/Keychain, so `createDatabase` returns nothing and the container
+ * runs in defaults-only storage mode (all values via the key/value store).
  */
 export async function configureAnemone(): Promise<AnemoneContainer> {
-    const keyValueStore = new MMKVKeyValueStore();
-    const secureStore = new ExpoSecureStoreAdapter();
+    const keyValueStore = new KeyValueStoreAdapter();
+    const secureStore = new SecureStoreAdapter();
     const database = await createDatabase();
 
     const identity: ClientIdentity = {
@@ -48,6 +51,7 @@ export async function configureAnemone(): Promise<AnemoneContainer> {
 
     return configureContainer({
         database,
+        storageMode: database ? "auto" : "defaults",
         secureStore,
         keyValueStore,
         identity,

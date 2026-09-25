@@ -15,7 +15,11 @@ up later. Grouped by area. Update this as items are completed or added.
 
 - [ ] **TV targets** (tvOS, Android TV): needs `react-native-tvos` + `@react-native-tvos/config-tv`.
   Business logic is already TV-agnostic; only the app shell + UI need TV wiring.
-- [ ] Install `@expo/ui` and `expo-router` when UI work begins (deliberately not installed yet).
+- [x] `@expo/ui` installed; UI uses its **universal** components (browser-testable via
+  react-native-web). `expo-router` still not installed — navigation is currently simple
+  session/state-based; add routing when the screen count grows.
+- [ ] **`@expo/ui` on native** needs the config plugin + a dev build; only web is exercised so far.
+- [ ] Web `SecureStore` is a `localStorage` stub (NOT secure) for dev only — never ship it.
 - [ ] Dev client / prebuild: `expo-sqlite`, `expo-secure-store`, `react-native-mmkv` are native
   modules — the app needs a custom dev build (not Expo Go). Wire `expo prebuild` / EAS later.
 - [ ] Implement the real Expo platform adapters in `apps/mobile` (SecureStore/KeyValueStore/DB/Logger)
@@ -62,7 +66,24 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - [ ] **Device profile / playback capabilities**: needed for real playback URLs; deferred with the
   media player.
 
-## Completed (this run)
+## Basic UI (built)
+
+- ✅ Connect-to-server, sign-in, and library-browse screens using `@expo/ui` universal components,
+  driven by the core view models / query hooks. Session-based flow in `AppNavigator`.
+- ✅ Web support: `.web.ts` platform adapters (localStorage KV + secure stub) + core "defaults-only"
+  storage mode (no SQLite) + monorepo `metro.config.js`; `expo export --platform web` builds clean.
+
+### UI follow-ups
+
+- [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).
+- [ ] Item-detail screen; posters/images via `itemImageSource` (Expo UI has no Image — use RN Image
+  or `react-native-web` `<img>` through `RNHostView`).
+- [ ] Search screen (VM/hook exist: `useSearch`).
+- [ ] PIN / biometric access-policy capture on sign-in (currently always `none`).
+- [ ] Proper navigation (expo-router) and back-stack; TV focus handling.
+- [ ] Loading/empty/error states polish; pull-to-refresh.
+
+## Completed (foundation run)
 
 - ✅ Monorepo scaffold: pnpm workspace, Expo SDK 57 app, `@anemone/core` package, 15-day release-age
   policy, vitest + better-sqlite3.

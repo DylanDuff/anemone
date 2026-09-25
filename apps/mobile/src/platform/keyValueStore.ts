@@ -1,6 +1,9 @@
 //
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
+// Native (iOS / Android / TV) KeyValueStore backed by react-native-mmkv.
+// The web build resolves `keyValueStore.web.ts` instead (localStorage).
+//
 
 import type { KeyValueStore } from "@anemone/core";
 import { createMMKV, type MMKV } from "react-native-mmkv";
@@ -11,7 +14,7 @@ const DEFAULT_SUITE = "__default__";
  * `KeyValueStore` backed by react-native-mmkv. Each suite maps to its own MMKV instance (id), so
  * clearing a user/server suite is isolated. This is the `UserDefaults`/`Defaults` equivalent.
  */
-export class MMKVKeyValueStore implements KeyValueStore {
+export class KeyValueStoreAdapter implements KeyValueStore {
     private readonly instances = new Map<string, MMKV>();
 
     private instance(suite: string | null): MMKV {
