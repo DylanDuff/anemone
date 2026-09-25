@@ -4,6 +4,7 @@
 //
 
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
+import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import { ImageType } from "@jellyfin/sdk/lib/generated-client/models/image-type";
 import type { UserDto } from "@jellyfin/sdk/lib/generated-client/models/user-dto";
 import { getImageUrlsApi } from "./api";
@@ -94,4 +95,51 @@ export function seriesImageSource(
 /** A user's profile image URL (Swiftfin `UserState.profileImageSource`). */
 export function userImageURL(api: Api, user: UserDto): string | undefined {
     return getImageUrlsApi(api).getUserImageUrl(user);
+}
+
+/** Build a chapter image URL: `/Items/{id}/Images/Chapter/{index}?tag=…`. */
+function chapterImageURL(api: Api, itemID: string, index: number, tag: string): string {
+    const base = api.basePath.replace(/\/+$/, "");
+    return `${base}/Items/${itemID}/Images/Chapter/${index}?tag=${encodeURIComponent(tag)}`;
+}
+
+/**
+ * The best available still frame for a "continue watching" item — approximating the frame the user
+ * is resuming from.
+ *
+ * Prefers the chapter image at/just-before the resume position (a real frame near the resume point),
+ * then a landscape fallback: an episode's Primary image is itself a 16:9 still, so it is preferred
+ * for episodes; movies fall back to Thumb/Backdrop then Primary.
+ *
+ * For the pixel-exact frame at the resume second, Jellyfin's trickplay tiles would be needed — that
+ * requires sprite cropping and is a follow-up (see docs/BACKLOG.md).
+ */
+export function resumeFrameSource(api: Api, item: BaseItemDto): ImageSource {
+    const position = item.UserData?.PlaybackPositionTicks ?? 0;
+    const chapters = item.Chapters ?? [];
+
+    let chapter: { index: number; tag: string } | undefined;
+    chapters.forEach((info, index) => {
+        if ((info.StartPositionTicks ?? 0) <= position && info.ImageTag) {
+            chapter = { index, tag: info.ImageTag };
+        }
+    });
+
+    if (chapter && item.Id) {
+        return { url: chapterImageURL(api, item.Id, chapter.index, chapter.tag), blurHash: undefined };
+    }
+
+    const fallbackOrder: ImageType[] =
+        item.Type === BaseItemKind.Episode
+            ? [ImageType.Primary, ImageType.Thumb, ImageType.Backdrop]
+            : [ImageType.Thumb, ImageType.Backdrop, ImageType.Primary];
+
+    for (const type of fallbackOrder) {
+        const source = itemImageSource(api, item, type);
+        if (source.url) {
+            return source;
+        }
+    }
+
+    return { url: undefined, blurHash: undefined };
 }

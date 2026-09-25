@@ -7,12 +7,14 @@ import {
     displayTitle,
     useLatestInLibrary,
     useQueryContext,
+    useResumeItems,
     useSessionController,
     useUserViews,
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
 import { HeroCarousel } from "../ui/HeroCarousel";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
@@ -28,6 +30,7 @@ export function HomeScreen() {
     const sessionController = useSessionController();
     const { data: views, isLoading: viewsLoading } = useUserViews();
     const recent = useLatestInLibrary(undefined, 12);
+    const resume = useResumeItems(12);
     const [openLibrary, setOpenLibrary] = useState<BaseItemDto | null>(null);
 
     if (openLibrary) {
@@ -47,6 +50,8 @@ export function HomeScreen() {
                 </View>
 
                 <HeroCarousel api={ctx.api} items={recent.data ?? []} />
+
+                <ContinueWatchingRow api={ctx.api} items={resume.data ?? []} />
 
                 {(views ?? []).map((view) => (
                     <LibraryRow

@@ -115,6 +115,7 @@ export {
     type ImageSource,
     itemImageSource,
     itemImageURLById,
+    resumeFrameSource,
     seriesImageSource,
     userImageURL,
 } from "./jellyfin/images";

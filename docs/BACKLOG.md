@@ -78,6 +78,13 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - ✅ Home experience: dark theme, hero carousel (recently added, auto-advancing) + per-library
   "recently added" poster rows, built with RN primitives (browser-testable via react-native-web,
   since Expo UI universal has no Image). Row titles open the full library.
+- ✅ Continue Watching row: landscape resume cards with a progress bar. The thumbnail uses
+  `resumeFrameSource` — the chapter image at/just-before the resume position (a real frame near
+  where you resume), falling back to a landscape image.
+- [ ] **Exact resume frame via trickplay**: `resumeFrameSource` uses chapter images (frame at the
+  nearest chapter). For the pixel-exact frame at the resume second, use Jellyfin trickplay tiles
+  (`item.Trickplay`, `/Videos/{id}/Trickplay/{width}/{tileIndex}.jpg`) — needs sprite cropping
+  (a clipping View + offset Image), so it was deferred. Request `ItemFields.Trickplay` when doing it.
 - [ ] **Item-detail screen** (tapping a poster/hero is currently a no-op). Then wire `onPressItem`.
 - [ ] "See all" library screen is a plain text list — make it a poster grid.
 - [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).

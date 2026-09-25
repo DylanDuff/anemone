@@ -11,6 +11,7 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { BaseItemDtoQueryResult } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto-query-result";
 import type { LibraryApiGetItemsRequest } from "@jellyfin/sdk/lib/generated-client/api/library-api";
+import { ItemFields } from "@jellyfin/sdk/lib/generated-client/models/item-fields";
 import { MediaType } from "@jellyfin/sdk/lib/generated-client/models/media-type";
 import {
     getGenreApi,
@@ -47,6 +48,8 @@ export function resumeItemsQuery(ctx: QueryContext, limit = 20) {
                 limit,
                 mediaTypes: [MediaType.Video],
                 enableUserData: true,
+                // Chapters carry the still frames used to show where playback resumes from.
+                fields: [ItemFields.Chapters],
             });
             return response.data.Items ?? [];
         },
