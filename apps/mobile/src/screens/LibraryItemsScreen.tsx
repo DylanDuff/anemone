@@ -2,57 +2,18 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
-import {
-    displayTitle,
-    libraryParentRequest,
-    premiereYear,
-    useLibraryItems,
-    useSessionController,
-    useUserViews,
-} from "@anemone/core";
+import { displayTitle, libraryParentRequest, premiereYear, useLibraryItems } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { Button, Column, Text } from "@expo/ui";
-import { useState } from "react";
 import { colors, Screen } from "../ui/Screen";
-
-/** Browse the signed-in server: libraries, then the items inside a chosen library. */
-export function LibraryScreen() {
-    const [library, setLibrary] = useState<BaseItemDto | null>(null);
-
-    if (library) {
-        return <LibraryItemsScreen library={library} onBack={() => setLibrary(null)} />;
-    }
-    return <LibraryListScreen onSelect={setLibrary} />;
-}
-
-function LibraryListScreen({ onSelect }: { onSelect: (view: BaseItemDto) => void }) {
-    const sessionController = useSessionController();
-    const { data: views, isLoading, error } = useUserViews();
-
-    return (
-        <Screen title="Libraries">
-            {isLoading ? <Text textStyle={{ color: colors.muted }}>Loading libraries…</Text> : null}
-            {error ? <Text textStyle={{ color: colors.error }}>{String(error)}</Text> : null}
-            <Column spacing={8}>
-                {(views ?? []).map((view) => (
-                    <Button
-                        key={view.Id ?? view.Name ?? Math.random().toString()}
-                        label={displayTitle(view)}
-                        onPress={() => onSelect(view)}
-                    />
-                ))}
-            </Column>
-            <Button label="Sign out" variant="text" onPress={() => void sessionController.signOut()} />
-        </Screen>
-    );
-}
 
 function itemLabel(item: BaseItemDto): string {
     const year = premiereYear(item);
     return year ? `${displayTitle(item)} (${year})` : displayTitle(item);
 }
 
-function LibraryItemsScreen({
+/** The full contents of a library, as a paged text list. A poster grid is a follow-up. */
+export function LibraryItemsScreen({
     library,
     onBack,
 }: {
@@ -67,7 +28,7 @@ function LibraryItemsScreen({
 
     return (
         <Screen title={title}>
-            <Button label="‹ Libraries" variant="text" onPress={onBack} />
+            <Button label="‹ Home" variant="text" onPress={onBack} />
             {isLoading ? <Text textStyle={{ color: colors.muted }}>Loading…</Text> : null}
             {error ? <Text textStyle={{ color: colors.error }}>{String(error)}</Text> : null}
             {!isLoading && items.length === 0 ? (

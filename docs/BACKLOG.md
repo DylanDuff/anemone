@@ -75,13 +75,18 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 
 ### UI follow-ups
 
+- ✅ Home experience: dark theme, hero carousel (recently added, auto-advancing) + per-library
+  "recently added" poster rows, built with RN primitives (browser-testable via react-native-web,
+  since Expo UI universal has no Image). Row titles open the full library.
+- [ ] **Item-detail screen** (tapping a poster/hero is currently a no-op). Then wire `onPressItem`.
+- [ ] "See all" library screen is a plain text list — make it a poster grid.
 - [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).
-- [ ] Item-detail screen; posters/images via `itemImageSource` (Expo UI has no Image — use RN Image
-  or `react-native-web` `<img>` through `RNHostView`).
 - [ ] Search screen (VM/hook exist: `useSearch`).
 - [ ] PIN / biometric access-policy capture on sign-in (currently always `none`).
 - [ ] Proper navigation (expo-router) and back-stack; TV focus handling.
-- [ ] Loading/empty/error states polish; pull-to-refresh.
+- [ ] Hero should prefer real backdrops; verify image auth on servers that require `api_key`.
+- [ ] A shared theme/typography layer so screens don't hand-set colors (connect/sign-in still use
+  the Expo UI light `Screen`; home uses the dark RN theme — unify later).
 
 ## Completed (foundation run)
 

@@ -6,7 +6,7 @@ import { type ServerState, useCurrentSession } from "@anemone/core";
 import { Host, Text } from "@expo/ui";
 import { useState } from "react";
 import { ConnectServerScreen } from "./screens/ConnectServerScreen";
-import { LibraryScreen } from "./screens/LibraryScreen";
+import { HomeScreen } from "./screens/HomeScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 
 /**
@@ -27,7 +27,7 @@ export function AppNavigator() {
     }
 
     if (session) {
-        return <LibraryScreen />;
+        return <HomeScreen />;
     }
 
     if (!server) {
