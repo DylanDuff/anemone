@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Expo / React Native
+.expo/
+dist/
+web-build/
+*.orig.*
+apps/*/ios/
+apps/*/android/
+apps/*/.expo/
+
+# Native build artifacts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Drizzle
+apps/*/*.db
+packages/core/*.db
+drizzle/meta/_journal.json.bak
+
+# Build output
+packages/*/dist/
+*.tsbuildinfo
+
+# Editor / OS / assistant tooling
+.DS_Store
+.idea/
+.vscode/
+.claude/
+.conductor/
+.codex/
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*

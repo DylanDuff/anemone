@@ -1,0 +1,16 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Only install package versions published at least 15 days ago.
+minimumReleaseAge: 21600 # minutes (15 days)
+
+# One-time, user-approved exception: @jellyfin/sdk@1.0.0 (published 2026-09-11,
+# under the 15-day window) is explicitly allowed.
+minimumReleaseAgeExclude:
+  - "@jellyfin/sdk"
+
+# Native/postinstall build scripts allowed to run (needed for Node-based core tests).
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
