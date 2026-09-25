@@ -4,6 +4,7 @@
 
 import {
     displayTitle,
+    libraryParentRequest,
     premiereYear,
     useLibraryItems,
     useSessionController,
@@ -16,21 +17,15 @@ import { Screen } from "../ui/Screen";
 
 /** Browse the signed-in server: libraries, then the items inside a chosen library. */
 export function LibraryScreen() {
-    const [library, setLibrary] = useState<{ id: string; name: string } | null>(null);
+    const [library, setLibrary] = useState<BaseItemDto | null>(null);
 
     if (library) {
-        return (
-            <LibraryItemsScreen
-                parentID={library.id}
-                title={library.name}
-                onBack={() => setLibrary(null)}
-            />
-        );
+        return <LibraryItemsScreen library={library} onBack={() => setLibrary(null)} />;
     }
-    return <LibraryListScreen onSelect={(id, name) => setLibrary({ id, name })} />;
+    return <LibraryListScreen onSelect={setLibrary} />;
 }
 
-function LibraryListScreen({ onSelect }: { onSelect: (id: string, name: string) => void }) {
+function LibraryListScreen({ onSelect }: { onSelect: (view: BaseItemDto) => void }) {
     const sessionController = useSessionController();
     const { data: views, isLoading, error } = useUserViews();
 
@@ -43,7 +38,7 @@ function LibraryListScreen({ onSelect }: { onSelect: (id: string, name: string) 
                     <Button
                         key={view.Id ?? view.Name ?? Math.random().toString()}
                         label={displayTitle(view)}
-                        onPress={() => onSelect(view.Id ?? "", displayTitle(view))}
+                        onPress={() => onSelect(view)}
                     />
                 ))}
             </Column>
@@ -58,16 +53,15 @@ function itemLabel(item: BaseItemDto): string {
 }
 
 function LibraryItemsScreen({
-    parentID,
-    title,
+    library,
     onBack,
 }: {
-    parentID: string;
-    title: string;
+    library: BaseItemDto;
     onBack: () => void;
 }) {
+    const title = displayTitle(library);
     const { data, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
-        useLibraryItems({ parentId: parentID });
+        useLibraryItems(libraryParentRequest(library));
 
     const items: BaseItemDto[] = (data?.pages ?? []).flatMap((page) => page.Items ?? []);
 

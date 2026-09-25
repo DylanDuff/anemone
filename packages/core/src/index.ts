@@ -122,6 +122,7 @@ export { setItemPlayed } from "./jellyfin/playstate";
 
 // Query layer (data-fetching view models)
 export { type QueryContext, queryContextFromSession } from "./query/queryContext";
+export { libraryParentRequest } from "./query/libraryParent";
 export { jellyfinKeys } from "./query/queryKeys";
 export {
     DEFAULT_PAGE_SIZE,
