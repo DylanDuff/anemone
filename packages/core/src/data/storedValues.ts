@@ -72,22 +72,33 @@ function resolvedDefaultsName<Value>(key: StoredValueKey<Value>): string {
  * ```
  */
 export class StoredValues {
+    /**
+     * @param anyData The blob store for `sql`-backed keys. May be `undefined` when `forceDefaults`
+     *                is set (e.g. web/tvOS, which have no SQLite) — then all keys use the KV store.
+     * @param forceDefaults When true, every key is treated as `defaults` storage. Mirrors Swiftfin
+     *                      forcing `.defaults` on tvOS.
+     */
     constructor(
-        private readonly anyData: AnyDataStore,
+        private readonly anyData: AnyDataStore | undefined,
         private readonly keyValueStore: KeyValueStore,
+        private readonly forceDefaults = false,
     ) {}
+
+    private usesDefaults<Value>(key: StoredValueKey<Value>): boolean {
+        return this.forceDefaults || key.storage === "defaults";
+    }
 
     async get<Value>(key: StoredValueKey<Value>): Promise<Value> {
         if (key.name.length === 0 || key.ownerID.length === 0) {
             return key.defaultValue();
         }
 
-        if (key.storage === "defaults") {
+        if (this.usesDefaults(key)) {
             const value = readJSON<Value>(this.keyValueStore, key.ownerID, resolvedDefaultsName(key));
             return value ?? key.defaultValue();
         }
 
-        const value = await this.anyData.fetch<Value>(key.ownerID, key.field, key.name);
+        const value = await this.requireAnyData().fetch<Value>(key.ownerID, key.field, key.name);
         return value ?? key.defaultValue();
     }
 
@@ -96,11 +107,21 @@ export class StoredValues {
             return;
         }
 
-        if (key.storage === "defaults") {
+        if (this.usesDefaults(key)) {
             writeJSON(this.keyValueStore, key.ownerID, resolvedDefaultsName(key), value);
             return;
         }
 
-        await this.anyData.store(value, key.ownerID, key.field, key.name);
+        await this.requireAnyData().store(value, key.ownerID, key.field, key.name);
+    }
+
+    private requireAnyData(): AnyDataStore {
+        if (!this.anyData) {
+            throw new Error(
+                "A `sql`-backed StoredValues key was used, but no database is configured. " +
+                    "Provide a database or use storageMode: 'defaults'.",
+            );
+        }
+        return this.anyData;
     }
 }

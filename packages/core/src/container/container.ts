@@ -18,11 +18,22 @@ import type { AnemoneDatabase, KeyValueStore, SecureStore } from "./adapters";
 
 /** Everything the app must supply at startup for core to run. */
 export interface ContainerConfig {
-    database: AnemoneDatabase;
+    /**
+     * The SQLite database for `sql`-backed values. Optional: omit it (or set
+     * `storageMode: 'defaults'`) on platforms without SQLite (web, tvOS), where all values are
+     * routed to the key/value store instead.
+     */
+    database?: AnemoneDatabase;
     secureStore: SecureStore;
     keyValueStore: KeyValueStore;
     identity: ClientIdentity;
     logger?: Logger;
+    /**
+     * How persisted values are stored. `'auto'` (default) uses each key's own destination and
+     * requires a `database` for `sql` keys. `'defaults'` forces everything through the key/value
+     * store (no SQLite) — the web/tvOS mode. Omitting `database` implies `'defaults'`.
+     */
+    storageMode?: "auto" | "defaults";
 }
 
 /**
@@ -33,12 +44,12 @@ export interface ContainerConfig {
  * Create one explicitly for tests, or use the module-global one the app configures at startup.
  */
 export class AnemoneContainer {
-    readonly database: AnemoneDatabase;
+    readonly database: AnemoneDatabase | undefined;
     readonly secureStore: SecureStore;
     readonly keyValueStore: KeyValueStore;
     readonly logger: Logger;
 
-    readonly anyData: AnyDataStore;
+    readonly anyData: AnyDataStore | undefined;
     readonly storedValues: StoredValues;
     readonly defaults: Defaults;
     readonly userSecrets: UserSecrets;
@@ -53,8 +64,9 @@ export class AnemoneContainer {
         this.keyValueStore = config.keyValueStore;
         this.logger = config.logger ?? noopLogger;
 
-        this.anyData = new AnyDataStore(config.database);
-        this.storedValues = new StoredValues(this.anyData, config.keyValueStore);
+        const useDefaultsOnly = config.storageMode === "defaults" || !config.database;
+        this.anyData = config.database ? new AnyDataStore(config.database) : undefined;
+        this.storedValues = new StoredValues(this.anyData, config.keyValueStore, useDefaultsOnly);
         this.defaults = new Defaults(config.keyValueStore);
         this.userSecrets = new UserSecrets(config.secureStore);
         this.clientFactory = new JellyfinClientFactory(config.identity);

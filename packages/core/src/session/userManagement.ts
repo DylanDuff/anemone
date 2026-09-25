@@ -23,8 +23,8 @@ export async function deleteUser(container: AnemoneContainer, user: UserState): 
         users.filter((candidate) => candidate.id !== user.id),
     );
 
-    // Per-user SQL data + settings suite.
-    await container.anyData.deleteAllForOwner(user.id);
+    // Per-user SQL data (when using a database) + settings suite (also holds defaults-mode data).
+    await container.anyData?.deleteAllForOwner(user.id);
     container.keyValueStore.clearSuite(user.id);
 
     // Detach from the server.
@@ -56,7 +56,7 @@ export async function deleteServer(container: AnemoneContainer, server: ServerSt
     }
 
     // Server-owned data + public info.
-    await container.anyData.deleteAllForOwner(server.id);
+    await container.anyData?.deleteAllForOwner(server.id);
     container.keyValueStore.clearSuite(server.id);
 
     const servers = await container.storedValues.get(ServerKeys.servers());
