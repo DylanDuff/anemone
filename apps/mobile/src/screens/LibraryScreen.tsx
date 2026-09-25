@@ -13,7 +13,7 @@ import {
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { Button, Column, Text } from "@expo/ui";
 import { useState } from "react";
-import { Screen } from "../ui/Screen";
+import { colors, Screen } from "../ui/Screen";
 
 /** Browse the signed-in server: libraries, then the items inside a chosen library. */
 export function LibraryScreen() {
@@ -31,8 +31,8 @@ function LibraryListScreen({ onSelect }: { onSelect: (view: BaseItemDto) => void
 
     return (
         <Screen title="Libraries">
-            {isLoading ? <Text textStyle={{ color: "#555" }}>Loading libraries…</Text> : null}
-            {error ? <Text textStyle={{ color: "#c0392b" }}>{String(error)}</Text> : null}
+            {isLoading ? <Text textStyle={{ color: colors.muted }}>Loading libraries…</Text> : null}
+            {error ? <Text textStyle={{ color: colors.error }}>{String(error)}</Text> : null}
             <Column spacing={8}>
                 {(views ?? []).map((view) => (
                     <Button
@@ -68,14 +68,16 @@ function LibraryItemsScreen({
     return (
         <Screen title={title}>
             <Button label="‹ Libraries" variant="text" onPress={onBack} />
-            {isLoading ? <Text textStyle={{ color: "#555" }}>Loading…</Text> : null}
-            {error ? <Text textStyle={{ color: "#c0392b" }}>{String(error)}</Text> : null}
+            {isLoading ? <Text textStyle={{ color: colors.muted }}>Loading…</Text> : null}
+            {error ? <Text textStyle={{ color: colors.error }}>{String(error)}</Text> : null}
             {!isLoading && items.length === 0 ? (
-                <Text textStyle={{ color: "#555" }}>No items in this library.</Text>
+                <Text textStyle={{ color: colors.muted }}>No items in this library.</Text>
             ) : null}
             <Column spacing={6}>
                 {items.map((item) => (
-                    <Text key={item.Id ?? Math.random().toString()}>{itemLabel(item)}</Text>
+                    <Text key={item.Id ?? Math.random().toString()} textStyle={{ color: colors.text }}>
+                        {itemLabel(item)}
+                    </Text>
                 ))}
             </Column>
             {hasNextPage ? (
