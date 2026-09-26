@@ -70,16 +70,13 @@ const styles = StyleSheet.create({
   panel: {
     marginTop: space(2),
     padding: space(2),
-    borderRadius: theme.radius,
+    borderRadius: theme.radii.lg,
     backgroundColor: theme.colors.surface,
     gap: space(1.25),
   },
   label: {
+    ...theme.type.eyebrow,
     color: theme.colors.muted,
-    fontSize: 12,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
   },
   chips: {
     flexDirection: "row",

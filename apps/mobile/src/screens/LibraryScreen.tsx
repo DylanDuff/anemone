@@ -231,13 +231,12 @@ const styles = StyleSheet.create({
     gap: space(1.5),
   },
   title: {
+    ...theme.type.title,
     color: theme.colors.text,
-    fontSize: 32,
-    fontWeight: "600",
   },
   count: {
+    ...theme.type.callout,
     color: theme.colors.muted,
-    fontSize: 14,
   },
   gridRow: {
     gap: GRID_GAP,
@@ -254,7 +253,7 @@ const styles = StyleSheet.create({
     gap: space(1),
   },
   messageText: {
+    ...theme.type.callout,
     color: theme.colors.muted,
-    fontSize: 14,
   },
 });

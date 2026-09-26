@@ -9,6 +9,7 @@ import { type PlaybackSource, ticksToSeconds, useContainer } from "@anemone/core
 import Hls from "hls.js";
 import { type CSSProperties, forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { type EngineHandle, type EngineProps, subtitleTrackID } from "./engine";
+import { theme } from "../ui/theme";
 
 /** Show the selected sideloaded subtitle, hide the rest. */
 function applySubtitle(video: HTMLVideoElement, source: PlaybackSource): void {
@@ -153,6 +154,6 @@ const styles = {
     width: "100%",
     height: "100%",
     objectFit: "contain",
-    backgroundColor: "#000000",
+    backgroundColor: theme.colors.black,
   },
 } satisfies Record<string, CSSProperties>;

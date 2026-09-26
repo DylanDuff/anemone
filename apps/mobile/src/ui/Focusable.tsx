@@ -119,7 +119,7 @@ export function FocusRing({ visible, radius }: { visible: boolean; radius: numbe
       <View style={[styles.ring, { borderRadius: radius }]} />
     ) : (
       <GradientScrim
-        color="#ffffff"
+        color={theme.colors.white}
         from="top"
         endOpacity={SHEEN_OPACITY}
         style={[styles.sheen, { borderTopLeftRadius: radius, borderTopRightRadius: radius }]}
@@ -168,8 +168,8 @@ export const hoverTransition: ViewStyle | undefined =
 
 /** The glow's shadow layers: [offsetY, blur, colour]. No spread — spread is what reads as rough. */
 const GLOW_LAYERS: ReadonlyArray<[offsetY: number, blur: number, color: string]> = [
-  [10, 30, "rgba(255, 255, 255, 0.12)"],
-  [16, 28, "rgba(0, 0, 0, 0.55)"],
+  [10, 30, theme.colors.glowLight],
+  [16, 28, theme.colors.glowShadow],
 ];
 
 /** How far the glow reaches past the element's bottom edge — its furthest-reaching direction. */

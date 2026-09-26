@@ -76,7 +76,7 @@ export function Poster({
                 )}
               </View>
             ) : null}
-            <FocusRing visible={focused} radius={theme.poster.radius} />
+            <FocusRing visible={focused} radius={theme.radii.md} />
           </View>
           {showCaption ? (
             <Text numberOfLines={1} style={styles.caption}>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   image: {
-    borderRadius: theme.poster.radius,
+    borderRadius: theme.radii.md,
     overflow: "hidden",
     backgroundColor: theme.colors.placeholder,
     alignItems: "center",
@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   placeholderText: {
+    ...theme.type.footnote,
     color: theme.colors.muted,
-    fontSize: 12,
     textAlign: "center",
   },
   badge: {
@@ -117,19 +117,19 @@ const styles = StyleSheet.create({
     minWidth: 22,
     height: 22,
     paddingHorizontal: 6,
-    borderRadius: 11,
+    borderRadius: theme.radii.pill,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.accent,
   },
   badgeText: {
+    ...theme.type.footnote,
     color: theme.colors.white,
-    fontSize: 12,
-    fontWeight: "700",
+    fontWeight: theme.weight.bold,
   },
   caption: {
+    ...theme.type.caption,
     color: theme.colors.text,
-    fontSize: 13,
     marginTop: space(0.75),
   },
 });

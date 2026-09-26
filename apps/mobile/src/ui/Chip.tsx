@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     gap: space(0.75),
     paddingHorizontal: space(1.75),
     paddingVertical: space(0.875),
-    borderRadius: 999,
+    borderRadius: theme.radii.pill,
     backgroundColor: theme.colors.chip,
   },
   selected: {
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   label: {
-    fontSize: 13,
-    fontWeight: "500",
+    ...theme.type.caption,
+    fontWeight: theme.weight.medium,
   },
 });

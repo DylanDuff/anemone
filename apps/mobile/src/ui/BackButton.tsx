@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: space(1.75),
     paddingVertical: space(0.875),
-    borderRadius: 999,
+    borderRadius: theme.radii.pill,
     backgroundColor: theme.colors.overlaySoft,
   },
   focused: {
@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   label: {
+    ...theme.type.callout,
     color: theme.colors.text,
-    fontSize: 14,
-    fontWeight: "500",
+    fontWeight: theme.weight.medium,
   },
 });

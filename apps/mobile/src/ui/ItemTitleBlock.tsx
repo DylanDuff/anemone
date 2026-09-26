@@ -23,8 +23,6 @@ import { space, theme } from "./theme";
 import { useIsCompact } from "./contentLayout";
 import { imagePixelWidth } from "./imageSize";
 
-const FACT_RADIUS = 6;
-
 /** Title-art box; logos are `contain`-fitted, so wide and tall logos both stay inside it. */
 const LOGO_WIDTH = 300;
 const LOGO_HEIGHT = 100;
@@ -165,7 +163,7 @@ function ItemDetails({ item, align }: { item: BaseItemDto; align: "left" | "righ
         <View style={[styles.facts, right ? styles.factsRight : null]}>
           {facts.map((fact) => (
             <View key={fact} style={[styles.fact, glass ? glassFillHost : null]}>
-              {glass ? <GlassFill radius={FACT_RADIUS} /> : null}
+              {glass ? <GlassFill radius={theme.radii.sm} /> : null}
               <Text style={styles.factText}>{fact}</Text>
             </View>
           ))}
@@ -216,9 +214,8 @@ const styles = StyleSheet.create({
     gap: space(0.5),
   },
   series: {
+    ...theme.type.label,
     color: theme.colors.muted,
-    fontSize: 16,
-    fontWeight: "500",
   },
   seriesFocused: {
     color: theme.colors.text,
@@ -231,9 +228,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   title: {
+    ...theme.type.display,
     color: theme.colors.text,
-    fontSize: 40,
-    fontWeight: "700",
   },
   facts: {
     flexDirection: "row",
@@ -243,17 +239,17 @@ const styles = StyleSheet.create({
   fact: {
     paddingHorizontal: space(1),
     paddingVertical: space(0.375),
-    borderRadius: FACT_RADIUS,
+    borderRadius: theme.radii.sm,
     backgroundColor: theme.colors.chip,
     overflow: "hidden",
   },
   factText: {
+    ...theme.type.caption,
     color: theme.colors.text,
-    fontSize: 13,
-    fontWeight: "500",
+    fontWeight: theme.weight.medium,
   },
   genres: {
+    ...theme.type.callout,
     color: theme.colors.muted,
-    fontSize: 14,
   },
 });

@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
     gap: space(1.5),
   },
   time: {
+    ...theme.type.caption,
     color: theme.colors.text,
-    fontSize: 13,
     fontVariant: ["tabular-nums"],
     minWidth: 52,
     textAlign: "center",
@@ -89,16 +89,16 @@ const styles = StyleSheet.create({
   },
   track: {
     height: 4,
-    borderRadius: 2,
-    backgroundColor: "rgba(255,255,255,0.3)",
+    borderRadius: theme.radii.hairline,
+    backgroundColor: theme.colors.track,
   },
   trackFocused: {
     height: 6,
-    borderRadius: 3,
+    borderRadius: theme.radii.xs,
   },
   fill: {
     height: "100%",
-    borderRadius: 3,
+    borderRadius: theme.radii.xs,
     backgroundColor: theme.colors.white,
   },
   thumb: {

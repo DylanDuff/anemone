@@ -102,25 +102,24 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   initials: {
+    ...theme.type.title,
     color: theme.colors.muted,
-    fontSize: 28,
-    fontWeight: "600",
   },
   name: {
+    ...theme.type.caption,
     color: theme.colors.text,
-    fontSize: 13,
     marginTop: space(1),
     textAlign: "center",
   },
   nameFocused: {
-    fontWeight: "600",
+    fontWeight: theme.weight.semibold,
   },
   roleFocused: {
     color: theme.colors.text,
   },
   role: {
+    ...theme.type.footnote,
     color: theme.colors.muted,
-    fontSize: 12,
     marginTop: space(0.25),
     textAlign: "center",
   },

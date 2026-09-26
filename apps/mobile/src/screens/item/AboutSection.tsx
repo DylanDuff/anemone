@@ -112,7 +112,7 @@ function AboutCard({ label, children }: { label: string; children: ReactNode }) 
       {({ focused }) => (
         <>
           {children}
-          <FocusRing visible={focused} radius={theme.radius} />
+          <FocusRing visible={focused} radius={theme.radii.lg} />
         </>
       )}
     </Focusable>
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     flexBasis: 360,
     maxWidth: 560,
     padding: space(2.5),
-    borderRadius: theme.radius,
+    borderRadius: theme.radii.lg,
     backgroundColor: theme.colors.surface,
     gap: space(1.5),
   },
@@ -153,23 +153,23 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.placeholder,
   },
   cardTitle: {
+    ...theme.type.body,
     color: theme.colors.text,
-    fontSize: 15,
-    fontWeight: "600",
+    fontWeight: theme.weight.semibold,
   },
   row: {
     flexDirection: "row",
     gap: space(2),
   },
   label: {
+    ...theme.type.caption,
     width: 110,
     color: theme.colors.muted,
-    fontSize: 13,
   },
   value: {
+    ...theme.type.caption,
     flex: 1,
     color: theme.colors.text,
-    fontSize: 13,
     lineHeight: 19,
   },
 });

@@ -17,6 +17,7 @@ import Video, {
   type VideoRef,
 } from "react-native-video";
 import { type EngineHandle, type EngineProps, subtitleTrackID } from "./engine";
+import { theme } from "../ui/theme";
 
 /**
  * The stream plus every sideloaded subtitle file. Rebuilt only for a new stream: changing it
@@ -84,7 +85,7 @@ export const VideoEngine = forwardRef<EngineHandle, EngineProps>(function VideoE
       focusable={false}
       preventsDisplaySleepDuringVideoPlayback
       ignoreSilentSwitch="ignore"
-      shutterColor="#000000"
+      shutterColor={theme.colors.black}
       progressUpdateInterval={500}
       onLoad={(event) => onLoad(event.duration)}
       onProgress={(event) => onProgress(event.currentTime)}

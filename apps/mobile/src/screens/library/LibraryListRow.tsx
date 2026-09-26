@@ -71,12 +71,13 @@ const styles = StyleSheet.create({
     gap: space(0.5),
   },
   title: {
+    ...theme.type.label,
     color: theme.colors.text,
-    fontSize: 16,
+    fontWeight: theme.weight.regular,
   },
   meta: {
+    ...theme.type.caption,
     color: theme.colors.muted,
-    fontSize: 13,
   },
   marks: {
     flexDirection: "row",

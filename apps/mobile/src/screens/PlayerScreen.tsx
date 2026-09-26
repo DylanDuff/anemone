@@ -54,7 +54,7 @@ export function PlayerScreen({ route }: NativeStackScreenProps<RootStackParamLis
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000000",
+    backgroundColor: theme.colors.black,
   },
   loading: {
     flex: 1,

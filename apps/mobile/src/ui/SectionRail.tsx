@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     pointerEvents: "box-none",
   },
   pillShadow: {
-    shadowColor: "#000",
+    shadowColor: theme.colors.black,
     shadowOpacity: 0.45,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 8 },
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   pill: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(255,255,255,0.14)",
+    borderColor: theme.colors.border,
   },
   pillVertical: {
     paddingVertical: RAIL_PADDING,
@@ -338,14 +338,14 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     marginVertical: space(0.75),
     marginHorizontal: space(1),
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: theme.colors.separator,
   },
   separatorDown: {
     width: StyleSheet.hairlineWidth,
     alignSelf: "stretch",
     marginVertical: space(1),
     marginHorizontal: space(0.25),
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: theme.colors.separator,
   },
   item: {
     alignItems: "center",
@@ -375,11 +375,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.chipActive,
   },
   sideLabel: {
+    ...theme.type.body,
     flex: 1,
     paddingRight: space(2),
     color: theme.colors.muted,
-    fontSize: 15,
-    fontWeight: "500",
+    fontWeight: theme.weight.medium,
   },
   sideLabelReversed: {
     paddingRight: 0,
@@ -387,9 +387,8 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   underLabel: {
+    ...theme.type.micro,
     color: theme.colors.muted,
-    fontSize: 11,
-    fontWeight: "500",
   },
   labelActive: {
     color: theme.colors.text,

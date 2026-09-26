@@ -48,21 +48,19 @@ const styles = StyleSheet.create({
     gap: space(1),
   },
   tagline: {
+    ...theme.type.headline,
     color: theme.colors.text,
-    fontSize: 17,
-    fontWeight: "600",
   },
   overview: {
+    ...theme.type.body,
     color: theme.colors.text,
     opacity: 0.85,
-    fontSize: 15,
-    lineHeight: 23,
   },
   toggle: {
+    ...theme.type.caption,
     color: theme.colors.muted,
-    fontSize: 13,
-    fontWeight: "600",
     marginTop: space(0.5),
+    fontWeight: theme.weight.semibold,
   },
   toggleFocused: {
     color: theme.colors.text,

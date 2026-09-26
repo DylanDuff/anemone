@@ -232,7 +232,7 @@ export function Player({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000000",
+    backgroundColor: theme.colors.black,
   },
   center: {
     ...StyleSheet.absoluteFill,
@@ -243,12 +243,12 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     marginHorizontal: space(3),
     padding: space(2),
-    borderRadius: theme.radius,
+    borderRadius: theme.radii.lg,
     backgroundColor: theme.colors.overlayStrong,
   },
   errorText: {
+    ...theme.type.body,
     color: theme.colors.text,
-    fontSize: 15,
     textAlign: "center",
   },
 });

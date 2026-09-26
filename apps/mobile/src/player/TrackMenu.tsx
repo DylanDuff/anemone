@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
     bottom: space(2),
     width: 340,
     maxWidth: "85%",
-    borderRadius: theme.radius,
-    backgroundColor: "rgba(23,23,29,0.94)",
+    borderRadius: theme.radii.lg,
+    backgroundColor: theme.colors.panel,
     overflow: "hidden",
   },
   content: {
@@ -135,11 +135,8 @@ const styles = StyleSheet.create({
     gap: space(0.5),
   },
   heading: {
+    ...theme.type.eyebrow,
     color: theme.colors.muted,
-    fontSize: 13,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
     marginBottom: space(0.5),
   },
   option: {
@@ -149,7 +146,7 @@ const styles = StyleSheet.create({
     gap: space(1),
     paddingHorizontal: space(1.5),
     paddingVertical: space(1.25),
-    borderRadius: 10,
+    borderRadius: theme.radii.md,
   },
   optionFocused: {
     backgroundColor: theme.colors.chipActive,
@@ -158,9 +155,9 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   optionLabel: {
+    ...theme.type.body,
     flex: 1,
     color: theme.colors.text,
-    fontSize: 15,
   },
   optionLabelFocused: {
     color: theme.colors.chipActiveText,

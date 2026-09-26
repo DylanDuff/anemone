@@ -8,12 +8,11 @@ import {
   useLatestInLibrary,
   useQueryContext,
   useResumeItems,
-  useSessionController,
   useUserViews,
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useOpenItem } from "../navigation/routes";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
 import { HeroCarousel } from "../ui/HeroCarousel";
@@ -27,7 +26,6 @@ import { space, theme } from "../ui/theme";
  */
 export function HomeScreen() {
   const ctx = useQueryContext();
-  const sessionController = useSessionController();
   const { data: views, isLoading: viewsLoading } = useUserViews();
   const recent = useLatestInLibrary(undefined, 12);
   const resume = useResumeItems(12);
@@ -44,16 +42,9 @@ export function HomeScreen() {
         contentContainerStyle={{ paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom }}
         showsVerticalScrollIndicator={showsPageScrollIndicator}
       >
-        {/*<View style={styles.topBar}>
-          <Text style={styles.brand}>Anemone</Text>
-          <Pressable onPress={() => void sessionController.signOut()}>
-            <Text style={styles.signOut}>Sign out</Text>
-          </Pressable>
-        </View>*/}
-
         <HeroCarousel api={ctx.api} items={recent.data ?? []} onPressItem={openItem} />
 
-        <View style={styles.itemRows}>
+        <View>
           <ContinueWatchingRow api={ctx.api} items={resume.data ?? []} onPressItem={openItem} />
 
           {(views ?? []).map((view) => (
@@ -101,24 +92,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: space(2),
-    paddingTop: space(2),
-    paddingBottom: space(1.5),
-  },
-  brand: {
-    color: theme.colors.text,
-    fontSize: 22,
-    fontWeight: "800",
-  },
-  itemRows: {},
-  signOut: {
-    color: theme.colors.muted,
-    fontSize: 14,
   },
   loader: {
     marginTop: space(3),

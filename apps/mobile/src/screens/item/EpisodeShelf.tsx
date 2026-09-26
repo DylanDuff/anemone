@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     marginLeft: space(2),
   },
   empty: {
+    ...theme.type.callout,
     color: theme.colors.muted,
-    fontSize: 14,
   },
 });

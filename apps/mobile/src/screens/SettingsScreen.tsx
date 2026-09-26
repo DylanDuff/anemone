@@ -141,23 +141,19 @@ const styles = StyleSheet.create({
     maxWidth: 900,
   },
   title: {
+    ...theme.type.title,
     color: theme.colors.text,
-    fontSize: 32,
-    fontWeight: "600",
   },
   group: {
     gap: space(1.5),
   },
   groupTitle: {
+    ...theme.type.eyebrow,
     color: theme.colors.muted,
-    fontSize: 12,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
   },
   groupNote: {
+    ...theme.type.caption,
     color: theme.colors.muted,
-    fontSize: 13,
     marginBottom: space(0.5),
   },
 });

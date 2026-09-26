@@ -65,7 +65,7 @@ export function LandscapeCard({
               <Image source={{ uri: imageURL }} style={{ width, height }} resizeMode="cover" />
             ) : null}
             {progress ? <ProgressBar fraction={progress} style={styles.progress} /> : null}
-            <FocusRing visible={focused} radius={theme.poster.radius} />
+            <FocusRing visible={focused} radius={theme.radii.md} />
           </View>
           <Text numberOfLines={1} style={styles.title}>
             {title}
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   thumb: {
-    borderRadius: theme.poster.radius,
+    borderRadius: theme.radii.md,
     overflow: "hidden",
     backgroundColor: theme.colors.placeholder,
   },
@@ -102,19 +102,18 @@ const styles = StyleSheet.create({
     bottom: 4,
   },
   title: {
+    ...theme.type.callout,
     color: theme.colors.text,
-    fontSize: 14,
     marginTop: space(0.75),
   },
   subtitle: {
+    ...theme.type.footnote,
     color: theme.colors.muted,
-    fontSize: 12,
     marginTop: space(0.25),
   },
   description: {
+    ...theme.type.footnote,
     color: theme.colors.muted,
-    fontSize: 12,
-    lineHeight: 17,
     marginTop: space(0.5),
   },
 });

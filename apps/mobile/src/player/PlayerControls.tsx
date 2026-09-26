@@ -57,8 +57,8 @@ export function PlayerControls({
       pointerEvents={visible ? "box-none" : "none"}
       style={[StyleSheet.absoluteFill, hoverTransition, { opacity: visible ? 1 : 0 }]}
     >
-      <GradientScrim color="#000000" from="top" endOpacity={0.7} style={styles.topScrim} />
-      <GradientScrim color="#000000" endOpacity={0.85} style={styles.bottomScrim} />
+      <GradientScrim color={theme.colors.black} from="top" endOpacity={0.7} style={styles.topScrim} />
+      <GradientScrim color={theme.colors.black} endOpacity={0.85} style={styles.bottomScrim} />
 
       <View style={[styles.top, padding, { paddingTop: Math.max(insets.top, space(2)) }]}>
         <BackButton />
@@ -182,13 +182,12 @@ const styles = StyleSheet.create({
     gap: space(0.25),
   },
   title: {
+    ...theme.type.headline,
     color: theme.colors.text,
-    fontSize: 18,
-    fontWeight: "600",
   },
   subtitle: {
+    ...theme.type.callout,
     color: theme.colors.muted,
-    fontSize: 14,
   },
   bottom: {
     position: "absolute",

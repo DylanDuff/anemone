@@ -225,9 +225,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.chip,
   },
   playLabel: {
+    ...theme.type.label,
     color: theme.colors.chipActiveText,
-    fontSize: 16,
-    fontWeight: "700",
+    fontWeight: theme.weight.bold,
   },
   playLabelResting: {
     color: theme.colors.text,
@@ -241,8 +241,8 @@ const styles = StyleSheet.create({
     width: 120,
   },
   remaining: {
+    ...theme.type.footnote,
     color: theme.colors.muted,
-    fontSize: 12,
   },
   pressed: {
     opacity: 0.6,

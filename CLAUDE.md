@@ -79,6 +79,9 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   the app's platform defaults and hooks live in `apps/mobile/src/settings.ts`. Components read them
   with those hooks — never a module-level flag.
 - Phone vs wide layouts: `useIsCompact()` (`src/ui/contentLayout.tsx`, <700pt and not TV).
+- Theme (`src/ui/theme.ts`) drives every colour, font size/weight and corner radius: compose
+  `theme.type.*` (+ `theme.weight.*` overrides), `theme.colors.*`, `theme.radii.*`, `space()`. No
+  literals in components — add a token instead.
 - Icons: Ionicons via `Icon` (`src/ui/Icon.tsx`) only — never import `@expo/vector-icons`
   directly. `iconVariant(base, filled)` picks filled (active/current) vs `-outline`.
 - Every interactive element is a `Focusable` (`src/ui/Focusable.tsx`) so D-pad/keyboard focus is

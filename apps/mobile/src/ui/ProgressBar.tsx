@@ -18,7 +18,7 @@ export function ProgressBar({ fraction, style }: { fraction: number; style?: Vie
 const styles = StyleSheet.create({
   track: {
     height: 4,
-    borderRadius: 30,
+    borderRadius: theme.radii.pill,
     overflow: "hidden",
     backgroundColor: theme.colors.overlayStrong,
   },

@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     top: space(3),
   },
   statusText: {
+    ...theme.type.callout,
     color: theme.colors.muted,
-    fontSize: 14,
   },
 });

@@ -71,7 +71,7 @@ export function RootStack() {
           component={PlayerScreen}
           options={{
             animation: "fade",
-            contentStyle: { backgroundColor: "#000000" },
+            contentStyle: { backgroundColor: theme.colors.black },
             statusBarHidden: true,
             navigationBarHidden: true,
             autoHideHomeIndicator: true,

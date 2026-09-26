@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     gap: space(3),
     paddingVertical: space(2),
     paddingHorizontal: space(2.5),
-    borderRadius: theme.radius,
+    borderRadius: theme.radii.lg,
     backgroundColor: theme.colors.surface,
   },
   nested: {
@@ -84,20 +84,18 @@ const styles = StyleSheet.create({
     gap: space(0.5),
   },
   label: {
+    ...theme.type.label,
     color: theme.colors.text,
-    fontSize: 16,
-    fontWeight: "500",
   },
   labelFocused: {
     color: theme.colors.chipActiveText,
   },
   description: {
+    ...theme.type.caption,
     color: theme.colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
   },
   descriptionFocused: {
-    color: "rgba(11, 11, 15, 0.7)",
+    color: theme.colors.chipActiveMuted,
   },
   track: {
     width: TRACK_WIDTH,

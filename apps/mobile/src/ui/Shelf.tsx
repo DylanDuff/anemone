@@ -96,9 +96,8 @@ const styles = StyleSheet.create({
     ...ABOVE_ROW,
   },
   header: {
+    ...theme.type.heading,
     color: theme.colors.text,
-    fontSize: 19,
-    fontWeight: "400",
   },
   seeAllRow: {
     flexDirection: "row",
@@ -106,8 +105,8 @@ const styles = StyleSheet.create({
     gap: space(0.25),
   },
   seeAll: {
+    ...theme.type.caption,
     color: theme.colors.muted,
-    fontSize: 13,
   },
   seeAllFocused: {
     color: theme.colors.text,

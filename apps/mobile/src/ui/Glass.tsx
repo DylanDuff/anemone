@@ -7,6 +7,7 @@ import { GlassView, isGlassEffectAPIAvailable, isLiquidGlassAvailable } from "ex
 import { createContext, type ReactNode, type RefObject, useContext, useRef } from "react";
 import { Platform, type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
 import { useGlassBlurSetting } from "../settings";
+import { theme } from "./theme";
 
 /**
  * iOS 26+ Liquid Glass. Both checks are needed: the API can be missing on some iOS 26 betas even
@@ -127,7 +128,7 @@ const GLASS_FILL_REDUCTION = 1.6;
 const styles = StyleSheet.create({
   fillEdge: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(255,255,255,0.22)",
+    borderColor: theme.colors.borderStrong,
   },
   // Safari composites `backdrop-filter` layers out of paint order at times, drawing the blur over
   // the host's icon. Pin it beneath the host's content (the host is a stacking context, below).
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   tint: {
-    backgroundColor: "rgba(23, 23, 29, 0.88)",
+    backgroundColor: theme.colors.glassTint,
   },
 });
 
