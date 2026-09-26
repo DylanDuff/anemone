@@ -13,6 +13,7 @@ import {
   useFocusIndicator,
 } from "./Focusable";
 import { ProgressBar } from "./ProgressBar";
+import { useCardWidths } from "./contentLayout";
 import { space, theme } from "./theme";
 
 /**
@@ -26,7 +27,7 @@ export function LandscapeCard({
   subtitle,
   description,
   progress,
-  width = theme.landscapeCard.width,
+  width: widthOverride,
   onPress,
 }: {
   item: BaseItemDto;
@@ -36,9 +37,12 @@ export function LandscapeCard({
   description?: string;
   /** Played fraction 0…1; the bar is hidden when absent or zero. */
   progress?: number;
+  /** Defaults to the screen's card width (`useCardWidths`); size `imageURL` to match. */
   width?: number;
   onPress?: (item: BaseItemDto) => void;
 }) {
+  const cardWidths = useCardWidths();
+  const width = widthOverride ?? cardWidths.landscapeCard;
   const height = Math.round((width * 9) / 16);
   const indicator = useFocusIndicator();
 

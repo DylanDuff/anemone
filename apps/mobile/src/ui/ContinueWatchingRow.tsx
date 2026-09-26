@@ -14,7 +14,7 @@ import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-ite
 import { LandscapeCard } from "./LandscapeCard";
 import { Shelf } from "./Shelf";
 import { imagePixelWidth } from "./imageSize";
-import { theme } from "./theme";
+import { useCardWidths } from "./contentLayout";
 
 function titleFor(item: BaseItemDto): string {
   if (item.Type === BaseItemKind.Episode && item.SeriesName) {
@@ -40,6 +40,7 @@ export function ContinueWatchingRow({
   items: readonly BaseItemDto[];
   onPressItem?: (item: BaseItemDto) => void;
 }) {
+  const cardWidth = useCardWidths().landscapeCard;
   if (items.length === 0) {
     return null;
   }
@@ -50,10 +51,8 @@ export function ContinueWatchingRow({
         <LandscapeCard
           key={item.Id ?? index}
           item={item}
-          imageURL={
-            resumeFrameSource(api, item, { maxWidth: imagePixelWidth(theme.landscapeCard.width) })
-              .url
-          }
+          width={cardWidth}
+          imageURL={resumeFrameSource(api, item, { maxWidth: imagePixelWidth(cardWidth) }).url}
           title={titleFor(item)}
           subtitle={subtitleFor(item)}
           progress={playedFraction(item)}

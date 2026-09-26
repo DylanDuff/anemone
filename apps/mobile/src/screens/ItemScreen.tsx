@@ -13,6 +13,7 @@ import { BackButton } from "../ui/BackButton";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
 import { isTV } from "../ui/tv";
+import { useContentLayout } from "../ui/contentLayout";
 import { AboutSection } from "./item/AboutSection";
 import { CastRow } from "./item/CastRow";
 import { CollectionItems } from "./item/CollectionItems";
@@ -31,6 +32,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
   const navigation = useAppNavigation();
   const openItem = useOpenItem();
   const { data: item, isLoading, error } = useItem(itemID);
+  const { insetLeft } = useContentLayout();
 
   useEffect(() => {
     if (item) {
@@ -41,7 +43,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
   if (!item?.Id) {
     return (
       <View style={styles.status}>
-        <View style={styles.statusBack}>
+        <View style={[styles.statusBack, { left: insetLeft }]}>
           <BackButton />
         </View>
         {isLoading ? <ActivityIndicator color={theme.colors.accent} /> : null}
@@ -133,7 +135,6 @@ const styles = StyleSheet.create({
   statusBack: {
     position: "absolute",
     top: space(3),
-    left: theme.gutter,
   },
   statusText: {
     color: theme.colors.muted,

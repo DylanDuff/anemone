@@ -7,6 +7,7 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import { PersonKind } from "@jellyfin/sdk/lib/generated-client/models/person-kind";
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useContentLayout } from "../../ui/contentLayout";
 import { Focusable, focusGlow, FocusRing, useFocusIndicator } from "../../ui/Focusable";
 import { SectionHeader } from "../../ui/Shelf";
 import { space, theme } from "../../ui/theme";
@@ -46,6 +47,7 @@ function trackList(tracks: readonly string[]): string | undefined {
  * `MediaSourcesCard`). Rows without a value are omitted.
  */
 export function AboutSection({ item }: { item: BaseItemDto }) {
+  const { insetLeft, insetRight } = useContentLayout();
   const details: Array<[label: string, value: string | undefined]> = [
     ["Directed by", peopleOfKind(item, PersonKind.Director)],
     ["Written by", peopleOfKind(item, PersonKind.Writer)],
@@ -63,7 +65,7 @@ export function AboutSection({ item }: { item: BaseItemDto }) {
   return (
     <View style={styles.section}>
       <SectionHeader title="About" />
-      <View style={styles.cards}>
+      <View style={[styles.cards, { paddingLeft: insetLeft, paddingRight: insetRight }]}>
         {presentDetails.length > 0 ? (
           <AboutCard label="Details">
             {presentDetails.map(([label, value]) => (
@@ -137,7 +139,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: space(2),
-    paddingHorizontal: theme.gutter,
   },
   card: {
     flexGrow: 1,

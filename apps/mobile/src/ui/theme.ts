@@ -22,17 +22,29 @@ export const theme = {
     chipActiveText: "#0b0b0f",
     favorite: "#ff5c7a",
   },
-  /** Horizontal inset of rows and screen content from the window edge. */
+  /**
+   * Horizontal inset of rows and screen content from the window edge (`compactGutter` on phones).
+   * Read it through `useContentLayout()`, not directly.
+   */
   gutter: 50,
+  compactGutter: 20,
   poster: {
     // TV is ~960pt wide at 10 feet; smaller posters show more of each row.
     width: isTV ? 160 : 200,
+    /** Phones (and narrow web): read sizes through `useCardWidths()`, not these directly. */
+    compactWidth: 120,
     radius: 10,
     aspectRatio: 2 / 3, // width / height
   },
-  /** Default width of 16:9 cards (Continue Watching); scaled down on TV like posters. */
+  /**
+   * 16:9 card widths: Continue Watching (scaled down on TV like posters), episodes and extras.
+   * Phones use `compactWidth` for all of them. Read through `useCardWidths()`.
+   */
   landscapeCard: {
     width: isTV ? 280 : 360,
+    episodeWidth: 320,
+    extraWidth: 280,
+    compactWidth: 260,
   },
   radius: 14,
 } as const;

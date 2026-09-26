@@ -131,6 +131,8 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   labels" (top/bottom only) puts names under the icons. Phones always get a compact icon-only
   bottom pill — the old `SectionTabBar` is gone. D-pad: the direction toward the page (or Back)
   returns focus to it. Untested on TV/tablet so far.
+- ✅ Compact screens (phones, narrow web) use smaller posters (120), 16:9 cards (260 for Continue
+  Watching, episodes and extras) via `useCardWidths()`, and a 20pt gutter (`gutterFor`).
 - ✅ **Settings section** (`/settings`, gear at the bottom of the rail/tab bar): "Hero glow" and
   "Glass blur" toggles, persisted per device (`AppSettingsKeys` in core, defaults in
   `apps/mobile/src/settings.ts`). Glass blur defaults off on TV. Sub-setting "Glass buttons"

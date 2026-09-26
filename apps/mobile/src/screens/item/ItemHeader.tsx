@@ -6,10 +6,11 @@ import type { Api } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { BackButton } from "../../ui/BackButton";
+import { useContentLayout } from "../../ui/contentLayout";
 import { GlassScope } from "../../ui/Glass";
 import { heroGeometry, SlideArtwork } from "../../ui/HeroSlide";
 import { ItemTitleBlock } from "../../ui/ItemTitleBlock";
-import { space, theme } from "../../ui/theme";
+import { space } from "../../ui/theme";
 import { isTV } from "../../ui/tv";
 
 /** How far the title block is pulled up over the backdrop's dissolving bottom. */
@@ -33,6 +34,7 @@ export function ItemHeader({
   onOpenSeries: (item: BaseItemDto) => void;
 }) {
   const { width } = useWindowDimensions();
+  const { insetLeft, insetRight } = useContentLayout();
   const geometry = heroGeometry(width);
 
   // One scope: the artwork is the backdrop the title block's glass buttons blur (Glass buttons).
@@ -41,12 +43,18 @@ export function ItemHeader({
       <View>
         <View style={{ height: geometry.slideHeight }}>
           <SlideArtwork api={api} item={item} width={width} geometry={geometry} />
-          <View style={styles.back}>
+          <View style={[styles.back, { left: insetLeft }]}>
             <BackButton />
           </View>
         </View>
 
-        <View style={[styles.body, { marginTop: -(geometry.spill + TITLE_OVERLAP) }]}>
+        <View
+          style={{
+            paddingLeft: insetLeft,
+            paddingRight: insetRight,
+            marginTop: -(geometry.spill + TITLE_OVERLAP),
+          }}
+        >
           <ItemTitleBlock api={api} item={item} onOpenSeries={onOpenSeries} preferFocus={isTV} />
         </View>
       </View>
@@ -58,9 +66,5 @@ const styles = StyleSheet.create({
   back: {
     position: "absolute",
     top: space(3),
-    left: theme.gutter,
-  },
-  body: {
-    paddingHorizontal: theme.gutter,
   },
 });

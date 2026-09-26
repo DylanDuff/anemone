@@ -13,11 +13,10 @@ import {
   useSpecialFeatures,
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
+import { useCardWidths } from "../../ui/contentLayout";
 import { LandscapeCard } from "../../ui/LandscapeCard";
 import { Shelf } from "../../ui/Shelf";
 import { imagePixelWidth } from "../../ui/imageSize";
-
-const CARD_WIDTH = 280;
 
 /** Additional parts, trailers and special features — each its own shelf, hidden when empty. */
 export function ExtrasSection({
@@ -53,6 +52,7 @@ function ExtrasShelf({
   items: readonly BaseItemDto[];
   onPressItem: (item: BaseItemDto) => void;
 }) {
+  const cardWidth = useCardWidths().extraCard;
   if (items.length === 0) {
     return null;
   }
@@ -63,10 +63,10 @@ function ExtrasShelf({
         <LandscapeCard
           key={extra.Id ?? index}
           item={extra}
-          width={CARD_WIDTH}
+          width={cardWidth}
           imageURL={
             itemImageSource(api, extra, ImageType.Primary, {
-              maxWidth: imagePixelWidth(CARD_WIDTH),
+              maxWidth: imagePixelWidth(cardWidth),
             }).url
           }
           title={displayTitle(extra)}

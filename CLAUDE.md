@@ -65,6 +65,10 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   full-size pages on the edge chosen in Settings (left/right/top/bottom; phones: always a compact
   bottom pill). Content starts inside `insetLeft`/`insetRight` and adds `insetTop`/`insetBottom` to
   its own padding, then scrolls under the pill; hero artwork bleeds beneath it.
+- Side margins come from the layout insets (`gutterFor(compact)`: 50pt, 20pt on phones) — never
+  `theme.gutter` in a stylesheet.
+- Poster / 16:9 card sizes (incl. episodes and extras) come from `useCardWidths()` (smaller when compact), never
+  `theme.poster.width` / `theme.landscapeCard.width` directly.
 - Frosted surfaces use `GlassSurface` (`src/ui/Glass.tsx`): Liquid Glass on iOS 26+, else
   `expo-blur`. Android blur only samples content inside a `GlassBackdrop`: wrap the content the
   glass floats over (a sibling rendered before it, never the glass itself), and wrap *both* in a

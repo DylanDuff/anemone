@@ -14,12 +14,11 @@ import {
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { ReactNode } from "react";
 import { ActivityIndicator, StyleSheet, Text } from "react-native";
+import { useCardWidths } from "../../ui/contentLayout";
 import { LandscapeCard } from "../../ui/LandscapeCard";
 import { Shelf } from "../../ui/Shelf";
 import { space, theme } from "../../ui/theme";
 import { imagePixelWidth } from "../../ui/imageSize";
-
-const CARD_WIDTH = 320;
 
 /**
  * A horizontal row of episode cards (Swiftfin `EpisodeHStack`) with loading/empty states. `header`
@@ -40,20 +39,23 @@ export function EpisodeShelf({
   header?: ReactNode;
   onPressEpisode: (episode: BaseItemDto) => void;
 }) {
+  const cardWidth = useCardWidths().episodeCard;
+  // Loading / empty states hold the row's height so the page doesn't jump.
+  const statusHeight = (cardWidth * 9) / 16;
   return (
     <Shelf title={title} accessory={header}>
       {isLoading ? (
-        <ActivityIndicator color={theme.colors.accent} style={styles.status} />
+        <ActivityIndicator color={theme.colors.accent} style={[styles.status, { height: statusHeight }]} />
       ) : episodes.length === 0 ? (
-        <Text style={[styles.status, styles.empty]}>No episodes.</Text>
+        <Text style={[styles.status, styles.empty, { height: statusHeight }]}>No episodes.</Text>
       ) : (
         episodes.map((episode, index) => (
           <LandscapeCard
             key={episode.Id ?? index}
             item={episode}
-            width={CARD_WIDTH}
+            width={cardWidth}
             imageURL={
-              itemImageSource(api, episode, ImageType.Primary, { maxWidth: imagePixelWidth(CARD_WIDTH) }).url
+              itemImageSource(api, episode, ImageType.Primary, { maxWidth: imagePixelWidth(cardWidth) }).url
             }
             title={[episodeLocator(episode), displayTitle(episode)].filter(Boolean).join(" · ")}
             subtitle={runtimeLabel(episode)}
@@ -69,7 +71,6 @@ export function EpisodeShelf({
 
 const styles = StyleSheet.create({
   status: {
-    height: (CARD_WIDTH * 9) / 16,
     marginLeft: space(2),
   },
   empty: {

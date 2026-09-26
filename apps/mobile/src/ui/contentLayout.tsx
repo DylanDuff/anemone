@@ -16,6 +16,40 @@ export function useIsCompact(): boolean {
   return !isTV && width < COMPACT_MAX_WIDTH;
 }
 
+/** The page's side margin: tighter on phones / narrow web. */
+export function gutterFor(compact: boolean): number {
+  return compact ? theme.compactGutter : theme.gutter;
+}
+
+export interface CardWidths {
+  readonly poster: number;
+  /** Continue Watching. */
+  readonly landscapeCard: number;
+  readonly episodeCard: number;
+  /** Trailers, special features, additional parts. */
+  readonly extraCard: number;
+}
+
+/** Poster and 16:9 card widths for this screen — smaller on phones / narrow web. */
+export function useCardWidths(): CardWidths {
+  const compact = useIsCompact();
+  const { poster, landscapeCard } = theme;
+  if (compact) {
+    return {
+      poster: poster.compactWidth,
+      landscapeCard: landscapeCard.compactWidth,
+      episodeCard: landscapeCard.compactWidth,
+      extraCard: landscapeCard.compactWidth,
+    };
+  }
+  return {
+    poster: poster.width,
+    landscapeCard: landscapeCard.width,
+    episodeCard: landscapeCard.episodeWidth,
+    extraCard: landscapeCard.extraWidth,
+  };
+}
+
 export interface ContentLayout {
   /** Width of the page. Full-bleed elements (hero artwork) span all of it. */
   readonly width: number;
@@ -43,11 +77,12 @@ export const ContentLayoutProvider = ContentLayoutContext.Provider;
  */
 export function useContentLayout(): ContentLayout {
   const { width } = useWindowDimensions();
+  const gutter = gutterFor(useIsCompact());
   const override = useContext(ContentLayoutContext);
   return {
     width: override?.width ?? width,
-    insetLeft: override?.insetLeft ?? theme.gutter,
-    insetRight: override?.insetRight ?? theme.gutter,
+    insetLeft: override?.insetLeft ?? gutter,
+    insetRight: override?.insetRight ?? gutter,
     insetTop: override?.insetTop ?? 0,
     insetBottom: override?.insetBottom ?? 0,
   };

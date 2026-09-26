@@ -5,6 +5,7 @@
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useContentLayout } from "../../ui/contentLayout";
 import { Focusable } from "../../ui/Focusable";
 import { space, theme } from "../../ui/theme";
 
@@ -13,13 +14,14 @@ const COLLAPSED_LINES = 4;
 /** Tagline + synopsis, collapsed to a few lines with a More/Less toggle (Swiftfin `OverviewView`). */
 export function ItemOverview({ item }: { item: BaseItemDto }) {
   const [expanded, setExpanded] = useState(false);
+  const { insetLeft, insetRight } = useContentLayout();
   const tagline = item.Taglines?.[0];
   if (!tagline && !item.Overview) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingLeft: insetLeft, paddingRight: insetRight }]}>
       {tagline ? <Text style={styles.tagline}>{tagline}</Text> : null}
       {item.Overview ? (
         <Focusable onPress={() => setExpanded((value) => !value)}>
@@ -41,7 +43,6 @@ export function ItemOverview({ item }: { item: BaseItemDto }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: theme.gutter,
     marginTop: space(3),
     maxWidth: 900,
     gap: space(1),

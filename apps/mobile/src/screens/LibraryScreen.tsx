@@ -25,7 +25,7 @@ import {
   View,
 } from "react-native";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
-import { useContentLayout } from "../ui/contentLayout";
+import { useCardWidths, useContentLayout } from "../ui/contentLayout";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
@@ -35,9 +35,12 @@ import { LibraryToolbar } from "./library/LibraryToolbar";
 
 const GRID_GAP = 25;
 
-/** How many posters fit across the inset content area, and the width that fills a row exactly. */
-function gridLayout(available: number): { columns: number; posterWidth: number } {
-  const columns = Math.max(2, Math.floor((available + GRID_GAP) / (theme.poster.width + GRID_GAP)));
+/**
+ * How many posters of about `targetWidth` fit across the inset content area, and the width that
+ * fills a row exactly.
+ */
+function gridLayout(available: number, targetWidth: number): { columns: number; posterWidth: number } {
+  const columns = Math.max(2, Math.floor((available + GRID_GAP) / (targetWidth + GRID_GAP)));
   const posterWidth = Math.floor((available - GRID_GAP * (columns - 1)) / columns);
   return { columns, posterWidth };
 }
@@ -112,7 +115,7 @@ function LibraryContent({
   const items = libraryPageItems(data?.pages);
   const total = data?.pages[0]?.TotalRecordCount;
   const isGrid = displayType === "grid";
-  const { columns, posterWidth } = gridLayout(width - insetLeft - insetRight);
+  const { columns, posterWidth } = gridLayout(width - insetLeft - insetRight, useCardWidths().poster);
 
   const header = (
     <View style={styles.header}>

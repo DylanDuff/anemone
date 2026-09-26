@@ -8,7 +8,7 @@ import { Animated, ScrollView, StyleSheet, Text, useWindowDimensions, View } fro
 import { type EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Section } from "../navigation/routes";
 import type { SectionEntry } from "../navigation/sections";
-import type { ContentLayout } from "./contentLayout";
+import { type ContentLayout, gutterFor } from "./contentLayout";
 import { Focusable, FocusWithin } from "./Focusable";
 import { GlassSurface } from "./Glass";
 import { Icon, iconVariant } from "./Icon";
@@ -98,7 +98,8 @@ function edgeOffset({ placement, compact }: PillForm, safeArea: EdgeInsets): num
 export function usePillContentInsets(form: PillForm): Omit<ContentLayout, "width"> {
   const safeArea = useSafeAreaInsets();
   const extent = edgeOffset(form, safeArea) + pillThickness(form) * REST_SCALE;
-  const insets = { insetLeft: theme.gutter, insetRight: theme.gutter, insetTop: 0, insetBottom: 0 };
+  const gutter = gutterFor(form.compact);
+  const insets = { insetLeft: gutter, insetRight: gutter, insetTop: 0, insetBottom: 0 };
   switch (form.placement) {
     case "left":
       return { ...insets, insetLeft: extent + SIDE_CONTENT_GAP };

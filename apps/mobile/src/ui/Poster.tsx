@@ -14,6 +14,7 @@ import {
   useFocusIndicator,
 } from "./Focusable";
 import { Icon } from "./Icon";
+import { useCardWidths } from "./contentLayout";
 import { space, theme } from "./theme";
 import { imagePixelWidth } from "./imageSize";
 
@@ -30,16 +31,19 @@ function watchedBadge(item: BaseItemDto): string | "played" | undefined {
 export function Poster({
   api,
   item,
-  width = theme.poster.width,
+  width: widthOverride,
   showCaption = true,
   onPress,
 }: {
   api: Api;
   item: BaseItemDto;
+  /** Defaults to the screen's poster width (`useCardWidths`). */
   width?: number;
   showCaption?: boolean;
   onPress?: (item: BaseItemDto) => void;
 }) {
+  const cardWidths = useCardWidths();
+  const width = widthOverride ?? cardWidths.poster;
   const indicator = useFocusIndicator();
   const url = itemImageSource(api, item, ImageType.Primary, { maxWidth: imagePixelWidth(width) }).url;
   const title = displayTitle(item);
