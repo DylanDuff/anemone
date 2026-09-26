@@ -36,6 +36,14 @@
           "isTV": false
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ],
       "./plugins/withCleartextTraffic"
     ]
   }
