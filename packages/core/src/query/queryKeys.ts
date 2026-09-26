@@ -18,23 +18,46 @@ export const jellyfinKeys = {
 
     nextUp: (userID: string) => [...jellyfinKeys.user(userID), "nextUp"] as const,
 
+    /** Prefix of every latest-in-library query (home hero + rows). */
+    allLatestInLibrary: (userID: string) =>
+        [...jellyfinKeys.user(userID), "latestInLibrary"] as const,
+
     latestInLibrary: (userID: string, parentID: string | undefined) =>
-        [...jellyfinKeys.user(userID), "latestInLibrary", parentID ?? null] as const,
+        [...jellyfinKeys.allLatestInLibrary(userID), parentID ?? null] as const,
 
     recentlyAdded: (userID: string, parentID: string | undefined) =>
         [...jellyfinKeys.user(userID), "recentlyAdded", parentID ?? null] as const,
 
-    items: (userID: string, params: unknown) =>
-        [...jellyfinKeys.user(userID), "items", params] as const,
+    /** Prefix of every paged library query. */
+    allItems: (userID: string) => [...jellyfinKeys.user(userID), "items"] as const,
 
-    item: (userID: string, itemID: string) =>
-        [...jellyfinKeys.user(userID), "item", itemID] as const,
+    items: (userID: string, params: unknown) => [...jellyfinKeys.allItems(userID), params] as const,
+
+    /** Prefix of every single-item query and its relations (similar, extras, …). */
+    allItem: (userID: string) => [...jellyfinKeys.user(userID), "item"] as const,
+
+    item: (userID: string, itemID: string) => [...jellyfinKeys.allItem(userID), itemID] as const,
+
+    /** Data related to one item, nested under it so invalidating the item covers it too. */
+    itemRelation: (
+        userID: string,
+        itemID: string,
+        relation:
+            | "similar"
+            | "specialFeatures"
+            | "localTrailers"
+            | "additionalParts"
+            | "seriesPlayTarget",
+    ) => [...jellyfinKeys.item(userID, itemID), relation] as const,
 
     seasons: (userID: string, seriesID: string) =>
         [...jellyfinKeys.user(userID), "seasons", seriesID] as const,
 
+    /** Prefix of every episode-list query. */
+    allEpisodes: (userID: string) => [...jellyfinKeys.user(userID), "episodes"] as const,
+
     episodes: (userID: string, seriesID: string, seasonID: string | undefined) =>
-        [...jellyfinKeys.user(userID), "episodes", seriesID, seasonID ?? null] as const,
+        [...jellyfinKeys.allEpisodes(userID), seriesID, seasonID ?? null] as const,
 
     search: (userID: string, searchTerm: string, params: unknown) =>
         [...jellyfinKeys.user(userID), "search", searchTerm, params] as const,

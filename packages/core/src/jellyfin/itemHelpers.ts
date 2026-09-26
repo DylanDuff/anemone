@@ -13,6 +13,25 @@ import { ChannelType } from "@jellyfin/sdk/lib/generated-client/models/channel-t
 import { LocationType } from "@jellyfin/sdk/lib/generated-client/models/location-type";
 import { formatHoursMinutes, ticksToSeconds } from "./ticks";
 
+/**
+ * Drop repeated items (same `Id`), keeping the first occurrence and the original order. The server
+ * can return an item twice — e.g. "latest" across libraries when it belongs to two views, or
+ * offset paging over a sort with ties — and duplicates break list rendering (React keys).
+ */
+export function uniqueItems<Item extends BaseItemDto>(items: readonly Item[]): Item[] {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+        if (!item.Id) {
+            return true;
+        }
+        if (seen.has(item.Id)) {
+            return false;
+        }
+        seen.add(item.Id);
+        return true;
+    });
+}
+
 /** The title to show for an item (Swiftfin `displayTitle`). */
 export function displayTitle(item: BaseItemDto): string {
     return item.Name ?? "Unknown";
@@ -65,6 +84,34 @@ export function isPlayed(item: BaseItemDto): boolean {
     return item.UserData?.Played ?? false;
 }
 
+/** Whether the user has favorited the item. */
+export function isFavorite(item: BaseItemDto): boolean {
+    return item.UserData?.IsFavorite ?? false;
+}
+
+/** Candidate episodes for a series' Play button, fetched in parallel. */
+export interface SeriesPlayCandidates {
+    readonly nextUp?: BaseItemDto;
+    readonly resume?: BaseItemDto;
+    readonly firstAvailable?: BaseItemDto;
+}
+
+/**
+ * Pick the episode a series' Play button should start (Swiftfin `SeriesItemViewModel`): next-up
+ * (unless missing), then an in-progress episode, then the first available episode.
+ */
+export function seriesPlayTarget(candidates: SeriesPlayCandidates): BaseItemDto | undefined {
+    const nextUp = candidates.nextUp && !isMissing(candidates.nextUp) ? candidates.nextUp : undefined;
+    return nextUp ?? candidates.resume ?? candidates.firstAvailable;
+}
+
+/** "Play", "Resume", "Play S1 E3", "Resume S2 E1" — for the item a Play button will start. */
+export function playButtonLabel(item: BaseItemDto): string {
+    const verb = (playbackPositionTicks(item) ?? 0) > 0 ? "Resume" : "Play";
+    const locator = item.Type === BaseItemKind.Episode ? seasonEpisodeLabel(item) : undefined;
+    return locator ? `${verb} ${locator}` : verb;
+}
+
 /** Playback resume position in ticks, if any. */
 export function playbackPositionTicks(item: BaseItemDto): number | undefined {
     return item.UserData?.PlaybackPositionTicks ?? undefined;
@@ -106,6 +153,32 @@ export function progressLabel(item: BaseItemDto): string | undefined {
         return undefined;
     }
     return formatHoursMinutes(ticksToSeconds(total - position));
+}
+
+/** "2019", or for a series its run: "2008–2013" when ended, "2022–" while continuing. */
+function yearLabel(item: BaseItemDto): string | undefined {
+    const year = item.ProductionYear != null ? String(item.ProductionYear) : premiereYear(item);
+    if (!year || item.Type !== BaseItemKind.Series) {
+        return year;
+    }
+    const endYear = item.EndDate ? String(new Date(item.EndDate).getFullYear()) : undefined;
+    if (endYear && endYear !== year) {
+        return `${year}–${endYear}`;
+    }
+    return item.Status === "Continuing" ? `${year}–` : year;
+}
+
+/**
+ * The short facts shown beside a title — year (or year range for an ended series), parental
+ * rating, runtime, and community rating: `["2019", "PG-13", "1h 52m", "★ 7.8"]`.
+ */
+export function itemMetadataLabels(item: BaseItemDto): string[] {
+    return [
+        yearLabel(item),
+        item.OfficialRating ?? undefined,
+        item.Type === BaseItemKind.Series ? undefined : runtimeLabel(item),
+        item.CommunityRating != null ? `★ ${item.CommunityRating.toFixed(1)}` : undefined,
+    ].filter((label): label is string => Boolean(label));
 }
 
 /** Four-digit premiere year, if known (Swiftfin `premiereDateYear`). */

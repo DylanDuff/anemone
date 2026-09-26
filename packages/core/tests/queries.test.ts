@@ -22,6 +22,27 @@ vi.mock("../src/jellyfin/api", () => ({
             calls.getLatestMedia = p;
             return { data: [{ Id: "latest1" }] };
         },
+        getItem: async (p: unknown) => {
+            calls.getItem = p;
+            return { data: { Id: "full1", Overview: "…" } };
+        },
+        getSimilarItems: async (p: unknown) => {
+            calls.getSimilarItems = p;
+            return { data: { Items: [{ Id: "similar1" }] } };
+        },
+        getSpecialFeatures: async () => ({
+            data: [
+                { Id: "featurette", ExtraType: "Featurette" },
+                { Id: "theme", ExtraType: "ThemeSong" },
+            ],
+        }),
+        getLocalTrailers: async () => ({ data: [{ Id: "trailer1" }] }),
+    }),
+    getVideoApi: () => ({
+        getAdditionalPart: async (p: unknown) => {
+            calls.getAdditionalPart = p;
+            return { data: { Items: [{ Id: "part2" }] } };
+        },
     }),
     getShowApi: () => ({
         getNextUp: async (p: unknown) => {
@@ -43,12 +64,18 @@ vi.mock("../src/jellyfin/api", () => ({
 }));
 
 import {
+    additionalPartsQuery,
     itemQuery,
     latestInLibraryQuery,
     libraryItemsInfiniteQuery,
+    libraryPageItems,
+    localTrailersQuery,
     nextUpQuery,
     resumeItemsQuery,
     searchItemsQuery,
+    seriesPlayTargetQuery,
+    similarItemsQuery,
+    specialFeaturesQuery,
     userViewsQuery,
 } from "../src/query/queries";
 import type { QueryContext } from "../src/query/queryContext";
@@ -88,9 +115,50 @@ describe("query option builders", () => {
         expect(calls.getLatestMedia).toMatchObject({ parentId: "lib1" });
     });
 
-    it("itemQuery fetches by id and returns the first item", async () => {
-        expect(await itemQuery(ctx, "i1").queryFn!(fnCtx)).toEqual({ Id: "i1" });
-        expect(calls.getItems).toMatchObject({ ids: ["i1"] });
+    it("itemQuery fetches the full item by id", async () => {
+        expect(await itemQuery(ctx, "i1").queryFn!(fnCtx)).toEqual({ Id: "full1", Overview: "…" });
+        expect(calls.getItem).toMatchObject({ itemId: "i1", userId: "u1" });
+    });
+
+    it("item relations are keyed under the item so invalidating it covers them", () => {
+        expect(similarItemsQuery(ctx, "i1").queryKey).toEqual([
+            "jellyfin",
+            "u1",
+            "item",
+            "i1",
+            "similar",
+        ]);
+    });
+
+    it("similarItemsQuery unwraps Items and passes the limit", async () => {
+        expect(await similarItemsQuery(ctx, "i1", 7).queryFn!(fnCtx)).toEqual([{ Id: "similar1" }]);
+        expect(calls.getSimilarItems).toMatchObject({ itemId: "i1", limit: 7 });
+    });
+
+    it("specialFeaturesQuery excludes theme songs", async () => {
+        const features = await specialFeaturesQuery(ctx, "i1").queryFn!(fnCtx);
+        expect(features.map((feature) => feature.Id)).toEqual(["featurette"]);
+    });
+
+    it("localTrailersQuery returns the array directly", async () => {
+        expect(await localTrailersQuery(ctx, "i1").queryFn!(fnCtx)).toEqual([{ Id: "trailer1" }]);
+    });
+
+    it("additionalPartsQuery is only enabled for multi-part items", async () => {
+        expect(additionalPartsQuery(ctx, { Id: "i1", PartCount: 1 }).enabled).toBe(false);
+        const opts = additionalPartsQuery(ctx, { Id: "i1", PartCount: 2 });
+        expect(opts.enabled).toBe(true);
+        expect(await opts.queryFn!(fnCtx)).toEqual([{ Id: "part2" }]);
+        expect(calls.getAdditionalPart).toMatchObject({ itemId: "i1" });
+    });
+
+    it("seriesPlayTargetQuery prefers next-up", async () => {
+        expect(await seriesPlayTargetQuery(ctx, "series1").queryFn!(fnCtx)).toEqual({
+            Id: "next1",
+        });
+        expect(calls.getNextUp).toMatchObject({ seriesId: "series1", limit: 1 });
+        expect(calls.getResumeItems).toMatchObject({ parentId: "series1", limit: 1 });
+        expect(calls.getItems).toMatchObject({ parentId: "series1", recursive: true, limit: 1 });
     });
 
     it("searchItemsQuery is disabled for an empty term", () => {
@@ -108,5 +176,11 @@ describe("query option builders", () => {
         // a short page => no next page
         const shortPage = { Items: [{ Id: "only" }] };
         expect(opts.getNextPageParam!(shortPage, [shortPage], 0, [0])).toBeUndefined();
+    });
+
+    it("libraryPageItems flattens pages and drops items repeated across a page boundary", () => {
+        const pages = [{ Items: [{ Id: "a" }, { Id: "b" }] }, { Items: [{ Id: "b" }, { Id: "c" }] }];
+        expect(libraryPageItems(pages).map((item) => item.Id)).toEqual(["a", "b", "c"]);
+        expect(libraryPageItems(undefined)).toEqual([]);
     });
 });

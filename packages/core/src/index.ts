@@ -34,6 +34,11 @@ export {
     storedKey,
 } from "./data/storedValues";
 export { AppDefaults } from "./data/keys/appDefaults";
+export {
+    AppSettingsKeys,
+    type FocusIndicator,
+    focusIndicatorValues,
+} from "./data/keys/appSettingsKeys";
 export { ServerKeys } from "./data/keys/serverKeys";
 export { UserKeys } from "./data/keys/userKeys";
 export { anyData, type AnyDataRow, createSchemaStatements } from "./data/schema";
@@ -95,37 +100,69 @@ export {
 export {
     displayTitle,
     episodeLocator,
+    isFavorite,
     isLiveStream,
     isMissing,
     isPlayable,
     isPlayed,
     isUnaired,
+    itemMetadataLabels,
     playbackPositionTicks,
+    playButtonLabel,
     playedFraction,
     premiereYear,
     progressLabel,
     runtimeLabel,
     runtimeSeconds,
     seasonEpisodeLabel,
+    type SeriesPlayCandidates,
+    seriesPlayTarget,
+    uniqueItems,
 } from "./jellyfin/itemHelpers";
 export {
+    audioChannelsLabel,
+    codecLabel,
+    mediaAttributeBadges,
+    mediaSourceSummary,
+    type MediaSourceSummary,
+    videoRangeLabel,
+    videoResolutionLabel,
+} from "./jellyfin/mediaInfo";
+export {
+    backdropImageSource,
     blurHashString,
     ImageType,
     type ImageRequestOptions,
     type ImageSource,
     itemImageSource,
     itemImageURLById,
+    logoImageSource,
+    personImageSource,
     resumeFrameSource,
     seriesImageSource,
     userImageURL,
 } from "./jellyfin/images";
-export { setItemPlayed } from "./jellyfin/playstate";
+export { setItemFavorite, setItemPlayed } from "./jellyfin/playstate";
 
 // Query layer (data-fetching view models)
 export { type QueryContext, queryContextFromSession } from "./query/queryContext";
 export { libraryParentRequest } from "./query/libraryParent";
+export {
+    activeFilterCount,
+    clearedFilters,
+    defaultLibraryFilters,
+    type LibraryFilters,
+    libraryItemsRequest,
+    type LibrarySortField,
+    librarySortFields,
+    librarySortMeta,
+    SortOrder,
+    toggleGenre,
+    withSortField,
+} from "./query/libraryFilters";
 export { jellyfinKeys } from "./query/queryKeys";
 export {
+    additionalPartsQuery,
     DEFAULT_PAGE_SIZE,
     episodesQuery,
     genresQuery,
@@ -133,23 +170,34 @@ export {
     itemQuery,
     latestInLibraryQuery,
     libraryItemsInfiniteQuery,
+    libraryPageItems,
+    localTrailersQuery,
     nextUpQuery,
     resumeItemsQuery,
     seasonsQuery,
     searchItemsQuery,
+    seriesPlayTargetQuery,
+    similarItemsQuery,
+    specialFeaturesQuery,
     userViewsQuery,
 } from "./query/queries";
 export {
+    useAdditionalParts,
     useEpisodes,
     useGenres,
     useItem,
     useLatestInLibrary,
     useLibraryItems,
+    useLocalTrailers,
     useNextUp,
     useResumeItems,
     useSearch,
     useSeasons,
+    useSeriesPlayTarget,
+    useSetItemFavorite,
     useSetItemPlayed,
+    useSimilarItems,
+    useSpecialFeatures,
     useUserViews,
 } from "./query/hooks";
 
@@ -162,6 +210,7 @@ export {
     useQueryContext,
     useSessionController,
 } from "./react/context";
+export { type StoredValueBinding, useStoredValue } from "./react/useStoredValue";
 export {
     SessionController,
     type SessionSnapshot,

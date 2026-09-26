@@ -1,0 +1,61 @@
+//
+// AnemoneReact is subject to the terms of the Mozilla Public
+// License, v2.0. Ported from Swiftfin (c) Jellyfin & Jellyfin Contributors.
+//
+
+import { APP_OWNER_ID, storedKey, type StoredValueKey } from "../storedValues";
+
+/** How focused/hovered artwork is marked: a white outline ring, or a soft white glow around it. */
+export type FocusIndicator = "outline" | "glow";
+
+export const focusIndicatorValues: readonly FocusIndicator[] = ["outline", "glow"];
+
+/**
+ * Device-wide app settings from the Settings screen, kept in the key/value store (not SQL): they
+ * describe what *this device* should render — e.g. heavy visual effects a weak TV can't afford —
+ * so they're per device, not per user or server.
+ *
+ * Each key takes its default from the caller, because the right default is platform-dependent
+ * (the app decides; core stays platform-agnostic). Read and write them with `StoredValues` /
+ * `useStoredValue`.
+ */
+export const AppSettingsKeys = {
+    /** The blurred, colour-matched glow behind the home hero. */
+    heroGlow: (defaultValue: boolean): StoredValueKey<boolean> =>
+        storedKey<boolean>({
+            field: "settings.heroGlow",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /** Live blur behind glass surfaces (the section rail); off shows a translucent tint instead. */
+    glassBlur: (defaultValue: boolean): StoredValueKey<boolean> =>
+        storedKey<boolean>({
+            field: "settings.glassBlur",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /**
+     * Glass (blur) behind the translucent buttons and detail chips over artwork. Only meaningful while
+     * `glassBlur` is on; the Settings screen shows it as a sub-setting of that.
+     */
+    glassButtons: (defaultValue: boolean): StoredValueKey<boolean> =>
+        storedKey<boolean>({
+            field: "settings.glassButtons",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /** The focus/hover indicator on artwork and cards. */
+    focusIndicator: (defaultValue: FocusIndicator): StoredValueKey<FocusIndicator> =>
+        storedKey<FocusIndicator>({
+            field: "settings.focusIndicator",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+} as const;

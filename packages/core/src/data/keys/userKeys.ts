@@ -4,7 +4,9 @@
 //
 
 import type { UserDto } from "@jellyfin/sdk/lib/generated-client/models/user-dto";
+import type { LibraryDisplayType } from "../../models/displayTypes";
 import type { LocalUserAccessPolicy } from "../../models/localUserAccessPolicy";
+import { defaultLibraryFilters, type LibraryFilters } from "../../query/libraryFilters";
 import type { UserState } from "../../session/userState";
 import { APP_OWNER_ID, storedKey, type StoredValueKey } from "../storedValues";
 
@@ -12,8 +14,8 @@ import { APP_OWNER_ID, storedKey, type StoredValueKey } from "../storedValues";
  * User-scoped `StoredValues` keys (Swiftfin `StoredValues.Keys.User`).
  *
  * The user list is app-owned; per-user records (`UserDto`, access policy, pin hint) are owned by
- * the user's id so they can be stored/retrieved without an active session. Current-session-scoped
- * settings keys (library display, device profiles, etc.) are ported alongside their view models.
+ * the user's id so they can be stored/retrieved without an active session. Per-library settings
+ * are owned by the user id and named by the library's parent id.
  */
 export const UserKeys = {
     /** All saved users across every server. */
@@ -42,6 +44,26 @@ export const UserKeys = {
             ownerID: id,
             storage: "sql",
             default: () => "none",
+        }),
+
+    /** Grid vs. list presentation for one library (Swiftfin `libraryDisplayType(parentID:)`). */
+    libraryDisplayType: (userID: string, parentID: string): StoredValueKey<LibraryDisplayType> =>
+        storedKey<LibraryDisplayType>({
+            name: parentID,
+            field: "libraryDisplayType",
+            ownerID: userID,
+            storage: "sql",
+            default: "grid",
+        }),
+
+    /** Sort + filter state for one library (Swiftfin `libraryFilters(parentID:)`). */
+    libraryFilters: (userID: string, parentID: string): StoredValueKey<LibraryFilters> =>
+        storedKey<LibraryFilters>({
+            name: parentID,
+            field: "libraryFilters",
+            ownerID: userID,
+            storage: "sql",
+            default: defaultLibraryFilters,
         }),
 
     /** The optional PIN hint for a user id. */

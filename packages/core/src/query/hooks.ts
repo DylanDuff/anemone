@@ -7,27 +7,35 @@
 // TanStack `QueryClientProvider`.
 //
 
+import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import {
+    type QueryClient,
     useInfiniteQuery,
     useMutation,
     useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
-import { setItemPlayed } from "../jellyfin/playstate";
+import { setItemFavorite, setItemPlayed } from "../jellyfin/playstate";
 import { useQueryContext } from "../react/context";
 import {
+    additionalPartsQuery,
     episodesQuery,
     genresQuery,
     type ItemsRequest,
     itemQuery,
     latestInLibraryQuery,
     libraryItemsInfiniteQuery,
+    localTrailersQuery,
     nextUpQuery,
     resumeItemsQuery,
     seasonsQuery,
     searchItemsQuery,
+    seriesPlayTargetQuery,
+    similarItemsQuery,
+    specialFeaturesQuery,
     userViewsQuery,
 } from "./queries";
+import type { QueryContext } from "./queryContext";
 import { jellyfinKeys } from "./queryKeys";
 
 export function useUserViews() {
@@ -71,21 +79,68 @@ export function useLibraryItems(params?: ItemsRequest, pageSize?: number) {
     return useInfiniteQuery(libraryItemsInfiniteQuery(useQueryContext(), params, pageSize));
 }
 
+export function useSimilarItems(itemID: string) {
+    return useQuery(similarItemsQuery(useQueryContext(), itemID));
+}
+
+export function useSpecialFeatures(itemID: string) {
+    return useQuery(specialFeaturesQuery(useQueryContext(), itemID));
+}
+
+export function useLocalTrailers(itemID: string) {
+    return useQuery(localTrailersQuery(useQueryContext(), itemID));
+}
+
+export function useAdditionalParts(item: BaseItemDto) {
+    return useQuery(additionalPartsQuery(useQueryContext(), item));
+}
+
+export function useSeriesPlayTarget(seriesID: string) {
+    return useQuery(seriesPlayTargetQuery(useQueryContext(), seriesID));
+}
+
 /**
- * Mark an item played/unplayed, invalidating the resume/next-up/item caches on success so the UI
- * reflects the change (Swiftfin `HomeViewModel.setIsPlayed` + background refresh).
+ * Invalidate every cached query that shows per-user item state (played, favorite, progress), so a
+ * change made on one screen is reflected on all of them (Swiftfin posts
+ * `itemShouldRefreshMetadata`). Only mounted queries refetch; the rest refetch when next shown.
  */
-export function useSetItemPlayed() {
+function invalidateUserItemData(queryClient: QueryClient, userID: string): void {
+    for (const queryKey of [
+        jellyfinKeys.resumeItems(userID),
+        jellyfinKeys.nextUp(userID),
+        jellyfinKeys.allLatestInLibrary(userID),
+        jellyfinKeys.allItem(userID),
+        jellyfinKeys.allItems(userID),
+        jellyfinKeys.allEpisodes(userID),
+    ]) {
+        void queryClient.invalidateQueries({ queryKey });
+    }
+}
+
+type UserItemDataSetter = (
+    api: QueryContext["api"],
+    userID: string,
+    itemID: string,
+    enabled: boolean,
+) => Promise<void>;
+
+function useUserItemDataMutation(setter: UserItemDataSetter) {
     const ctx = useQueryContext();
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ itemID, played }: { itemID: string; played: boolean }) =>
-            setItemPlayed(ctx.api, ctx.userID, itemID, played),
-        onSuccess: (_result, { itemID }) => {
-            void queryClient.invalidateQueries({ queryKey: jellyfinKeys.resumeItems(ctx.userID) });
-            void queryClient.invalidateQueries({ queryKey: jellyfinKeys.nextUp(ctx.userID) });
-            void queryClient.invalidateQueries({ queryKey: jellyfinKeys.item(ctx.userID, itemID) });
-        },
+        mutationFn: ({ itemID, enabled }: { itemID: string; enabled: boolean }) =>
+            setter(ctx.api, ctx.userID, itemID, enabled),
+        onSuccess: () => invalidateUserItemData(queryClient, ctx.userID),
     });
+}
+
+/** Mark an item played/unplayed (Swiftfin `setIsPlayed`). Call with `{ itemID, enabled }`. */
+export function useSetItemPlayed() {
+    return useUserItemDataMutation(setItemPlayed);
+}
+
+/** Favorite/unfavorite an item (Swiftfin `setIsFavorite`). Call with `{ itemID, enabled }`. */
+export function useSetItemFavorite() {
+    return useUserItemDataMutation(setItemFavorite);
 }

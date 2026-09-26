@@ -23,6 +23,7 @@ export { getAuthenticationApi } from "@jellyfin/sdk/lib/utils/api/authentication
 export { getBrandingApi } from "@jellyfin/sdk/lib/utils/api/branding-api";
 export { getImageApi } from "@jellyfin/sdk/lib/utils/api/image-api";
 export { getSearchApi } from "@jellyfin/sdk/lib/utils/api/search-api";
+export { getVideoApi } from "@jellyfin/sdk/lib/utils/api/video-api";
 
 export { ImageUrlsApi };
 

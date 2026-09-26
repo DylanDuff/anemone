@@ -23,3 +23,18 @@ export async function setItemPlayed(
         await userDataApi.markUnplayedItem({ userId: userID, itemId: itemID });
     }
 }
+
+/** Mark an item as a favorite or remove it (Swiftfin `ItemViewModel.setIsFavorite`). */
+export async function setItemFavorite(
+    api: Api,
+    userID: string,
+    itemID: string,
+    favorite: boolean,
+): Promise<void> {
+    const userDataApi = getUserDataApi(api);
+    if (favorite) {
+        await userDataApi.markFavoriteItem({ userId: userID, itemId: itemID });
+    } else {
+        await userDataApi.unmarkFavoriteItem({ userId: userID, itemId: itemID });
+    }
+}

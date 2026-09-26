@@ -4,6 +4,7 @@
 //
 
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
+import type { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client/models/base-item-person";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import { ImageType } from "@jellyfin/sdk/lib/generated-client/models/image-type";
 import type { UserDto } from "@jellyfin/sdk/lib/generated-client/models/user-dto";
@@ -20,6 +21,8 @@ export interface ImageSource {
     readonly url: string | undefined;
     readonly blurHash: string | undefined;
 }
+
+const NO_IMAGE: ImageSource = { url: undefined, blurHash: undefined };
 
 /** Optional sizing/quality parameters for an image request. */
 export interface ImageRequestOptions {
@@ -87,9 +90,89 @@ export function seriesImageSource(
 ): ImageSource {
     const seriesID = item.SeriesId;
     if (!seriesID) {
-        return { url: undefined, blurHash: undefined };
+        return NO_IMAGE;
     }
     return { url: itemImageURLById(api, seriesID, type, options), blurHash: undefined };
+}
+
+/**
+ * The best wide backdrop for an item: its own backdrop, then its parent's (an episode/season shows
+ * its series backdrop), then its Primary image as a last resort. Used by the hero and item headers.
+ */
+export function backdropImageSource(
+    api: Api,
+    item: BaseItemDto,
+    options: ImageRequestOptions = {},
+): ImageSource {
+    const ownTag = item.BackdropImageTags?.[0];
+    if (ownTag && item.Id) {
+        return {
+            url: itemImageURLById(api, item.Id, ImageType.Backdrop, { ...options, tag: ownTag }),
+            blurHash: blurHashString(item, ImageType.Backdrop),
+        };
+    }
+
+    const parentTag = item.ParentBackdropImageTags?.[0];
+    if (parentTag && item.ParentBackdropItemId) {
+        return {
+            url: itemImageURLById(api, item.ParentBackdropItemId, ImageType.Backdrop, {
+                ...options,
+                tag: parentTag,
+            }),
+            blurHash: undefined,
+        };
+    }
+
+    return itemImageSource(api, item, ImageType.Primary, options);
+}
+
+/**
+ * The item's logo (title treatment), falling back to its parent's logo so episodes show the series
+ * logo. `url` is undefined when neither exists — callers then render the plain title.
+ */
+export function logoImageSource(
+    api: Api,
+    item: BaseItemDto,
+    options: ImageRequestOptions = {},
+): ImageSource {
+    const ownTag = (item.ImageTags as Record<string, string> | undefined | null)?.[ImageType.Logo];
+    if (ownTag && item.Id) {
+        return {
+            url: itemImageURLById(api, item.Id, ImageType.Logo, { ...options, tag: ownTag }),
+            blurHash: undefined,
+        };
+    }
+
+    if (item.ParentLogoImageTag && item.ParentLogoItemId) {
+        return {
+            url: itemImageURLById(api, item.ParentLogoItemId, ImageType.Logo, {
+                ...options,
+                tag: item.ParentLogoImageTag,
+            }),
+            blurHash: undefined,
+        };
+    }
+
+    return NO_IMAGE;
+}
+
+/** A cast/crew member's portrait (Swiftfin `BaseItemPerson.portraitImageSources`). */
+export function personImageSource(
+    api: Api,
+    person: BaseItemPerson,
+    options: ImageRequestOptions = {},
+): ImageSource {
+    if (!person.Id || !person.PrimaryImageTag) {
+        return NO_IMAGE;
+    }
+    const hashes = person.ImageBlurHashes?.Primary;
+    return {
+        url: itemImageURLById(api, person.Id, ImageType.Primary, {
+            ...options,
+            tag: person.PrimaryImageTag,
+        }),
+        blurHash: hashes?.[person.PrimaryImageTag] ?? undefined,
+    };
 }
 
 /** A user's profile image URL (Swiftfin `UserState.profileImageSource`). */
@@ -97,10 +180,27 @@ export function userImageURL(api: Api, user: UserDto): string | undefined {
     return getImageUrlsApi(api).getUserImageUrl(user);
 }
 
-/** Build a chapter image URL: `/Items/{id}/Images/Chapter/{index}?tag=…`. */
-function chapterImageURL(api: Api, itemID: string, index: number, tag: string): string {
+/**
+ * Build a chapter image URL: `/Items/{id}/Images/Chapter/{index}?tag=…&maxWidth=…`. Hand-built
+ * because the SDK's URL builder has no image-index path segment; sizing params are passed through
+ * so the server scales the frame instead of the client decoding a full-resolution one.
+ */
+function chapterImageURL(
+    api: Api,
+    itemID: string,
+    index: number,
+    tag: string,
+    options: ImageRequestOptions,
+): string {
     const base = api.basePath.replace(/\/+$/, "");
-    return `${base}/Items/${itemID}/Images/Chapter/${index}?tag=${encodeURIComponent(tag)}`;
+    const params = new URLSearchParams({ tag });
+    for (const key of ["maxWidth", "maxHeight", "quality"] as const) {
+        const value = options[key];
+        if (value != null) {
+            params.set(key, String(Math.round(value)));
+        }
+    }
+    return `${base}/Items/${itemID}/Images/Chapter/${index}?${params.toString()}`;
 }
 
 /**
@@ -113,8 +213,15 @@ function chapterImageURL(api: Api, itemID: string, index: number, tag: string): 
  *
  * For the pixel-exact frame at the resume second, Jellyfin's trickplay tiles would be needed — that
  * requires sprite cropping and is a follow-up (see docs/BACKLOG.md).
+ *
+ * Always pass a `maxWidth`: chapter frames and backdrops are full video resolution (up to 4K), and a
+ * row of them decoded at that size is enough to exhaust a TV's memory.
  */
-export function resumeFrameSource(api: Api, item: BaseItemDto): ImageSource {
+export function resumeFrameSource(
+    api: Api,
+    item: BaseItemDto,
+    options: ImageRequestOptions = {},
+): ImageSource {
     const position = item.UserData?.PlaybackPositionTicks ?? 0;
     const chapters = item.Chapters ?? [];
 
@@ -126,7 +233,10 @@ export function resumeFrameSource(api: Api, item: BaseItemDto): ImageSource {
     });
 
     if (chapter && item.Id) {
-        return { url: chapterImageURL(api, item.Id, chapter.index, chapter.tag), blurHash: undefined };
+        return {
+            url: chapterImageURL(api, item.Id, chapter.index, chapter.tag, options),
+            blurHash: undefined,
+        };
     }
 
     const fallbackOrder: ImageType[] =
@@ -135,11 +245,11 @@ export function resumeFrameSource(api: Api, item: BaseItemDto): ImageSource {
             : [ImageType.Thumb, ImageType.Backdrop, ImageType.Primary];
 
     for (const type of fallbackOrder) {
-        const source = itemImageSource(api, item, type);
+        const source = itemImageSource(api, item, type, options);
         if (source.url) {
             return source;
         }
     }
 
-    return { url: undefined, blurHash: undefined };
+    return NO_IMAGE;
 }

@@ -11,14 +11,19 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { BaseItemDtoQueryResult } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto-query-result";
 import type { LibraryApiGetItemsRequest } from "@jellyfin/sdk/lib/generated-client/api/library-api";
+import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
+import { ExtraType } from "@jellyfin/sdk/lib/generated-client/models/extra-type";
 import { ItemFields } from "@jellyfin/sdk/lib/generated-client/models/item-fields";
 import { MediaType } from "@jellyfin/sdk/lib/generated-client/models/media-type";
+import { SortOrder } from "@jellyfin/sdk/lib/generated-client/models/sort-order";
 import {
     getGenreApi,
     getLibraryApi,
     getShowApi,
     getUserViewApi,
+    getVideoApi,
 } from "../jellyfin/api";
+import { seriesPlayTarget, uniqueItems } from "../jellyfin/itemHelpers";
 import type { QueryContext } from "./queryContext";
 import { jellyfinKeys } from "./queryKeys";
 
@@ -51,7 +56,7 @@ export function resumeItemsQuery(ctx: QueryContext, limit = 20) {
                 // Chapters carry the still frames used to show where playback resumes from.
                 fields: [ItemFields.Chapters],
             });
-            return response.data.Items ?? [];
+            return uniqueItems(response.data.Items ?? []);
         },
     });
 }
@@ -66,7 +71,7 @@ export function nextUpQuery(ctx: QueryContext, limit = 20) {
                 limit,
                 enableUserData: true,
             });
-            return response.data.Items ?? [];
+            return uniqueItems(response.data.Items ?? []);
         },
     });
 }
@@ -80,23 +85,126 @@ export function latestInLibraryQuery(ctx: QueryContext, parentID?: string, limit
                 userId: ctx.userID,
                 parentId: parentID,
                 limit,
+                // Genres feed the home hero's title block.
+                fields: [ItemFields.Genres],
+            });
+            return uniqueItems(response.data);
+        },
+    });
+}
+
+/**
+ * A single item with all fields (overview, people, studios, media sources, chapters…) — Swiftfin
+ * `getFullItem`, the base fetch of every item-detail view model.
+ */
+export function itemQuery(ctx: QueryContext, itemID: string) {
+    return queryOptions({
+        queryKey: jellyfinKeys.item(ctx.userID, itemID),
+        queryFn: async (): Promise<BaseItemDto> => {
+            const response = await getLibraryApi(ctx.api).getItem({
+                userId: ctx.userID,
+                itemId: itemID,
             });
             return response.data;
         },
     });
 }
 
-/** A single item, resolved via `getItems` by id (Swiftfin item detail base fetch). */
-export function itemQuery(ctx: QueryContext, itemID: string) {
+/** "More like this" (Swiftfin `ItemViewModel.getSimilarItems`). */
+export function similarItemsQuery(ctx: QueryContext, itemID: string, limit = 20) {
     return queryOptions({
-        queryKey: jellyfinKeys.item(ctx.userID, itemID),
-        queryFn: async (): Promise<BaseItemDto | undefined> => {
-            const response = await getLibraryApi(ctx.api).getItems({
+        queryKey: jellyfinKeys.itemRelation(ctx.userID, itemID, "similar"),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getLibraryApi(ctx.api).getSimilarItems({
+                itemId: itemID,
                 userId: ctx.userID,
-                ids: [itemID],
-                enableUserData: true,
+                limit,
             });
-            return response.data.Items?.[0];
+            return uniqueItems(response.data.Items ?? []);
+        },
+    });
+}
+
+/** Video extras (featurettes, behind the scenes, …); theme songs excluded, as in Swiftfin. */
+export function specialFeaturesQuery(ctx: QueryContext, itemID: string) {
+    return queryOptions({
+        queryKey: jellyfinKeys.itemRelation(ctx.userID, itemID, "specialFeatures"),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getLibraryApi(ctx.api).getSpecialFeatures({
+                itemId: itemID,
+                userId: ctx.userID,
+            });
+            return response.data.filter((feature) => feature.ExtraType !== ExtraType.ThemeSong);
+        },
+    });
+}
+
+/** Trailers stored alongside the item's media (Swiftfin `getLocalTrailers`). */
+export function localTrailersQuery(ctx: QueryContext, itemID: string) {
+    return queryOptions({
+        queryKey: jellyfinKeys.itemRelation(ctx.userID, itemID, "localTrailers"),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getLibraryApi(ctx.api).getLocalTrailers({
+                itemId: itemID,
+                userId: ctx.userID,
+            });
+            return response.data;
+        },
+    });
+}
+
+/**
+ * The other parts of a multi-part item (e.g. "Part 2" of a split film). Only queried when the item
+ * reports more than one part — Swiftfin `getAdditionalParts`.
+ */
+export function additionalPartsQuery(ctx: QueryContext, item: BaseItemDto) {
+    const itemID = item.Id ?? "";
+    return queryOptions({
+        queryKey: jellyfinKeys.itemRelation(ctx.userID, itemID, "additionalParts"),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getVideoApi(ctx.api).getAdditionalPart({
+                itemId: itemID,
+                userId: ctx.userID,
+            });
+            return response.data.Items ?? [];
+        },
+        enabled: Boolean(item.Id) && (item.PartCount ?? 0) > 1,
+    });
+}
+
+/**
+ * The episode a series' Play button should start: next-up, then in-progress, then first available
+ * (Swiftfin `SeriesItemViewModel` — the three fetches run in parallel).
+ */
+export function seriesPlayTargetQuery(ctx: QueryContext, seriesID: string) {
+    return queryOptions({
+        queryKey: jellyfinKeys.itemRelation(ctx.userID, seriesID, "seriesPlayTarget"),
+        queryFn: async (): Promise<BaseItemDto | null> => {
+            const [nextUp, resume, firstAvailable] = await Promise.all([
+                getShowApi(ctx.api).getNextUp({ userId: ctx.userID, seriesId: seriesID, limit: 1 }),
+                getLibraryApi(ctx.api).getResumeItems({
+                    userId: ctx.userID,
+                    parentId: seriesID,
+                    limit: 1,
+                }),
+                getLibraryApi(ctx.api).getItems({
+                    userId: ctx.userID,
+                    parentId: seriesID,
+                    includeItemTypes: [BaseItemKind.Episode],
+                    recursive: true,
+                    sortOrder: [SortOrder.Ascending],
+                    limit: 1,
+                    enableUserData: true,
+                }),
+            ]);
+            // TanStack Query forbids `undefined` results, hence `null` for "nothing playable".
+            return (
+                seriesPlayTarget({
+                    nextUp: nextUp.data.Items?.[0],
+                    resume: resume.data.Items?.[0],
+                    firstAvailable: firstAvailable.data.Items?.[0],
+                }) ?? null
+            );
         },
     });
 }
@@ -126,6 +234,8 @@ export function episodesQuery(ctx: QueryContext, seriesID: string, seasonID?: st
                 userId: ctx.userID,
                 seasonId: seasonID,
                 enableUserData: true,
+                // Episode cards show a synopsis and use the resume frame.
+                fields: [ItemFields.Overview, ItemFields.Chapters],
             });
             return response.data.Items ?? [];
         },
@@ -162,6 +272,14 @@ export function searchItemsQuery(ctx: QueryContext, searchTerm: string, params: 
         },
         enabled: searchTerm.trim().length > 0,
     });
+}
+
+/**
+ * The items of a paged library query, in order and de-duplicated: offset paging can repeat an item
+ * across a page boundary (sort ties, or the library changing between pages).
+ */
+export function libraryPageItems(pages: readonly BaseItemDtoQueryResult[] | undefined): BaseItemDto[] {
+    return uniqueItems((pages ?? []).flatMap((page) => page.Items ?? []));
 }
 
 /**
