@@ -107,15 +107,21 @@ function edgeOffset({ placement, compact }: PillForm, safeArea: EdgeInsets): num
 }
 
 /**
- * The page insets that clear the pill. Content scrolls underneath it; hero artwork ignores these
- * and bleeds beneath it. Side pills push that side's gutter past the pill; top/bottom pills keep
- * the standard gutter and reserve room above/below instead.
+ * The page insets that clear the pill and the device's safe area (status bar, notch, home
+ * indicator). Content scrolls underneath them; hero artwork ignores these and bleeds beneath. Side
+ * pills push that side's gutter past the pill; top/bottom pills keep the standard gutter and
+ * reserve room above/below instead (their offset already includes that edge's safe area).
  */
 export function usePillContentInsets(form: PillForm): Omit<ContentLayout, "width"> {
   const safeArea = useSafeAreaInsets();
   const extent = edgeOffset(form, safeArea) + pillThickness(form) * REST_SCALE;
   const gutter = gutterFor(form.compact);
-  const insets = { insetLeft: gutter, insetRight: gutter, insetTop: 0, insetBottom: 0 };
+  const insets = {
+    insetLeft: gutter,
+    insetRight: gutter,
+    insetTop: safeArea.top,
+    insetBottom: safeArea.bottom,
+  };
   switch (form.placement) {
     case "left":
       return { ...insets, insetLeft: extent + SIDE_CONTENT_GAP };

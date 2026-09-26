@@ -64,8 +64,9 @@ export interface ContentLayout {
   readonly insetLeft: number;
   readonly insetRight: number;
   /**
-   * Room to leave above / below a page's content for a pill floating along the top / bottom edge
-   * (0 otherwise). Add to the page's own padding; hero artwork ignores it and bleeds beneath.
+   * Room to leave above / below a page's content: the safe area (status bar, home indicator), or
+   * a pill floating along that edge. Add to the page's own padding; hero artwork ignores it and
+   * bleeds beneath. 0 outside the browse shell, where screens handle their own safe area.
    */
   readonly insetTop: number;
   readonly insetBottom: number;
