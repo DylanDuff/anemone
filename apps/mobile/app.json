@@ -8,7 +8,13 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.dylanduff.anemone"
+      "bundleIdentifier": "com.dylanduff.anemone",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Anemone connects to Jellyfin servers on your local network."
+      }
     },
     "android": {
       "adaptiveIcon": {
