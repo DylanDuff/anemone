@@ -265,6 +265,7 @@ export function SectionRail({
         ]}
       >
         <GlassSurface
+          tintInDarkMode
           style={[
             styles.pill,
             { borderRadius: pillRadius },

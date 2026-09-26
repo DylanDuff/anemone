@@ -37,6 +37,8 @@ const colors = {
   track: "rgba(255,255,255,0.3)",
   /** Tint of glass surfaces when live blur is off. */
   glassTint: "rgba(23,23,29,0.88)",
+  /** Extra tint on the navigation pill's live glass while the device is in dark mode. */
+  glassDarkTint: "rgba(11,11,15,0.45)",
   /** Opaque-ish floating panels over video (track menu). */
   panel: "rgba(23,23,29,0.94)",
   /** The focus glow's white bloom and dark drop shadow. */

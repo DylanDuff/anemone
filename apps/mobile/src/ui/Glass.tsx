@@ -5,7 +5,7 @@
 import { BlurTargetView, BlurView } from "expo-blur";
 import { GlassView, isGlassEffectAPIAvailable, isLiquidGlassAvailable } from "expo-glass-effect";
 import { createContext, type ReactNode, type RefObject, useContext, useRef } from "react";
-import { Platform, type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
+import { Platform, type StyleProp, StyleSheet, useColorScheme, View, type ViewStyle } from "react-native";
 import { useGlassBlurSetting } from "../settings";
 import { theme } from "./theme";
 
@@ -52,12 +52,14 @@ export function GlassBackdrop({
 /**
  * A frosted surface: real Liquid Glass on iOS 26+, otherwise `BlurView` — a native blur of the
  * nearest `GlassBackdrop` on Android, `backdrop-filter` on web, a material on older iOS. A dark
- * tint keeps it legible over bright artwork in every mode.
+ * tint keeps it legible over bright artwork in every mode; `tintInDarkMode` deepens it while the
+ * device is in dark mode (`glassDarkTint`).
  */
 export function GlassSurface({
   style,
   intensity = 60,
   blurReductionFactor,
+  tintInDarkMode = false,
   children,
 }: {
   style?: StyleProp<ViewStyle>;
@@ -71,9 +73,12 @@ export function GlassSurface({
    * to get a stronger blur without raising the tint.
    */
   blurReductionFactor?: number;
+  /** Darken the glass while the device's appearance is dark (the navigation pill). */
+  tintInDarkMode?: boolean;
   children?: ReactNode;
 }) {
   const blurTarget = useContext(BlurTargetContext);
+  const darkTint = useColorScheme() === "dark" && tintInDarkMode;
 
   // The Settings "Glass blur" toggle; off renders a translucent tint (cheap on weak TV hardware).
   const { value: blurEnabled } = useGlassBlurSetting();
@@ -83,7 +88,12 @@ export function GlassSurface({
 
   if (liquidGlass) {
     return (
-      <GlassView glassEffectStyle="regular" colorScheme="dark" style={style}>
+      <GlassView
+        glassEffectStyle="regular"
+        colorScheme="dark"
+        tintColor={darkTint ? theme.colors.glassDarkTint : undefined}
+        style={style}
+      >
         {children}
       </GlassView>
     );
@@ -96,7 +106,7 @@ export function GlassSurface({
       blurReductionFactor={blurReductionFactor}
       blurMethod="dimezisBlurViewSdk31Plus"
       blurTarget={blurTarget ?? undefined}
-      style={[styles.clip, style]}
+      style={[styles.clip, darkTint ? styles.darkTint : null, style]}
     >
       {children}
     </BlurView>
@@ -139,6 +149,9 @@ const styles = StyleSheet.create({
   },
   tint: {
     backgroundColor: theme.colors.glassTint,
+  },
+  darkTint: {
+    backgroundColor: theme.colors.glassDarkTint,
   },
 });
 
