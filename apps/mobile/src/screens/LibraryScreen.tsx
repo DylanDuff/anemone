@@ -27,6 +27,7 @@ import {
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
 import { showsPageScrollIndicator, useCardWidths, useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
+import { Collapsible } from "../ui/Collapsible";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
@@ -134,8 +135,10 @@ function LibraryContent({
           filtersOpen={filtersOpen}
           onToggleFilters={() => setFiltersOpen((open) => !open)}
         />
-        {filtersOpen && library.Id ? (
-          <FilterPanel libraryID={library.Id} filters={filters} onChangeFilters={onChangeFilters} />
+        {library.Id ? (
+          <Collapsible open={filtersOpen} contentStyle={styles.filterPanel}>
+            <FilterPanel libraryID={library.Id} filters={filters} onChangeFilters={onChangeFilters} />
+          </Collapsible>
         ) : null}
       </FocusGuide>
     </View>
@@ -223,6 +226,10 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
+  },
+  // The gap above the panel grows with it (see `Collapsible`).
+  filterPanel: {
+    paddingTop: space(2),
   },
   header: {
     paddingTop: space(3),

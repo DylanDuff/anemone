@@ -75,7 +75,6 @@ export function FilterPanel({
 
 const styles = StyleSheet.create({
   panel: {
-    marginTop: space(2),
     padding: space(2),
     borderRadius: theme.radii.lg,
     backgroundColor: theme.colors.surface,
