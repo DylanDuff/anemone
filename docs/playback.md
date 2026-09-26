@@ -77,6 +77,8 @@ Notes:
   native HLS (as jellyfin-web does). With fMP4 segments, the server's remux of MKV H.264 (video
   copied) failed in Chrome with `DECODER_ERROR_NOT_SUPPORTED … kUnsupportedConfig` /
   hls.js `mediaSourceRequiresReset`. iOS keeps fMP4 (required for HEVC over HLS).
+- Web transcode audio is AAC/MP3 only — what hls.js demuxes from TS. It rejects E-AC-3 in TS and
+  drops the audio (Safari, which advertises E-AC-3, got silent remuxes).
 - iOS: react-native-video only skips subtitle sideloading for URLs *ending* in `.m3u8`; Jellyfin's
   playlist URL has a query string, so core must (and does) send no external subtitles with HLS on
   AVPlayer.

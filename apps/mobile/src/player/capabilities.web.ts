@@ -73,7 +73,11 @@ function browserCapabilities(): PlayerCapabilities {
       // still fail to decode the server's HEVC output ("kUnsupportedConfig"). H.264 sources in an
       // unplayable container (MKV) are then remuxed with the video copied rather than re-encoded.
       videoCodecs: ["h264"],
-      audioCodecs: supported(AUDIO_PROBES, canStream).filter((codec) => codec !== "flac"),
+      // What hls.js can demux from TS, not what the browser decodes: it rejects E-AC-3 in TS
+      // ("Unsupported EC-3 in M2TS") and drops the audio, which Safari hit with E-AC-3 remuxes.
+      audioCodecs: supported(AUDIO_PROBES, canStream).filter(
+        (codec) => codec === "aac" || codec === "mp3",
+      ),
     },
     videoRanges: [],
     maxAudioChannels: 6,
