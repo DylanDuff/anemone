@@ -145,9 +145,10 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   1.8 GB box and got killed by lmkd once. Images are now sized via `imagePixelWidth()`.
 - ✅ Ionicons (`@expo/vector-icons`) everywhere via `ui/Icon.tsx` — rail/tabs, actions, chips,
   badges, chevrons.
-- ✅ **Sign out**: Settings → Account shows the user and server, Sign out confirms inline
-  (`screens/settings/AccountSection.tsx`).
-- [ ] Server/user switching from Settings (select-user VM exists).
+- ✅ **Accounts**: signed out, the app shows a "Who's watching?" picker (`screens/SelectUserScreen.tsx`)
+  of saved accounts per server — tap to sign straight in, Add User / Add Server, Edit to remove
+  accounts or servers; empty goes to Connect. Settings → Account: Switch User (back to the picker,
+  account kept) and Sign Out (confirms, then forgets the account on this device).
 - ✅ **Library screen**: responsive poster grid / list toggle, infinite scroll, sort + direction,
   unplayed/favorites/genre filters, all persisted per library.
 - ✅ **Item screen**: cinematic backdrop + logo header, facts & media badges, Play/Resume target,
@@ -163,7 +164,6 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - ✅ Hover/focus states: `Focusable` (hover-driven + eased on web, D-pad on TV).
 - ✅ Home hero reuses the item page's `ItemTitleBlock` (title art, facts, Play/played/favorite) and `backdropImageSource`.
 - ✅ Native stack verified on iOS (iPhone 14 Pro), Android and Android TV.
-- [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).
 - ✅ **Search** section in the pill: debounced field, then Movies / Shows / Episodes / Collections
   / People shelves (`useSearchResults`, `searchItemScopes`, `searchPeopleQuery`).
 - [ ] Search: recent searches, and filters (genre, year) like Swiftfin.

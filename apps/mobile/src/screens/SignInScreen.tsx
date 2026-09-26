@@ -11,11 +11,9 @@ import {
   useStatefulEvents,
 } from "@anemone/core";
 import { useEffect, useMemo, useRef } from "react";
-import { StyleSheet, View } from "react-native";
 import { Button } from "../ui/Button";
-import { Screen, ScreenNote } from "../ui/Screen";
+import { Screen, ScreenActions, ScreenNote } from "../ui/Screen";
 import { TextField } from "../ui/TextField";
-import { space } from "../ui/theme";
 
 /**
  * Sign in to `server` with a username/password. On success the user is saved with the `none` access
@@ -68,19 +66,11 @@ export function SignInScreen({ server, onBack }: { server: ServerState; onBack: 
         }}
         onSubmit={signIn}
       />
-      <View style={styles.actions}>
+      <ScreenActions>
         <Button label="Sign In" busy={state === "signingIn"} onPress={signIn} />
         <Button label="Back" variant="plain" onPress={onBack} />
-      </View>
+      </ScreenActions>
       {error ? <ScreenNote error>{error.message}</ScreenNote> : null}
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space(1),
-  },
-});

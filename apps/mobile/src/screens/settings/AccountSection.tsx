@@ -9,8 +9,9 @@ import { Button } from "../../ui/Button";
 import { space, theme } from "../../ui/theme";
 
 /**
- * Who's signed in, to which server, and Sign out. Signing out asks first, inline (no alert dialogs:
- * they don't exist on web and are awkward on TV); on TV focus jumps to the confirm button.
+ * Who's signed in, to which server. Switch User returns to the user picker, keeping this account;
+ * Sign Out also removes it from this device, so it asks first — inline (no alert dialogs: they
+ * don't exist on web and are awkward on TV); on TV focus jumps to the confirm button.
  */
 export function AccountSection() {
   const { session } = useCurrentSession();
@@ -23,9 +24,11 @@ export function AccountSection() {
   }
   const { user, server } = session;
 
+  // Switch User keeps this account saved (one tap back from the picker); Sign Out forgets it.
+  const switchUser = () => void sessionController.signOut();
   const signOut = () => {
     setSigningOut(true);
-    void sessionController.signOut();
+    void sessionController.signOutAndForget();
   };
 
   return (
@@ -38,7 +41,7 @@ export function AccountSection() {
       </View>
       {confirming ? (
         <View style={styles.actions}>
-          <Text style={styles.prompt}>Sign out of {server.name}?</Text>
+          <Text style={styles.prompt}>Sign out and remove {user.username} from this device?</Text>
           <Button
             label="Sign Out"
             variant="destructive"
@@ -49,7 +52,15 @@ export function AccountSection() {
           <Button label="Cancel" variant="plain" onPress={() => setConfirming(false)} />
         </View>
       ) : (
-        <Button label="Sign Out" variant="destructive" icon="log-out-outline" onPress={() => setConfirming(true)} />
+        <View style={styles.actions}>
+          <Button label="Switch User" variant="secondary" icon="people-outline" onPress={switchUser} />
+          <Button
+            label="Sign Out"
+            variant="destructive"
+            icon="log-out-outline"
+            onPress={() => setConfirming(true)}
+          />
+        </View>
       )}
     </View>
   );

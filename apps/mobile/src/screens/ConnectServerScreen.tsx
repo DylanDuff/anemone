@@ -11,11 +11,20 @@ import {
 } from "@anemone/core";
 import { useEffect, useMemo, useRef } from "react";
 import { Button } from "../ui/Button";
-import { Screen, ScreenNote } from "../ui/Screen";
+import { Screen, ScreenActions, ScreenNote } from "../ui/Screen";
 import { TextField } from "../ui/TextField";
 
-/** Enter a Jellyfin server URL and connect. Calls `onConnected` once the server is reachable. */
-export function ConnectServerScreen({ onConnected }: { onConnected: (server: ServerState) => void }) {
+/**
+ * Enter a Jellyfin server URL and connect. Calls `onConnected` once the server is reachable;
+ * `onBack` (when given) returns to the user picker.
+ */
+export function ConnectServerScreen({
+  onConnected,
+  onBack,
+}: {
+  onConnected: (server: ServerState) => void;
+  onBack?: () => void;
+}) {
   const container = useContainer();
   const vm = useMemo(() => createConnectToServerViewModel(container), [container]);
   const url = useRef("");
@@ -46,7 +55,10 @@ export function ConnectServerScreen({ onConnected }: { onConnected: (server: Ser
         }}
         onSubmit={connect}
       />
-      <Button label="Connect" busy={state === "connecting"} onPress={connect} />
+      <ScreenActions>
+        <Button label="Connect" busy={state === "connecting"} onPress={connect} />
+        {onBack ? <Button label="Back" variant="plain" onPress={onBack} /> : null}
+      </ScreenActions>
       {error ? <ScreenNote error>{error.message}</ScreenNote> : null}
     </Screen>
   );

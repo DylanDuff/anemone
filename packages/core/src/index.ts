@@ -146,6 +146,7 @@ export {
     logoImageSource,
     personImageSource,
     resumeFrameSource,
+    savedUserImageURL,
     seriesImageSource,
     userImageURL,
 } from "./jellyfin/images";
@@ -294,6 +295,7 @@ export {
 } from "./viewmodels/connectToServerViewModel";
 export {
     createSelectUserViewModel,
+    type SavedUser,
     type SelectUserAction,
     type SelectUserBackgroundState,
     type SelectUserData,

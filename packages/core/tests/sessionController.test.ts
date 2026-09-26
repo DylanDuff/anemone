@@ -40,5 +40,27 @@ describe("SessionController", () => {
 
         await controller.signOut();
         expect(controller.getSession()).toBeNull();
+        // Signing out keeps the user saved, so the picker can switch back.
+        expect((await container.storedValues.get(UserKeys.users())).map((user) => user.id)).toEqual(["u1"]);
+    });
+
+    it("signs out and forgets the current user", async () => {
+        const container = await makeTestContainer();
+        await container.storedValues.set(ServerKeys.servers(), [
+            makeServerState({ id: "s1", name: "Home", currentURL: "http://host", userIDs: ["u1"] }),
+        ]);
+        await container.storedValues.set(UserKeys.users(), [
+            makeUserState({ id: "u1", serverID: "s1", username: "alice" }),
+        ]);
+        container.userSecrets.setAccessToken("u1", "tok");
+
+        const controller = new SessionController(container);
+        await controller.setCurrentUser("u1");
+        await controller.signOutAndForget();
+
+        expect(controller.getSession()).toBeNull();
+        expect(await container.storedValues.get(UserKeys.users())).toEqual([]);
+        const [server] = await container.storedValues.get(ServerKeys.servers());
+        expect(server?.userIDs).toEqual([]);
     });
 });

@@ -5,28 +5,13 @@
 import { type Api, personImageSource } from "@anemone/core";
 import type { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client/models/base-item-person";
 import type { ReactNode } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import {
-  Focusable,
-  focusGlow,
-  focusLift,
-  FocusRing,
-  hoverTransition,
-  useFocusIndicator,
-} from "./Focusable";
+import { StyleSheet, Text } from "react-native";
+import { Avatar } from "./Avatar";
+import { Focusable, focusLift, FocusRing } from "./Focusable";
 import { imagePixelWidth } from "./imageSize";
 import { space, theme } from "./theme";
 
 const CARD_PHOTO_SIZE = 120;
-
-function initials(name: string | null | undefined): string {
-  return (name ?? "?")
-    .split(/\s+/)
-    .map((part) => part[0] ?? "")
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 /**
  * A person's round photo, over their initials (shown when there's no photo, or while it loads).
@@ -45,28 +30,13 @@ export function PersonPhoto({
   focused?: boolean;
   children?: ReactNode;
 }) {
-  const indicator = useFocusIndicator();
   const url = personImageSource(api, person, { maxWidth: imagePixelWidth(size) }).url;
   return (
-    <View
-      style={[
-        styles.photo,
-        { width: size, height: size },
-        hoverTransition,
-        focusGlow(indicator, focused),
-      ]}
-    >
-      <Text style={[styles.initials, { fontSize: size * INITIALS_SCALE }]}>
-        {initials(person.Name)}
-      </Text>
-      {url ? <Image source={{ uri: url }} style={styles.image} resizeMode="cover" /> : null}
+    <Avatar name={person.Name} imageURL={url} size={size} focused={focused}>
       {children}
-    </View>
+    </Avatar>
   );
 }
-
-/** Initials fill about a quarter of the photo's diameter at the `title` weight. */
-const INITIALS_SCALE = 0.25;
 
 /**
  * A person in a row (cast, people search): lifted photo with a ring following its circle and a
@@ -118,20 +88,6 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_PHOTO_SIZE,
     alignItems: "center",
-  },
-  photo: {
-    borderRadius: theme.radii.pill,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.placeholder,
-  },
-  image: {
-    ...StyleSheet.absoluteFill,
-  },
-  initials: {
-    ...theme.type.title,
-    color: theme.colors.muted,
   },
   name: {
     ...theme.type.caption,

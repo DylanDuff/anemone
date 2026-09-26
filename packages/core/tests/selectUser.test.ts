@@ -55,6 +55,35 @@ describe("createSelectUserViewModel", () => {
         expect(servers[0]?.users[0]?.username).toBe("zoe");
     });
 
+    it("attaches each user's avatar tag from their cached profile", async () => {
+        const container = await makeTestContainer();
+        await seed(container);
+        await container.storedValues.set(UserKeys.data("u1"), { Id: "u1", PrimaryImageTag: "tag1" });
+        const vm = createSelectUserViewModel(container);
+        vm.send({ kind: "getServers" });
+        await tick();
+
+        const users = vm.getData().servers.flatMap((entry) => entry.users);
+        expect(users.find((user) => user.id === "u1")?.imageTag).toBe("tag1");
+        expect(users.find((user) => user.id === "u2")?.imageTag).toBeUndefined();
+    });
+
+    it("deletes a server with its users", async () => {
+        const container = await makeTestContainer();
+        await seed(container);
+        const vm = createSelectUserViewModel(container);
+        vm.send({ kind: "getServers" });
+        await tick();
+
+        const alpha = vm.getData().servers[0]!.server;
+        vm.send({ kind: "deleteServer", server: alpha });
+        await tick();
+
+        expect(vm.getData().servers.map((entry) => entry.server.name)).toEqual(["Beta"]);
+        const users = await container.storedValues.get(UserKeys.users());
+        expect(users.map((user) => user.id)).toEqual(["u2"]);
+    });
+
     it("deletes a user as a background refresh and prunes it everywhere", async () => {
         const container = await makeTestContainer();
         await seed(container);

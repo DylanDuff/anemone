@@ -6,6 +6,7 @@
 import { describe, expect, it } from "vitest";
 import { JellyfinClientFactory } from "../src/jellyfin/client";
 import {
+    savedUserImageURL,
     backdropImageSource,
     logoImageSource,
     personImageSource,
@@ -96,5 +97,17 @@ describe("resumeFrameSource", () => {
         );
         expect(source.url).toContain("/Items/movie/Images/Thumb");
         expect(source.url).toContain("maxWidth=560");
+    });
+});
+
+describe("savedUserImageURL", () => {
+    it("builds the public avatar URL with its tag and size", () => {
+        expect(savedUserImageURL("http://host:8096/", "u1", "tag1", { maxWidth: 240 })).toBe(
+            "http://host:8096/Users/u1/Images/Primary?tag=tag1&maxWidth=240",
+        );
+    });
+
+    it("is undefined without a tag (the user has no avatar)", () => {
+        expect(savedUserImageURL("http://host", "u1", undefined)).toBeUndefined();
     });
 });

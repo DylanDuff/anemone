@@ -8,7 +8,7 @@ import { ErrorMessage } from "../errors/errorMessage";
 import { ServerKeys } from "../data/keys/serverKeys";
 import { UserKeys } from "../data/keys/userKeys";
 import type { ServerState } from "../session/serverState";
-import { deleteUser } from "../session/userManagement";
+import { deleteServer, deleteUser } from "../session/userManagement";
 import type { UserState } from "../session/userState";
 import {
     createStatefulStore,
@@ -19,15 +19,22 @@ import {
 export type SelectUserState = "initial" | "loading" | "content";
 export type SelectUserBackgroundState = "refreshing";
 
+/** A saved user as the picker shows it: their avatar's image tag, if they have one. */
+export interface SavedUser extends UserState {
+    readonly imageTag?: string;
+}
+
 /** A server together with the users saved for it, sorted for display. */
 export interface ServerUsers {
     readonly server: ServerState;
-    readonly users: readonly UserState[];
+    readonly users: readonly SavedUser[];
 }
 
 export type SelectUserAction =
     | { readonly kind: "getServers" }
     | { readonly kind: "deleteUsers"; readonly users: readonly UserState[] }
+    /** Remove a server along with every user saved for it. */
+    | { readonly kind: "deleteServer"; readonly server: ServerState }
     | { readonly kind: "signIn"; readonly user: UserState; readonly pin: string };
 
 export type SelectUserEvent = { readonly kind: "signedIn"; readonly user: UserState };
@@ -57,8 +64,15 @@ export function createSelectUserViewModel(container: AnemoneContainer): SelectUs
             container.storedValues.get(UserKeys.users()),
         ]);
 
-        const usersByServer = new Map<string, UserState[]>();
-        for (const user of users) {
+        // The cached UserDto carries the avatar tag (no tag: no avatar, so no image request).
+        const savedUsers: SavedUser[] = await Promise.all(
+            users.map(async (user) => {
+                const data = await container.storedValues.get(UserKeys.data(user.id));
+                return { ...user, imageTag: data.PrimaryImageTag ?? undefined };
+            }),
+        );
+        const usersByServer = new Map<string, SavedUser[]>();
+        for (const user of savedUsers) {
             const list = usersByServer.get(user.serverID) ?? [];
             list.push(user);
             usersByServer.set(user.serverID, list);
@@ -88,6 +102,7 @@ export function createSelectUserViewModel(container: AnemoneContainer): SelectUs
                 case "getServers":
                     return Transitions.to("loading", "content");
                 case "deleteUsers":
+                case "deleteServer":
                     return Transitions.background("refreshing");
                 case "signIn":
                     return Transitions.none();
@@ -104,6 +119,12 @@ export function createSelectUserViewModel(container: AnemoneContainer): SelectUs
                     for (const user of action.users) {
                         await deleteUser(container, user);
                     }
+                    context.setData({ servers: await loadServers() });
+                    return;
+                }
+
+                case "deleteServer": {
+                    await deleteServer(container, action.server);
                     context.setData({ servers: await loadServers() });
                     return;
                 }

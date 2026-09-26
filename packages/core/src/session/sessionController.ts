@@ -5,6 +5,7 @@
 
 import { createStore, type StoreApi } from "zustand/vanilla";
 import type { AnemoneContainer } from "../container/container";
+import { deleteUser } from "./userManagement";
 import type { UserSession } from "./userSession";
 
 export interface SessionSnapshot {
@@ -47,9 +48,19 @@ export class SessionController {
         return this.refresh();
     }
 
-    /** Sign out and refresh. */
+    /** Sign out and refresh. The user stays saved, so they can switch back from the user picker. */
     async signOut(): Promise<void> {
         this.container.signOut();
+        await this.refresh();
+    }
+
+    /** Sign out and forget the current user on this device (token, settings, cached data). */
+    async signOutAndForget(): Promise<void> {
+        const user = this.getSession()?.user;
+        this.container.signOut();
+        if (user) {
+            await deleteUser(this.container, user);
+        }
         await this.refresh();
     }
 }

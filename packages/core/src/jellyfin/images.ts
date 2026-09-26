@@ -176,6 +176,29 @@ export function personImageSource(
 }
 
 /** A user's profile image URL (Swiftfin `UserState.profileImageSource`). */
+/**
+ * A saved user's avatar, for the user picker (no signed-in session, so no `Api`): Jellyfin serves
+ * `/Users/{id}/Images/Primary` without auth. `undefined` when the user has no image (`tag`).
+ */
+export function savedUserImageURL(
+    serverURL: string,
+    userID: string,
+    tag: string | undefined,
+    options: Omit<ImageRequestOptions, "tag"> = {},
+): string | undefined {
+    if (!tag) {
+        return undefined;
+    }
+    const params = new URLSearchParams({ tag });
+    for (const key of ["maxWidth", "maxHeight", "quality"] as const) {
+        const value = options[key];
+        if (value != null) {
+            params.set(key, String(value));
+        }
+    }
+    return `${serverURL.replace(/\/+$/, "")}/Users/${userID}/Images/Primary?${params}`;
+}
+
 export function userImageURL(api: Api, user: UserDto): string | undefined {
     return getImageUrlsApi(api).getUserImageUrl(user);
 }

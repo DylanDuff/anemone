@@ -3,13 +3,24 @@
 //
 
 import type { ReactNode } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useContentLayout } from "./contentLayout";
 import { space, theme } from "./theme";
 
-/** A padded, scrollable form page with a title — the connect / sign-in steps before a session. */
-export function Screen({ title, children }: { title: string; children: ReactNode }) {
+/**
+ * A padded, scrollable page with a title — the connect / sign-in / user-picker steps before a
+ * session. `accessory` sits at the end of the title row (e.g. an Edit toggle).
+ */
+export function Screen({
+  title,
+  accessory,
+  children,
+}: {
+  title: string;
+  accessory?: ReactNode;
+  children: ReactNode;
+}) {
   const safeArea = useSafeAreaInsets();
   const { insetLeft, insetRight } = useContentLayout();
   return (
@@ -26,10 +37,18 @@ export function Screen({ title, children }: { title: string; children: ReactNode
         },
       ]}
     >
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>{title}</Text>
+        {accessory}
+      </View>
       {children}
     </ScrollView>
   );
+}
+
+/** A row of buttons on a form page (primary action first, then e.g. Back). */
+export function ScreenActions({ children }: { children: ReactNode }) {
+  return <View style={styles.actions}>{children}</View>;
 }
 
 /** Supporting text on a form page: a hint, or an error. */
@@ -46,10 +65,22 @@ const styles = StyleSheet.create({
     gap: space(2),
     maxWidth: 560,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space(2),
+    marginBottom: space(1),
+  },
   title: {
     ...theme.type.title,
     color: theme.colors.text,
-    marginBottom: space(1),
+    flexShrink: 1,
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space(1),
   },
   note: {
     ...theme.type.callout,
