@@ -12,6 +12,7 @@ import {
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
+import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useGlassButtons } from "../settings";
 import { Focusable } from "./Focusable";
@@ -95,12 +96,7 @@ export function ItemTitleBlock({
       ) : null}
 
       {logo && !isEpisode ? (
-        <Image
-          source={{ uri: logo }}
-          style={styles.logo}
-          resizeMode="contain"
-          accessibilityLabel={displayTitle(item)}
-        />
+        <TitleLogo uri={logo} label={displayTitle(item)} />
       ) : (
         <Text numberOfLines={2} style={styles.title}>
           {locator ? `${locator} · ${displayTitle(item)}` : displayTitle(item)}
@@ -120,6 +116,35 @@ export function ItemTitleBlock({
         </>
       )}
     </View>
+  );
+}
+
+/**
+ * The title-art logo, fitted inside the logo box but anchored to its leading edge (in line with
+ * the actions below). `contain` alone centres it, and `Image` has no content position, so once
+ * the logo loads the box shrinks to the fitted size.
+ */
+function TitleLogo({ uri, label }: { uri: string; label: string }) {
+  const [aspectRatio, setAspectRatio] = useState<number>();
+  const fitted =
+    aspectRatio == null
+      ? null
+      : aspectRatio >= LOGO_WIDTH / LOGO_HEIGHT
+        ? { width: LOGO_WIDTH, height: LOGO_WIDTH / aspectRatio }
+        : { width: LOGO_HEIGHT * aspectRatio, height: LOGO_HEIGHT };
+
+  return (
+    <Image
+      source={{ uri }}
+      style={[styles.logo, fitted]}
+      resizeMode="contain"
+      accessibilityLabel={label}
+      onLoad={({ nativeEvent: { source } }) => {
+        if (source?.width && source.height) {
+          setAspectRatio(source.width / source.height);
+        }
+      }}
+    />
   );
 }
 
