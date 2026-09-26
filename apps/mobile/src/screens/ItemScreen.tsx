@@ -12,8 +12,7 @@ import { type RootStackParamList, useAppNavigation, useOpenItem } from "../navig
 import { BackButton } from "../ui/BackButton";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
-import { isTV } from "../ui/tv";
-import { useContentLayout } from "../ui/contentLayout";
+import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
 import { AboutSection } from "./item/AboutSection";
 import { CastRow } from "./item/CastRow";
 import { CollectionItems } from "./item/CollectionItems";
@@ -64,7 +63,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
     <ScrollView
       style={styles.screen}
       contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={!isTV}
+      showsVerticalScrollIndicator={showsPageScrollIndicator}
     >
       <ItemHeader api={ctx.api} item={identified} onOpenSeries={openSeries} />
       <ItemOverview item={identified} />

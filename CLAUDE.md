@@ -65,6 +65,8 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   full-size pages on the edge chosen in Settings (left/right/top/bottom; phones: always a compact
   bottom pill). Content starts inside `insetLeft`/`insetRight` and adds `insetTop`/`insetBottom` to
   its own padding, then scrolls under the pill; hero artwork bleeds beneath it.
+- Page ScrollViews use `showsPageScrollIndicator` (off on TV and web): Safari's classic scrollbar
+  takes a gutter from the window and breaks the full-bleed hero/rows.
 - Side margins come from the layout insets (`gutterFor(compact)`: 50pt, 20pt on phones) — never
   `theme.gutter` in a stylesheet.
 - Poster / 16:9 card sizes (incl. episodes and extras) come from `useCardWidths()` (smaller when compact), never

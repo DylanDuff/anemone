@@ -3,7 +3,7 @@
 //
 
 import { createContext, useContext } from "react";
-import { useWindowDimensions } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 import { theme } from "./theme";
 import { isTV } from "./tv";
 
@@ -15,6 +15,13 @@ export function useIsCompact(): boolean {
   const { width } = useWindowDimensions();
   return !isTV && width < COMPACT_MAX_WIDTH;
 }
+
+/**
+ * Whether full-bleed pages show a vertical scroll indicator. Never on TV; never on web either,
+ * where a classic scrollbar (Safari with a mouse attached) takes a gutter from the window, so the
+ * hero and rows would stop short of the edge. Native indicators overlay the content.
+ */
+export const showsPageScrollIndicator = !isTV && Platform.OS !== "web";
 
 /** The page's side margin: tighter on phones / narrow web. */
 export function gutterFor(compact: boolean): number {

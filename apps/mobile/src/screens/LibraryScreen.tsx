@@ -25,7 +25,7 @@ import {
   View,
 } from "react-native";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
-import { useCardWidths, useContentLayout } from "../ui/contentLayout";
+import { showsPageScrollIndicator, useCardWidths, useContentLayout } from "../ui/contentLayout";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
@@ -153,7 +153,7 @@ function LibraryContent({
       onLayout={isTV ? (event) => setListHeight(event.nativeEvent.layout.height) : undefined}
     >
       <FlatList
-        showsVerticalScrollIndicator={!isTV}
+        showsVerticalScrollIndicator={showsPageScrollIndicator}
         // Changing column count requires a fresh list.
         key={isGrid ? `grid-${columns}` : "list"}
         style={isTV && listHeight != null ? { height: listHeight } : styles.list}

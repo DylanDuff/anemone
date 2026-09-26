@@ -15,10 +15,9 @@ import {
   useNavigationPlacementSetting,
 } from "../settings";
 import { ChoiceRow } from "../ui/ChoiceRow";
-import { useContentLayout, useIsCompact } from "../ui/contentLayout";
+import { showsPageScrollIndicator, useContentLayout, useIsCompact } from "../ui/contentLayout";
 import { space, theme } from "../ui/theme";
 import { ToggleRow } from "../ui/ToggleRow";
-import { isTV } from "../ui/tv";
 
 /**
  * Device settings (a top-level section). Values persist per device and apply immediately — every
@@ -40,7 +39,7 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
 
   return (
     <ScrollView
-      showsVerticalScrollIndicator={!isTV}
+      showsVerticalScrollIndicator={showsPageScrollIndicator}
       style={styles.screen}
       contentContainerStyle={[
         styles.content,

@@ -14,12 +14,11 @@ import {
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useOpenItem } from "../navigation/routes";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useContentLayout } from "../ui/contentLayout";
+import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
 import { HeroCarousel } from "../ui/HeroCarousel";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
-import { isTV } from "../ui/tv";
 
 /**
  * The signed-in home: a hero carousel of recently-added items across all libraries, followed by a
@@ -43,7 +42,7 @@ export function HomeScreen() {
     <View style={styles.screen}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom }}
-        showsVerticalScrollIndicator={!isTV}
+        showsVerticalScrollIndicator={showsPageScrollIndicator}
       >
         {/*<View style={styles.topBar}>
           <Text style={styles.brand}>Anemone</Text>
