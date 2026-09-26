@@ -114,10 +114,6 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - ✅ Continue Watching row: landscape resume cards with a progress bar. The thumbnail uses
   `resumeFrameSource` — the chapter image at/just-before the resume position (a real frame near
   where you resume), falling back to a landscape image.
-- [ ] **Exact resume frame via trickplay**: `resumeFrameSource` uses chapter images (frame at the
-  nearest chapter). For the pixel-exact frame at the resume second, use Jellyfin trickplay tiles
-  (`item.Trickplay`, `/Videos/{id}/Trickplay/{width}/{tileIndex}.jpg`) — needs sprite cropping
-  (a clipping View + offset Image), so it was deferred. Request `ItemFields.Trickplay` when doing it.
 - ✅ **Navigation**: React Navigation native stack (`navigation/RootStack.tsx`), id-only params
   with web linking (`/library/:libraryID`, `/item/:itemID`) so refresh/back work in the browser.
   Auth screens remain state-based in `AppNavigator`.
