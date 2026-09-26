@@ -2,7 +2,7 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Focusable, focusLift } from "./Focusable";
 import { Icon, type IconName } from "./Icon";
 import { space, theme } from "./theme";
@@ -38,18 +38,42 @@ export function Chip({
         pressed ? styles.pressed : null,
       ]}
     >
-      {({ focused }) => {
-        const color = focused ? theme.colors.chipActiveText : theme.colors.text;
-        return (
-          <>
-            {icon ? <Icon name={icon} size={15} color={color} /> : null}
-            {label ? <Text style={[styles.label, { color }]}>{label}</Text> : null}
-          </>
-        );
-      }}
+      {({ focused }) => <ChipContent label={label} icon={icon} focused={focused} />}
     </Focusable>
   );
 }
+
+/**
+ * A chip's look without its press handling, for native controls that own the tap themselves (the
+ * trigger of a native menu, see `ChoiceMenu`).
+ */
+export function ChipFace({ label, icon }: { label?: string; icon?: IconName }) {
+  return (
+    <View style={styles.chip}>
+      <ChipContent label={label} icon={icon} focused={false} />
+    </View>
+  );
+}
+
+function ChipContent({
+  label,
+  icon,
+  focused,
+}: {
+  label?: string;
+  icon?: IconName;
+  focused: boolean;
+}) {
+  const color = focused ? theme.colors.chipActiveText : theme.colors.text;
+  return (
+    <>
+      {icon ? <Icon name={icon} size={CHIP_ICON_SIZE} color={color} /> : null}
+      {label ? <Text style={[styles.label, { color }]}>{label}</Text> : null}
+    </>
+  );
+}
+
+const CHIP_ICON_SIZE = 15;
 
 const styles = StyleSheet.create({
   chip: {
