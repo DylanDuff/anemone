@@ -9,7 +9,7 @@ import { type EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-conte
 import type { Section } from "../navigation/routes";
 import type { SectionEntry } from "../navigation/sections";
 import { type ContentLayout, gutterFor } from "./contentLayout";
-import { Focusable, FocusWithin } from "./Focusable";
+import { Focusable, focusLift, FocusWithin } from "./Focusable";
 import { GlassSurface } from "./Glass";
 import { Icon, iconVariant } from "./Icon";
 import { space, theme } from "./theme";
@@ -218,8 +218,8 @@ export function SectionRail({
           vertical ? styles.sideItem : null,
           placement === "right" ? styles.sideItemReversed : null,
           labelledUnder ? styles.labelledItem : null,
+          focused ? [styles.itemFocused, focusLift] : null,
           entry.active ? styles.itemActive : null,
-          focused ? styles.itemFocused : null,
         ]}
       >
         {({ focused }) => (
@@ -228,7 +228,13 @@ export function SectionRail({
               <Icon
                 name={iconVariant(entry.icon, entry.active)}
                 size={ICON_SIZE}
-                color={focused ? theme.colors.chipActiveText : theme.colors.text}
+                color={
+                  entry.active
+                    ? theme.colors.accent
+                    : focused
+                      ? theme.colors.chipActiveText
+                      : theme.colors.text
+                }
               />
             </View>
             {labelled ? (
@@ -237,8 +243,8 @@ export function SectionRail({
                 style={[
                   vertical ? styles.sideLabel : styles.underLabel,
                   placement === "right" ? styles.sideLabelReversed : null,
-                  entry.active ? styles.labelActive : null,
                   focused ? styles.labelFocused : null,
+                  entry.active ? styles.labelActive : null,
                 ]}
               >
                 {entry.label}
@@ -393,8 +399,9 @@ const styles = StyleSheet.create({
     width: ITEM_SIZE,
     alignItems: "center",
   },
+  // The current section: a white pill with an accent icon (and label).
   itemActive: {
-    backgroundColor: theme.colors.accent,
+    backgroundColor: theme.colors.white,
   },
   itemFocused: {
     backgroundColor: theme.colors.chipActive,
@@ -416,7 +423,7 @@ const styles = StyleSheet.create({
     color: theme.colors.muted,
   },
   labelActive: {
-    color: theme.colors.text,
+    color: theme.colors.accent,
   },
   labelFocused: {
     color: theme.colors.chipActiveText,
