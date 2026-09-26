@@ -15,6 +15,7 @@ import {
     useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { setItemFavorite, setItemPlayed } from "../jellyfin/playstate";
 import { useQueryContext } from "../react/context";
 import {
@@ -115,6 +116,16 @@ function invalidateUserItemData(queryClient: QueryClient, userID: string): void 
     ]) {
         void queryClient.invalidateQueries({ queryKey });
     }
+}
+
+/** Refresh per-user item state everywhere, e.g. after playback moved the resume position. */
+export function useRefreshUserItemData(): () => void {
+    const ctx = useQueryContext();
+    const queryClient = useQueryClient();
+    return useCallback(
+        () => invalidateUserItemData(queryClient, ctx.userID),
+        [queryClient, ctx.userID],
+    );
 }
 
 type UserItemDataSetter = (

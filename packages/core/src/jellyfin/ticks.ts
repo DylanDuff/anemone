@@ -14,6 +14,19 @@ export function secondsToTicks(seconds: number): number {
     return Math.round(seconds * TICKS_PER_SECOND);
 }
 
+/** A player clock: "4:05", "1:02:03". Hours appear once the position or `total` needs them. */
+export function formatClock(totalSeconds: number, referenceSeconds = totalSeconds): string {
+    const seconds = Math.max(0, Math.floor(totalSeconds));
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secondsPart = String(seconds % 60).padStart(2, "0");
+
+    if (hours > 0 || referenceSeconds >= 3600) {
+        return `${hours}:${String(minutes).padStart(2, "0")}:${secondsPart}`;
+    }
+    return `${minutes}:${secondsPart}`;
+}
+
 /**
  * Format a duration in seconds as an abbreviated hours/minutes label (e.g. "1h 23m", "45m"),
  * mirroring Swiftfin's `DateComponentsFormatter` with `[.hour, .minute]`. Localization of the

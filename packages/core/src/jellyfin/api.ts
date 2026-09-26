@@ -24,6 +24,8 @@ export { getBrandingApi } from "@jellyfin/sdk/lib/utils/api/branding-api";
 export { getImageApi } from "@jellyfin/sdk/lib/utils/api/image-api";
 export { getSearchApi } from "@jellyfin/sdk/lib/utils/api/search-api";
 export { getVideoApi } from "@jellyfin/sdk/lib/utils/api/video-api";
+export { getMediaInfoApi } from "@jellyfin/sdk/lib/utils/api/media-info-api";
+export { getSessionApi } from "@jellyfin/sdk/lib/utils/api/session-api";
 
 export { ImageUrlsApi };
 

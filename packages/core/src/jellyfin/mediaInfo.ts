@@ -91,7 +91,10 @@ export function codecLabel(codec: string | null | undefined): string | undefined
     return CODEC_LABELS[codec.toLowerCase()] ?? codec.toUpperCase();
 }
 
-function streamsOfType(streams: readonly MediaStream[], type: MediaStreamType): MediaStream[] {
+export function streamsOfType(
+    streams: readonly MediaStream[],
+    type: MediaStreamType,
+): MediaStream[] {
     return streams.filter((stream) => stream.Type === type);
 }
 
@@ -110,7 +113,7 @@ function joinParts(parts: ReadonlyArray<string | undefined>, separator = " "): s
 }
 
 /** A per-track label: the server's `DisplayTitle` if present, else language + codec + channels. */
-function trackLabel(stream: MediaStream): string {
+export function trackLabel(stream: MediaStream): string {
     return (
         stream.DisplayTitle ??
         joinParts([

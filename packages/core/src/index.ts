@@ -92,6 +92,7 @@ export { deleteServer, deleteUser } from "./session/userManagement";
 // Jellyfin operation factories (Paths.* equivalents)
 export * as JellyfinApi from "./jellyfin/api";
 export {
+    formatClock,
     formatHoursMinutes,
     secondsToTicks,
     TICKS_PER_SECOND,
@@ -144,6 +145,42 @@ export {
 } from "./jellyfin/images";
 export { setItemFavorite, setItemPlayed } from "./jellyfin/playstate";
 
+// Playback
+export {
+    type DirectPlayFormat,
+    IMAGE_SUBTITLE_FORMATS,
+    type PlayerCapabilities,
+    type TranscodeFormat,
+} from "./playback/capabilities";
+export { buildDeviceProfile } from "./playback/deviceProfile";
+export {
+    type AudioDelivery,
+    type ExternalSubtitle,
+    mediaURL,
+    type PlaybackRequest,
+    type PlaybackSource,
+    type PlaybackTrack,
+    resolvePlayback,
+    type SubtitleDelivery,
+    SUBTITLES_OFF,
+} from "./playback/playbackSource";
+export { selectTrackLocally, type TrackChange } from "./playback/trackSelection";
+export {
+    type PlaybackProgress,
+    PlaybackReporter,
+    type PlaybackReporterOptions,
+} from "./playback/playbackReporter";
+export {
+    createPlaybackViewModel,
+    type PlaybackAction,
+    type PlaybackBackgroundState,
+    type PlaybackData,
+    type PlaybackState,
+    type PlaybackViewModel,
+    type PlaybackViewModelOptions,
+} from "./playback/playbackViewModel";
+export { type PlaybackReporting, usePlaybackReporting } from "./playback/usePlaybackReporting";
+
 // Query layer (data-fetching view models)
 export { type QueryContext, queryContextFromSession } from "./query/queryContext";
 export { libraryParentRequest } from "./query/libraryParent";
@@ -190,6 +227,7 @@ export {
     useLibraryItems,
     useLocalTrailers,
     useNextUp,
+    useRefreshUserItemData,
     useResumeItems,
     useSearch,
     useSeasons,

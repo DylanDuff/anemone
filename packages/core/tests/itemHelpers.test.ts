@@ -27,7 +27,7 @@ import {
     seriesPlayTarget,
     uniqueItems,
 } from "../src/jellyfin/itemHelpers";
-import { formatHoursMinutes, secondsToTicks } from "../src/jellyfin/ticks";
+import { formatClock, formatHoursMinutes, secondsToTicks } from "../src/jellyfin/ticks";
 
 describe("ticks / formatting", () => {
     it("formats hours and minutes", () => {
@@ -35,6 +35,14 @@ describe("ticks / formatting", () => {
         expect(formatHoursMinutes(45 * 60)).toBe("45m");
         expect(formatHoursMinutes(3600 + 23 * 60)).toBe("1h 23m");
         expect(formatHoursMinutes(2 * 3600)).toBe("2h");
+    });
+
+    it("formats a player clock, with hours when the reference needs them", () => {
+        expect(formatClock(0)).toBe("0:00");
+        expect(formatClock(245.9)).toBe("4:05");
+        expect(formatClock(3723)).toBe("1:02:03");
+        expect(formatClock(65, 2 * 3600)).toBe("0:01:05");
+        expect(formatClock(-3)).toBe("0:00");
     });
 });
 
