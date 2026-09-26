@@ -175,12 +175,17 @@ const GLOW_LAYERS: ReadonlyArray<[offsetY: number, blur: number, color: string]>
 /** How far the glow reaches past the element's bottom edge — its furthest-reaching direction. */
 const GLOW_REACH = Math.max(...GLOW_LAYERS.map(([offsetY, blur]) => offsetY + blur));
 
+/** How far an item `size` points across overflows each side when `focusLift` scales it. */
+export function liftRoom(size: number): number {
+  return Math.ceil((size * (FOCUS_SCALE - 1)) / 2);
+}
+
 /**
  * Space to leave around focusable artwork inside a clipping container (a horizontal ScrollView
  * crops to its own bounds), so neither the lift nor the glow is cut off. Covers a ~300pt-tall item
  * growing by `FOCUS_SCALE` about its centre, plus the glow's reach.
  */
-export const focusRoom = Math.ceil((300 * (FOCUS_SCALE - 1)) / 2) + GLOW_REACH;
+export const focusRoom = liftRoom(300) + GLOW_REACH;
 
 interface FocusWithinValue {
   report: (focused: boolean) => void;

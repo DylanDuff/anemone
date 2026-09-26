@@ -13,6 +13,7 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import { useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Chip } from "../../ui/Chip";
+import { liftRoom } from "../../ui/Focusable";
 import { space } from "../../ui/theme";
 import { EpisodeShelf } from "./EpisodeShelf";
 
@@ -43,7 +44,12 @@ export function SeasonsSection({
 
   const picker =
     seasons.length > 1 ? (
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.picker}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.pickerFrame}
+        contentContainerStyle={styles.picker}
+      >
         {seasons.map((season, index) => (
           <Chip
             key={season.Id ?? index}
@@ -89,8 +95,16 @@ export function SeasonEpisodes({
   );
 }
 
+/** Room for a focused chip's lift inside the clipping picker; covers chips up to 160pt wide. */
+const PICKER_ROOM = liftRoom(160);
+
 const styles = StyleSheet.create({
+  // Extend the clip past the chips by the lift's reach, without moving them.
+  pickerFrame: {
+    margin: -PICKER_ROOM,
+  },
   picker: {
     gap: space(1),
+    padding: PICKER_ROOM,
   },
 });
