@@ -12,6 +12,7 @@ import { describe, expect, it } from "vitest";
 import {
     displayTitle,
     episodeLocator,
+    formatLongDate,
     isFavorite,
     isLiveStream,
     isMissing,
@@ -24,6 +25,8 @@ import {
     progressLabel,
     runtimeLabel,
     seasonEpisodeLabel,
+    personFromItem,
+    personLifeLabels,
     seriesPlayTarget,
     uniqueItems,
 } from "../src/jellyfin/itemHelpers";
@@ -177,5 +180,50 @@ describe("uniqueItems", () => {
 
     it("keeps items without an id", () => {
         expect(uniqueItems([{ Name: "x" }, { Name: "y" }])).toHaveLength(2);
+    });
+});
+
+describe("personFromItem", () => {
+    it("maps a person item to the cast-entry shape, primary image tag included", () => {
+        expect(
+            personFromItem({
+                Id: "p1",
+                Name: "Keanu Reeves",
+                ImageTags: { Primary: "tag1" },
+                ImageBlurHashes: { Primary: { tag1: "hash" } },
+            }),
+        ).toEqual({
+            Id: "p1",
+            Name: "Keanu Reeves",
+            PrimaryImageTag: "tag1",
+            ImageBlurHashes: { Primary: { tag1: "hash" } },
+        });
+    });
+
+    it("leaves the image tag unset when there is no primary image", () => {
+        expect(personFromItem({ Id: "p2", Name: "Nobody" }).PrimaryImageTag).toBeUndefined();
+    });
+});
+
+describe("person life labels", () => {
+    it("formats a long date in the local format, and nothing for a missing one", () => {
+        expect(formatLongDate("1964-09-02T00:00:00Z")).toContain("1964");
+        expect(formatLongDate(undefined)).toBeUndefined();
+    });
+
+    it("joins birth date and place, and adds a death line", () => {
+        const labels = personLifeLabels({
+            PremiereDate: "1964-09-02T12:00:00Z",
+            EndDate: "2020-01-01T12:00:00Z",
+            ProductionLocations: ["Beirut, Lebanon"],
+        });
+        expect(labels).toHaveLength(2);
+        expect(labels[0]).toMatch(/^Born .*1964 in Beirut, Lebanon$/);
+        expect(labels[1]).toMatch(/^Died .*2020$/);
+    });
+
+    it("falls back to the place alone, and is empty without either", () => {
+        expect(personLifeLabels({ ProductionLocations: ["Lyon"] })).toEqual(["Born in Lyon"]);
+        expect(personLifeLabels({})).toEqual([]);
     });
 });

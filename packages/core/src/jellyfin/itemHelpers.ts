@@ -8,6 +8,7 @@
 //
 
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
+import type { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client/models/base-item-person";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import { ChannelType } from "@jellyfin/sdk/lib/generated-client/models/channel-type";
 import { LocationType } from "@jellyfin/sdk/lib/generated-client/models/location-type";
@@ -18,6 +19,19 @@ import { formatHoursMinutes, ticksToSeconds } from "./ticks";
  * can return an item twice — e.g. "latest" across libraries when it belongs to two views, or
  * offset paging over a sort with ties — and duplicates break list rendering (React keys).
  */
+/**
+ * A person item (e.g. a people-search result) in the cast-entry shape (`BaseItemPerson`), so both
+ * render through the same person card and image helpers.
+ */
+export function personFromItem(item: BaseItemDto): BaseItemPerson {
+    return {
+        Id: item.Id ?? undefined,
+        Name: item.Name,
+        PrimaryImageTag: item.ImageTags?.Primary,
+        ImageBlurHashes: item.ImageBlurHashes,
+    };
+}
+
 export function uniqueItems<Item extends BaseItemDto>(items: readonly Item[]): Item[] {
     const seen = new Set<string>();
     return items.filter((item) => {
@@ -182,6 +196,38 @@ export function itemMetadataLabels(item: BaseItemDto): string[] {
 }
 
 /** Four-digit premiere year, if known (Swiftfin `premiereDateYear`). */
+/** An ISO date as a long, localised date ("2 September 1964" / "September 2, 1964"). */
+export function formatLongDate(isoDate: string | null | undefined): string | undefined {
+    if (!isoDate) {
+        return undefined;
+    }
+    return new Date(isoDate).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+}
+
+/**
+ * A person's birth and death lines ("Born 2 September 1964 in Beirut, Lebanon", "Died …"), from the
+ * dates and first production location Jellyfin stores on person items.
+ */
+export function personLifeLabels(item: BaseItemDto): string[] {
+    const labels: string[] = [];
+    const born = formatLongDate(item.PremiereDate);
+    const place = item.ProductionLocations?.[0];
+    if (born) {
+        labels.push(place ? `Born ${born} in ${place}` : `Born ${born}`);
+    } else if (place) {
+        labels.push(`Born in ${place}`);
+    }
+    const died = formatLongDate(item.EndDate);
+    if (died) {
+        labels.push(`Died ${died}`);
+    }
+    return labels;
+}
+
 export function premiereYear(item: BaseItemDto): string | undefined {
     if (!item.PremiereDate) {
         return undefined;

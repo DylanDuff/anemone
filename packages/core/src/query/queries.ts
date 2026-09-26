@@ -15,6 +15,7 @@ import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-ite
 import { ExtraType } from "@jellyfin/sdk/lib/generated-client/models/extra-type";
 import { ItemFields } from "@jellyfin/sdk/lib/generated-client/models/item-fields";
 import { MediaType } from "@jellyfin/sdk/lib/generated-client/models/media-type";
+import { ItemSortBy } from "@jellyfin/sdk/lib/generated-client/models/item-sort-by";
 import { SortOrder } from "@jellyfin/sdk/lib/generated-client/models/sort-order";
 import {
     getGenreApi,
@@ -119,6 +120,25 @@ export function similarItemsQuery(ctx: QueryContext, itemID: string, limit = 20)
                 itemId: itemID,
                 userId: ctx.userID,
                 limit,
+            });
+            return uniqueItems(response.data.Items ?? []);
+        },
+    });
+}
+
+/** A person's movies and shows, newest first (Swiftfin's person library). */
+export function personItemsQuery(ctx: QueryContext, personID: string) {
+    return queryOptions({
+        queryKey: jellyfinKeys.itemRelation(ctx.userID, personID, "personItems"),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getLibraryApi(ctx.api).getItems({
+                userId: ctx.userID,
+                personIds: [personID],
+                recursive: true,
+                includeItemTypes: [BaseItemKind.Movie, BaseItemKind.Series],
+                sortBy: [ItemSortBy.PremiereDate, ItemSortBy.SortName],
+                sortOrder: [SortOrder.Descending, SortOrder.Ascending],
+                enableUserData: true,
             });
             return uniqueItems(response.data.Items ?? []);
         },

@@ -85,6 +85,8 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
 - Form controls: `TextField`, `Switch`, `Button` (`src/ui/`). Text fields and switches are the
   platform's own via `@expo/ui` when `nativeControls` (iOS/iPadOS/tvOS, Android phones — tvOS fields
   open the system keyboard), themed RN ones on Android TV and web. Screens never branch on it.
+- People are items: `openItem` a cast entry or person result and `ItemScreen` renders
+  `PersonDetail`. `PersonCard`/`PersonPhoto` (`src/ui/PersonCard.tsx`) draw people everywhere.
 - Icons: Ionicons via `Icon` (`src/ui/Icon.tsx`) only — never import `@expo/vector-icons`
   directly. `iconVariant(base, filled)` picks filled (active/current) vs `-outline`.
 - Every interactive element is a `Focusable` (`src/ui/Focusable.tsx`) so D-pad/keyboard focus is

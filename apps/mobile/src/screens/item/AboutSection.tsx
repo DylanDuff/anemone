@@ -2,7 +2,7 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
-import { mediaSourceSummary } from "@anemone/core";
+import { formatLongDate, mediaSourceSummary } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { PersonKind } from "@jellyfin/sdk/lib/generated-client/models/person-kind";
 import type { ReactNode } from "react";
@@ -19,17 +19,6 @@ function peopleOfKind(item: BaseItemDto, kind: PersonKind): string | undefined {
     .filter((person) => person.Type === kind && person.Name)
     .map((person) => person.Name as string);
   return names.length > 0 ? [...new Set(names)].join(", ") : undefined;
-}
-
-function formatDate(isoDate: string | null | undefined): string | undefined {
-  if (!isoDate) {
-    return undefined;
-  }
-  return new Date(isoDate).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 }
 
 /** Summarise a long track list: the first few, then "+N more". */
@@ -52,7 +41,7 @@ export function AboutSection({ item }: { item: BaseItemDto }) {
     ["Directed by", peopleOfKind(item, PersonKind.Director)],
     ["Written by", peopleOfKind(item, PersonKind.Writer)],
     ["Studios", item.Studios?.map((studio) => studio.Name).filter(Boolean).join(", ")],
-    ["Released", formatDate(item.PremiereDate)],
+    ["Released", formatLongDate(item.PremiereDate)],
     ["Original title", item.OriginalTitle !== item.Name ? (item.OriginalTitle ?? undefined) : undefined],
   ];
   const versions = (item.MediaSources ?? []).map(mediaSourceSummary);

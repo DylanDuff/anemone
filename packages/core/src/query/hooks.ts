@@ -28,6 +28,7 @@ import {
     libraryItemsInfiniteQuery,
     localTrailersQuery,
     nextUpQuery,
+    personItemsQuery,
     resumeItemsQuery,
     seasonsQuery,
     searchItemsQuery,
@@ -78,6 +79,10 @@ export function useSearch(searchTerm: string, params?: ItemsRequest) {
 /** A paged library as an infinite query (Swiftfin `PagingLibraryViewModel`). */
 export function useLibraryItems(params?: ItemsRequest, pageSize?: number) {
     return useInfiniteQuery(libraryItemsInfiniteQuery(useQueryContext(), params, pageSize));
+}
+
+export function usePersonItems(personID: string) {
+    return useQuery(personItemsQuery(useQueryContext(), personID));
 }
 
 export function useSimilarItems(itemID: string) {

@@ -103,6 +103,7 @@ export {
 export {
     displayTitle,
     episodeLocator,
+    formatLongDate,
     isFavorite,
     isLiveStream,
     isMissing,
@@ -120,6 +121,8 @@ export {
     seasonEpisodeLabel,
     type SeriesPlayCandidates,
     seriesPlayTarget,
+    personFromItem,
+    personLifeLabels,
     uniqueItems,
 } from "./jellyfin/itemHelpers";
 export {
@@ -212,6 +215,7 @@ export {
     libraryPageItems,
     localTrailersQuery,
     nextUpQuery,
+    personItemsQuery,
     resumeItemsQuery,
     seasonsQuery,
     searchItemsQuery,
@@ -229,6 +233,7 @@ export {
     useLibraryItems,
     useLocalTrailers,
     useNextUp,
+    usePersonItems,
     useRefreshUserItemData,
     useResumeItems,
     useSearch,

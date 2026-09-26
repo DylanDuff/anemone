@@ -36,11 +36,14 @@ export function useAppNavigation(): AppNavigation {
   return useNavigation<AppNavigation>();
 }
 
+/** Anything with an item id: a full item, or a cast entry (a person is an item too). */
+type ItemReference = Pick<BaseItemDto, "Id">;
+
 /** A press handler that opens an item's detail page. Items without an id are ignored. */
-export function useOpenItem(): (item: BaseItemDto) => void {
+export function useOpenItem(): (item: ItemReference) => void {
   const navigation = useAppNavigation();
   return useCallback(
-    (item: BaseItemDto) => {
+    (item: ItemReference) => {
       if (item.Id) {
         navigation.push("Item", { itemID: item.Id });
       }

@@ -160,8 +160,10 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   per-version media info).
 - ✅ **Playback**: Play/Resume opens the player (`usePlayItem`).
 - [ ] Trailers/extras still open their own item page; play them directly with `usePlayItem`.
-- [ ] **Person page**: cast cards are focusable (TV focus ring/lift) but pressing is a no-op; Swiftfin
-  opens a library filtered by person (`personIds`). Wire `onPress` in `screens/item/CastRow.tsx`.
+- ✅ **Person page**: people are items, so the `Item` route renders `PersonDetail` for them —
+  photo, birth/death (`personLifeLabels`), biography, Movies/Shows shelves (`personItemsQuery`).
+  Cast cards and people search results open it (`ui/PersonCard.tsx`).
+- [ ] Person page: episodes / guest roles, and a full filterable library of the person's items.
 - ✅ Hover/focus states: `Focusable` (hover-driven + eased on web, D-pad on TV).
 - ✅ Home hero reuses the item page's `ItemTitleBlock` (title art, facts, Play/played/favorite) and `backdropImageSource`.
 - [ ] Verify the native stack on iOS (Android/Android TV verified).

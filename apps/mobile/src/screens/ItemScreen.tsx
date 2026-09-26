@@ -19,11 +19,12 @@ import { CollectionItems } from "./item/CollectionItems";
 import { ExtrasSection } from "./item/ExtrasSection";
 import { ItemHeader } from "./item/ItemHeader";
 import { ItemOverview } from "./item/ItemOverview";
+import { PersonDetail } from "./item/PersonDetail";
 import { SeasonEpisodes, SeasonsSection } from "./item/SeasonsSection";
 
 /**
  * Item detail for movies, series, seasons, episodes and box sets (Swiftfin `ItemView`). One
- * cinematic layout; the middle section varies by type.
+ * cinematic layout; the middle section varies by type. People get their own page (`PersonDetail`).
  */
 export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList, "Item">) {
   const { itemID } = route.params;
@@ -65,13 +66,19 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={showsPageScrollIndicator}
     >
-      <ItemHeader api={ctx.api} item={identified} onOpenSeries={openSeries} />
-      <ItemOverview item={identified} />
-      <TypeSpecificSection api={ctx.api} item={identified} onPressItem={openItem} />
-      <CastRow api={ctx.api} people={identified.People ?? []} />
-      <ExtrasSection api={ctx.api} item={identified} onPressItem={openItem} />
-      <SimilarItems api={ctx.api} itemID={identified.Id} onPressItem={openItem} />
-      <AboutSection item={identified} />
+      {identified.Type === BaseItemKind.Person ? (
+        <PersonDetail api={ctx.api} person={identified} onPressItem={openItem} />
+      ) : (
+        <>
+          <ItemHeader api={ctx.api} item={identified} onOpenSeries={openSeries} />
+          <ItemOverview item={identified} />
+          <TypeSpecificSection api={ctx.api} item={identified} onPressItem={openItem} />
+          <CastRow api={ctx.api} people={identified.People ?? []} />
+          <ExtrasSection api={ctx.api} item={identified} onPressItem={openItem} />
+          <SimilarItems api={ctx.api} itemID={identified.Id} onPressItem={openItem} />
+          <AboutSection item={identified} />
+        </>
+      )}
     </ScrollView>
   );
 }

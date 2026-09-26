@@ -47,7 +47,8 @@ export const jellyfinKeys = {
             | "specialFeatures"
             | "localTrailers"
             | "additionalParts"
-            | "seriesPlayTarget",
+            | "seriesPlayTarget"
+            | "personItems",
     ) => [...jellyfinKeys.item(userID, itemID), relation] as const,
 
     seasons: (userID: string, seriesID: string) =>

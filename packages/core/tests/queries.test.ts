@@ -71,6 +71,7 @@ import {
     libraryPageItems,
     localTrailersQuery,
     nextUpQuery,
+    personItemsQuery,
     resumeItemsQuery,
     searchItemsQuery,
     seriesPlayTargetQuery,
@@ -164,6 +165,18 @@ describe("query option builders", () => {
     it("searchItemsQuery is disabled for an empty term", () => {
         expect(searchItemsQuery(ctx, "").enabled).toBe(false);
         expect(searchItemsQuery(ctx, "matrix").enabled).toBe(true);
+    });
+
+    it("personItemsQuery fetches a person's movies and shows, newest first", async () => {
+        expect(await personItemsQuery(ctx, "person1").queryFn!(fnCtx)).toEqual([{ Id: "i1" }, { Id: "i2" }]);
+        expect(calls.getItems).toMatchObject({
+            userId: "u1",
+            personIds: ["person1"],
+            recursive: true,
+            includeItemTypes: ["Movie", "Series"],
+            sortBy: ["PremiereDate", "SortName"],
+            sortOrder: ["Descending", "Ascending"],
+        });
     });
 
     it("libraryItemsInfiniteQuery paginates via startIndex and computes next page", async () => {
