@@ -14,6 +14,7 @@ import { useCallback } from "react";
  */
 export type BrowseParamList = {
   Home: undefined;
+  Search: undefined;
   Library: { libraryID: string };
   Settings: undefined;
 };
@@ -68,9 +69,10 @@ export function usePlayItem(): (item: BaseItemDto) => void {
   );
 }
 
-/** A section to show in `Browse`: Home, a library by id, or Settings. */
+/** A section to show in `Browse`: Home, Search, a library by id, or Settings. */
 export type Section =
   | { kind: "home" }
+  | { kind: "search" }
   | { kind: "library"; libraryID: string }
   | { kind: "settings" };
 
@@ -92,6 +94,9 @@ export function useOpenSection(): (section: Section) => void {
             screen: "Library",
             params: { libraryID: section.libraryID },
           });
+          break;
+        case "search":
+          navigation.navigate("Browse", { screen: "Search" });
           break;
         case "settings":
           navigation.navigate("Browse", { screen: "Settings" });

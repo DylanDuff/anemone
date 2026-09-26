@@ -63,6 +63,9 @@ export const jellyfinKeys = {
     search: (userID: string, searchTerm: string, params: unknown) =>
         [...jellyfinKeys.user(userID), "search", searchTerm, params] as const,
 
+    searchPeople: (userID: string, searchTerm: string) =>
+        [...jellyfinKeys.user(userID), "searchPeople", searchTerm] as const,
+
     genres: (userID: string, parentID: string | undefined) =>
         [...jellyfinKeys.user(userID), "genres", parentID ?? null] as const,
 } as const;

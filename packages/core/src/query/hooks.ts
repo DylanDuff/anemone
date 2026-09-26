@@ -12,6 +12,7 @@ import {
     type QueryClient,
     useInfiniteQuery,
     useMutation,
+    useQueries,
     useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
@@ -31,7 +32,11 @@ import {
     personItemsQuery,
     resumeItemsQuery,
     seasonsQuery,
+    type SearchItemScope,
+    searchItemScopes,
     searchItemsQuery,
+    searchPeopleQuery,
+    searchScopeRequest,
     seriesPlayTargetQuery,
     similarItemsQuery,
     specialFeaturesQuery,
@@ -79,6 +84,45 @@ export function useSearch(searchTerm: string, params?: ItemsRequest) {
 /** A paged library as an infinite query (Swiftfin `PagingLibraryViewModel`). */
 export function useLibraryItems(params?: ItemsRequest, pageSize?: number) {
     return useInfiniteQuery(libraryItemsInfiniteQuery(useQueryContext(), params, pageSize));
+}
+
+export function useSearchPeople(searchTerm: string) {
+    return useQuery(searchPeopleQuery(useQueryContext(), searchTerm));
+}
+
+/** One search category's results. */
+export interface SearchCategoryResults {
+    readonly scope: SearchItemScope;
+    readonly items: readonly BaseItemDto[];
+    readonly isLoading: boolean;
+}
+
+/**
+ * Every search category for `searchTerm` at once (Swiftfin `SearchViewModel`): items per
+ * `searchItemScopes` entry, plus people. `isEmpty` is true only once everything has loaded with no
+ * results, so a screen can tell "nothing found" from "still looking".
+ */
+export function useSearchResults(searchTerm: string) {
+    const ctx = useQueryContext();
+    const categories = useQueries({
+        queries: searchItemScopes.map((scope) =>
+            searchItemsQuery(ctx, searchTerm, searchScopeRequest(scope)),
+        ),
+    });
+    const people = useQuery(searchPeopleQuery(ctx, searchTerm));
+
+    const results: SearchCategoryResults[] = searchItemScopes.map((scope, index) => ({
+        scope,
+        items: categories[index]?.data ?? [],
+        isLoading: categories[index]?.isLoading ?? false,
+    }));
+    const isLoading = people.isLoading || results.some((category) => category.isLoading);
+    const isEmpty =
+        !isLoading &&
+        (people.data ?? []).length === 0 &&
+        results.every((category) => category.items.length === 0);
+
+    return { categories: results, people: people.data ?? [], isLoading, isEmpty };
 }
 
 export function usePersonItems(personID: string) {

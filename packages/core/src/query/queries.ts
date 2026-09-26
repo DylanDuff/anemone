@@ -20,6 +20,7 @@ import { SortOrder } from "@jellyfin/sdk/lib/generated-client/models/sort-order"
 import {
     getGenreApi,
     getLibraryApi,
+    getPersonApi,
     getShowApi,
     getUserViewApi,
     getVideoApi,
@@ -287,6 +288,43 @@ export function searchItemsQuery(ctx: QueryContext, searchTerm: string, params: 
                 recursive: true,
                 enableUserData: true,
                 ...params,
+            });
+            return response.data.Items ?? [];
+        },
+        enabled: searchTerm.trim().length > 0,
+    });
+}
+
+/** How many results each search category fetches. */
+export const SEARCH_RESULT_LIMIT = 20;
+
+/**
+ * The item categories search looks in, in display order (Swiftfin `SearchViewModel`). Each is a
+ * `searchItemsQuery` scoped by type; people come from their own endpoint (`searchPeopleQuery`).
+ */
+export const searchItemScopes = [
+    { key: "movies", title: "Movies", itemTypes: [BaseItemKind.Movie] },
+    { key: "shows", title: "Shows", itemTypes: [BaseItemKind.Series] },
+    { key: "episodes", title: "Episodes", itemTypes: [BaseItemKind.Episode] },
+    { key: "collections", title: "Collections", itemTypes: [BaseItemKind.BoxSet] },
+] as const;
+
+export type SearchItemScope = (typeof searchItemScopes)[number];
+
+/** The request for one search category. */
+export function searchScopeRequest(scope: SearchItemScope): ItemsRequest {
+    return { includeItemTypes: [...scope.itemTypes], limit: SEARCH_RESULT_LIMIT };
+}
+
+/** People (cast and crew) whose name matches `searchTerm`. */
+export function searchPeopleQuery(ctx: QueryContext, searchTerm: string, limit = SEARCH_RESULT_LIMIT) {
+    return queryOptions({
+        queryKey: jellyfinKeys.searchPeople(ctx.userID, searchTerm),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getPersonApi(ctx.api).getPersons({
+                userId: ctx.userID,
+                searchTerm,
+                limit,
             });
             return response.data.Items ?? [];
         },

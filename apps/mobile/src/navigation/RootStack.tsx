@@ -21,6 +21,7 @@ const linking: LinkingOptions<RootStackParamList> = {
         screens: {
           Home: "",
           Library: "library/:libraryID",
+          Search: "search",
           Settings: "settings",
         },
       },

@@ -168,7 +168,9 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - ✅ Home hero reuses the item page's `ItemTitleBlock` (title art, facts, Play/played/favorite) and `backdropImageSource`.
 - [ ] Verify the native stack on iOS (Android/Android TV verified).
 - [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).
-- [ ] Search screen (VM/hook exist: `useSearch`).
+- ✅ **Search** section in the pill: debounced field, then Movies / Shows / Episodes / Collections
+  / People shelves (`useSearchResults`, `searchItemScopes`, `searchPeopleQuery`).
+- [ ] Search: recent searches, and filters (genre, year) like Swiftfin.
 - [ ] PIN / biometric access-policy capture on sign-in (currently always `none`).
 
 - [ ] Verify image auth on servers that require `api_key` (hero/backdrops use `backdropImageSource`).

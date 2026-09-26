@@ -7,6 +7,7 @@ import { type ComponentRef, useCallback, useRef } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { HomeScreen } from "../screens/HomeScreen";
 import { LibraryScreen } from "../screens/LibraryScreen";
+import { SearchScreen } from "../screens/SearchScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
 import { ContentLayoutProvider, useIsCompact } from "../ui/contentLayout";
 import { GlassBackdrop, GlassScope } from "../ui/Glass";
@@ -46,6 +47,9 @@ function activeSection(route: BrowseProps["route"]): Section {
   if (focused?.name === "Settings") {
     return { kind: "settings" };
   }
+  if (focused?.name === "Search") {
+    return { kind: "search" };
+  }
   const libraryID = (focused?.params as { libraryID?: string } | undefined)?.libraryID;
   return focused?.name === "Library" && libraryID ? { kind: "library", libraryID } : { kind: "home" };
 }
@@ -80,6 +84,7 @@ export function BrowseShell({ route }: BrowseProps) {
       }}
     >
       <SectionStack.Screen name="Home" component={HomeScreen} />
+      <SectionStack.Screen name="Search" component={SearchScreen} />
       <SectionStack.Screen name="Library" component={LibraryScreen} />
       <SectionStack.Screen name="Settings" component={SettingsScreen} />
     </SectionStack.Navigator>

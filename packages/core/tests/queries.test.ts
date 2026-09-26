@@ -58,6 +58,12 @@ vi.mock("../src/jellyfin/api", () => ({
             return { data: { Items: [{ Id: "view1" }] } };
         },
     }),
+    getPersonApi: () => ({
+        getPersons: async (p: unknown) => {
+            calls.getPersons = p;
+            return { data: { Items: [{ Id: "person1", Type: "Person" }] } };
+        },
+    }),
     getGenreApi: () => ({
         getGenres: async () => ({ data: { Items: [{ Id: "g1" }] } }),
     }),
@@ -73,7 +79,10 @@ import {
     nextUpQuery,
     personItemsQuery,
     resumeItemsQuery,
+    searchItemScopes,
     searchItemsQuery,
+    searchPeopleQuery,
+    searchScopeRequest,
     seriesPlayTargetQuery,
     similarItemsQuery,
     specialFeaturesQuery,
@@ -165,6 +174,19 @@ describe("query option builders", () => {
     it("searchItemsQuery is disabled for an empty term", () => {
         expect(searchItemsQuery(ctx, "").enabled).toBe(false);
         expect(searchItemsQuery(ctx, "matrix").enabled).toBe(true);
+    });
+
+    it("searchScopeRequest limits each category to its item types", () => {
+        const shows = searchItemScopes.find((scope) => scope.key === "shows")!;
+        expect(searchScopeRequest(shows)).toEqual({ includeItemTypes: ["Series"], limit: 20 });
+    });
+
+    it("searchPeopleQuery searches people by name, disabled for an empty term", async () => {
+        expect(searchPeopleQuery(ctx, " ").enabled).toBe(false);
+        const opts = searchPeopleQuery(ctx, "keanu");
+        expect(opts.queryKey).toEqual(["jellyfin", "u1", "searchPeople", "keanu"]);
+        expect(await opts.queryFn!(fnCtx)).toEqual([{ Id: "person1", Type: "Person" }]);
+        expect(calls.getPersons).toMatchObject({ userId: "u1", searchTerm: "keanu", limit: 20 });
     });
 
     it("personItemsQuery fetches a person's movies and shows, newest first", async () => {

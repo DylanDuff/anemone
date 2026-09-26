@@ -43,7 +43,7 @@ function isSameSection(a: Section, b: Section): boolean {
   return a.kind === b.kind;
 }
 
-/** Home, every library the server returns, then Settings — marking the one currently shown. */
+/** Home, Search, every library the server returns, then Settings — marking the one shown. */
 export function useSectionEntries(active: Section): SectionEntry[] {
   const { data: views } = useUserViews();
   const home: Section = { kind: "home" };
@@ -63,9 +63,17 @@ export function useSectionEntries(active: Section): SectionEntry[] {
     ];
   });
 
+  const search: Section = { kind: "search" };
   const settings: Section = { kind: "settings" };
   return [
     { key: "home", label: "Home", icon: "home", section: home, active: isSameSection(home, active) },
+    {
+      key: "search",
+      label: "Search",
+      icon: "search",
+      section: search,
+      active: isSameSection(search, active),
+    },
     ...libraries,
     {
       key: "settings",
