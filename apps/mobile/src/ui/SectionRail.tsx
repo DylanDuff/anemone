@@ -14,6 +14,7 @@ import { GlassSurface } from "./Glass";
 import { Icon, iconVariant } from "./Icon";
 import { space, theme } from "./theme";
 import { FocusGuide, isTV, type RemoteEvent, useHardwareBack, useRemoteEvents } from "./tv";
+import { type ScrollMinimizeStore, useScrollMinimized } from "./pageScroll";
 import { useKeyboardShown } from "./useKeyboardShown";
 
 const RAIL_MARGIN = space(2);
@@ -148,19 +149,20 @@ export function usePillContentInsets(form: PillForm): Omit<ContentLayout, "width
 export function SectionRail({
   entries,
   form,
-  minimized = false,
+  scrollMinimize,
   onSelect,
   onDismiss,
 }: {
   entries: readonly SectionEntry[];
   form: PillForm;
-  /** Shrink while the page scrolls (phones; see `useScrollMinimize`). */
-  minimized?: boolean;
+  /** Shrinks the pill while the page scrolls down (phones). */
+  scrollMinimize: ScrollMinimizeStore;
   onSelect: (section: Section) => void;
   /** Return focus to the page (Back, or the direction of the page, while the pill is focused). */
   onDismiss: () => void;
 }) {
   const { placement, compact } = form;
+  const minimized = useScrollMinimized(scrollMinimize);
   const { width } = useWindowDimensions();
   const safeArea = useSafeAreaInsets();
   const vertical = isVertical(placement);

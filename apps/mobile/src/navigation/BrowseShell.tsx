@@ -3,7 +3,7 @@
 //
 
 import { createNativeStackNavigator, type NativeStackScreenProps } from "@react-navigation/native-stack";
-import { type ComponentRef, useCallback, useEffect, useRef } from "react";
+import { type ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { HomeScreen } from "../screens/HomeScreen";
 import { LibraryScreen } from "../screens/LibraryScreen";
@@ -11,7 +11,7 @@ import { SearchScreen } from "../screens/SearchScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
 import { ContentLayoutProvider, useIsCompact } from "../ui/contentLayout";
 import { GlassBackdrop, GlassScope } from "../ui/Glass";
-import { PageScrollProvider, useScrollMinimize } from "../ui/pageScroll";
+import { PageScrollProvider, ScrollMinimizeStore } from "../ui/pageScroll";
 import { useNavigationLabelsSetting, useNavigationPlacementSetting } from "../settings";
 import { type PillForm, SectionRail, usePillContentInsets } from "../ui/SectionRail";
 import { theme } from "../ui/theme";
@@ -71,25 +71,25 @@ export function BrowseShell({ route }: BrowseProps) {
   const form: PillForm = compact
     ? { placement: "bottom", compact, labels: false }
     : { placement, compact, labels };
-  const insets = usePillContentInsets(form);
-  // The phone pill shrinks while the page scrolls down; a newly shown section starts full size.
-  const pageScroll = useScrollMinimize();
+  const { insetLeft, insetRight, insetTop, insetBottom } = usePillContentInsets(form);
+  // A new object would re-render every layout consumer in every mounted section; only change it
+  // when a number does.
+  const contentLayout = useMemo(
+    () => ({ width, insetLeft, insetRight, insetTop, insetBottom }),
+    [width, insetLeft, insetRight, insetTop, insetBottom],
+  );
+  // The phone pill shrinks while the page scrolls down (only the pill re-renders for it); a newly
+  // shown section starts full size.
+  const [scrollMinimize] = useState(() => new ScrollMinimizeStore());
   const sectionKey = section.kind === "library" ? section.libraryID : section.kind;
-  const { reset: resetPageScroll } = pageScroll;
-  useEffect(resetPageScroll, [sectionKey, resetPageScroll]);
+  useEffect(scrollMinimize.reset, [sectionKey, scrollMinimize]);
   // The page's focus guide remembers its last focused item (`autoFocus`), so focusing the guide
   // returns there — used when Back (or the page's direction) dismisses the pill.
   const pageGuide = useRef<ComponentRef<typeof FocusGuide>>(null);
   const returnToPage = useCallback(() => pageGuide.current?.requestTVFocus?.(), []);
 
   const sections = (
-    <SectionStack.Navigator
-      screenOptions={{
-        headerShown: false,
-        animation: "none",
-        contentStyle: { backgroundColor: theme.colors.background },
-      }}
-    >
+    <SectionStack.Navigator screenOptions={SECTION_SCREEN_OPTIONS}>
       <SectionStack.Screen name="Home" component={HomeScreen} />
       <SectionStack.Screen name="Search" component={SearchScreen} />
       <SectionStack.Screen name="Library" component={LibraryScreen} />
@@ -104,15 +104,15 @@ export function BrowseShell({ route }: BrowseProps) {
             scrolls under it), hero artwork bleeds beneath it. It's also what the pill's glass blurs. */}
         <FocusGuide ref={pageGuide} autoFocus style={styles.content}>
           <GlassBackdrop style={styles.content}>
-            <ContentLayoutProvider value={{ width, ...insets }}>
-              <PageScrollProvider value={pageScroll.report}>{sections}</PageScrollProvider>
+            <ContentLayoutProvider value={contentLayout}>
+              <PageScrollProvider value={scrollMinimize.report}>{sections}</PageScrollProvider>
             </ContentLayoutProvider>
           </GlassBackdrop>
         </FocusGuide>
         <SectionRail
           entries={entries}
           form={form}
-          minimized={pageScroll.minimized}
+          scrollMinimize={scrollMinimize}
           onSelect={openSection}
           onDismiss={returnToPage}
         />
@@ -120,6 +120,13 @@ export function BrowseShell({ route }: BrowseProps) {
     </GlassScope>
   );
 }
+
+/** Constant, so the section navigator doesn't recompute every screen's options on each render. */
+const SECTION_SCREEN_OPTIONS = {
+  headerShown: false,
+  animation: "none",
+  contentStyle: { backgroundColor: theme.colors.background },
+} as const;
 
 const styles = StyleSheet.create({
   shell: {

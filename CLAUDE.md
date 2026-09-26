@@ -65,6 +65,11 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   full-size pages on the edge chosen in Settings (left/right/top/bottom; phones: always a compact
   bottom pill). Content starts inside `insetLeft`/`insetRight` and adds `insetTop`/`insetBottom` to
   its own padding, then scrolls under the pill; hero artwork bleeds beneath it.
+- **Shell re-renders are expensive:** section screens stay mounted in the section stack, and ~20
+  components read the layout context. Memoise any context value the shell provides (`useMemo` on
+  primitives), keep navigator options constant, and keep high-frequency UI state (scroll-driven pill
+  shrink) in an external store that only its consumer subscribes to (`ui/pageScroll.tsx`) — never
+  in `BrowseShell` state. Missing this made iPhone page changes visibly laggy.
 - Page ScrollViews use `showsPageScrollIndicator` (off on TV and web): Safari's classic scrollbar
   takes a gutter from the window and breaks the full-bleed hero/rows.
 - Side margins come from the layout insets (`gutterFor(compact)`: 50pt, 20pt on phones) — never
