@@ -28,6 +28,7 @@ import { type BrowseParamList, useOpenItem } from "../navigation/routes";
 import { useCardWidths, useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { Collapsible } from "../ui/Collapsible";
+import { ErrorState } from "../ui/ErrorState";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
@@ -58,7 +59,8 @@ export function LibraryScreen({
 }: NativeStackScreenProps<BrowseParamList, "Library">) {
   const { libraryID } = route.params;
   const ctx = useQueryContext();
-  const { data: views, isLoading: viewsLoading } = useUserViews();
+  const userViews = useUserViews();
+  const { data: views, isLoading: viewsLoading } = userViews;
   const library = views?.find((view) => view.Id === libraryID);
   const filters = useStoredValue(UserKeys.libraryFilters(ctx.userID, libraryID));
   const displayType = useStoredValue(UserKeys.libraryDisplayType(ctx.userID, libraryID));
@@ -73,7 +75,13 @@ export function LibraryScreen({
     return <CenteredMessage loading />;
   }
   if (!library) {
-    return <CenteredMessage text="This library could not be found." />;
+    return userViews.error ? (
+      <View style={styles.fill}>
+        <ErrorState error={userViews.error} onRetry={() => void userViews.refetch()} />
+      </View>
+    ) : (
+      <CenteredMessage text="This library could not be found." />
+    );
   }
 
   return (
@@ -112,7 +120,7 @@ function LibraryContent({
   // `flex: 1` has nothing to fill and the list collapses to ~1pt. Size it explicitly from the
   // wrapper instead.
   const [listHeight, setListHeight] = useState<number>();
-  const { data, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
+  const { data, isLoading, error, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useLibraryItems(libraryItemsRequest(library, filters));
 
   const items = libraryPageItems(data?.pages);
@@ -147,7 +155,7 @@ function LibraryContent({
   const footer = isLoading || isFetchingNextPage ? <CenteredMessage loading compact /> : null;
 
   const empty = isLoading ? null : error ? (
-    <CenteredMessage text={String(error)} compact />
+    <ErrorState error={error} onRetry={() => void refetch()} />
   ) : (
     <CenteredMessage text="Nothing matches these filters." compact />
   );

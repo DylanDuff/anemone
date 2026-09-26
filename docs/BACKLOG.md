@@ -25,8 +25,9 @@ up later. Grouped by area. Update this as items are completed or added.
 - [ ] Android TV **banner** (`androidTVBanner`, 320×180) — the launcher currently uses the icon.
 - [ ] Focus polish: animated focus lift on TV (web already eases), TV-sized type/spacing pass,
   library grid "jump to letter", long-press menus.
-- [ ] Home shows nothing on failed requests — add error states with retry (hit this with release
-  builds blocking cleartext HTTP before `plugins/withCleartextTraffic.js`).
+- ✅ Error states with retry (`ui/ErrorState.tsx`, core `describeError`): Home, Library, Search and
+  item pages explain a failure (can't reach the server, signed out, not found, server fault) and
+  offer Try Again (TV focus lands on it). Rows that fail on an otherwise-loaded Home stay hidden.
 - [x] `@expo/ui` installed; UI uses its **universal** components (browser-testable via
   react-native-web). `expo-router` still not installed — navigation is currently simple
   session/state-based; add routing when the screen count grows.

@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { type RootStackParamList, useAppNavigation, useOpenItem } from "../navigation/routes";
 import { BackButton } from "../ui/BackButton";
+import { ErrorState } from "../ui/ErrorState";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
 import { useContentLayout } from "../ui/contentLayout";
@@ -31,7 +32,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
   const ctx = useQueryContext();
   const navigation = useAppNavigation();
   const openItem = useOpenItem();
-  const { data: item, isLoading, error } = useItem(itemID);
+  const { data: item, isLoading, error, refetch } = useItem(itemID);
   const { insetLeft } = useContentLayout();
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
           <BackButton />
         </View>
         {isLoading ? <ActivityIndicator color={theme.colors.accent} /> : null}
-        {error ? <Text style={styles.statusText}>{String(error)}</Text> : null}
+        {error ? <ErrorState error={error} onRetry={() => void refetch()} /> : null}
         {!isLoading && !error ? <Text style={styles.statusText}>Item not found.</Text> : null}
       </View>
     );

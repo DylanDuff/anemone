@@ -20,6 +20,7 @@ export { consoleLogger, type Logger, type LogLevel, noopLogger } from "./logging
 
 // Errors
 export { ErrorMessage } from "./errors/errorMessage";
+export { describeError, type ErrorDescription, type ErrorKind } from "./errors/describeError";
 
 // Data / persistence
 export { AnyDataStore } from "./data/anyData";

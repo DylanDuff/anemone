@@ -10,6 +10,7 @@ import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
 import { useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
+import { ErrorState } from "../ui/ErrorState";
 import { PERSON_ROW_GAP, PersonCard } from "../ui/PersonCard";
 import { PosterRow } from "../ui/PosterRow";
 import { Shelf } from "../ui/Shelf";
@@ -32,7 +33,7 @@ export function SearchScreen({ navigation }: NativeStackScreenProps<BrowseParamL
   const [text, setText] = useState("");
   const onPageScroll = usePageScrollHandler();
   const searchTerm = useDebouncedValue(text.trim(), SEARCH_DEBOUNCE_MS);
-  const { categories, people, isLoading, isEmpty } = useSearchResults(searchTerm);
+  const { categories, people, isLoading, isEmpty, error, retry } = useSearchResults(searchTerm);
 
   useEffect(() => {
     navigation.setOptions({ title: "Search" });
@@ -69,6 +70,7 @@ export function SearchScreen({ navigation }: NativeStackScreenProps<BrowseParamL
           onSubmit={setText}
         />
         {status ? <Text style={styles.status}>{status}</Text> : null}
+        {searchTerm && error ? <ErrorState error={error} onRetry={retry} /> : null}
         {searchTerm && isLoading ? (
           <ActivityIndicator style={styles.loader} color={theme.colors.accent} />
         ) : null}

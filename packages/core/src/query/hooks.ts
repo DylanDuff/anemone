@@ -100,7 +100,8 @@ export interface SearchCategoryResults {
 /**
  * Every search category for `searchTerm` at once (Swiftfin `SearchViewModel`): items per
  * `searchItemScopes` entry, plus people. `isEmpty` is true only once everything has loaded with no
- * results, so a screen can tell "nothing found" from "still looking".
+ * results and no failure, so a screen can tell "nothing found" from "still looking" or "failed";
+ * `error` is the first failure and `retry` refetches every category.
  */
 export function useSearchResults(searchTerm: string) {
     const ctx = useQueryContext();
@@ -117,12 +118,19 @@ export function useSearchResults(searchTerm: string) {
         isLoading: categories[index]?.isLoading ?? false,
     }));
     const isLoading = people.isLoading || results.some((category) => category.isLoading);
+    // The first failure, if any; with one, "nothing found" would be misleading.
+    const error = people.error ?? categories.find((category) => category.error)?.error ?? null;
     const isEmpty =
         !isLoading &&
+        !error &&
         (people.data ?? []).length === 0 &&
         results.every((category) => category.items.length === 0);
+    const retry = () => {
+        void people.refetch();
+        categories.forEach((category) => void category.refetch());
+    };
 
-    return { categories: results, people: people.data ?? [], isLoading, isEmpty };
+    return { categories: results, people: people.data ?? [], isLoading, isEmpty, error, retry };
 }
 
 export function usePersonItems(personID: string) {

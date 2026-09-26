@@ -16,6 +16,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
+import { ErrorState } from "../ui/ErrorState";
 import { HeroCarousel } from "../ui/HeroCarousel";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
@@ -27,16 +28,31 @@ import { space, theme } from "../ui/theme";
  */
 export function HomeScreen() {
   const ctx = useQueryContext();
-  const { data: views, isLoading: viewsLoading } = useUserViews();
+  const userViews = useUserViews();
+  const { data: views, isLoading: viewsLoading } = userViews;
   const recent = useLatestInLibrary(undefined, 12);
   const resume = useResumeItems(12);
   const openItem = useOpenItem();
   const onPageScroll = usePageScrollHandler();
 
   // The hero bleeds beneath a top pill; only the end of the page needs to clear a bottom one.
-  const { insetBottom } = useContentLayout();
+  const { insetTop, insetBottom } = useContentLayout();
 
   const loading = viewsLoading || recent.isLoading;
+
+  // Without the libraries there's nothing to browse (rows, and usually the hero, fail alike).
+  if (userViews.error && !views) {
+    const retry = () => {
+      void userViews.refetch();
+      void recent.refetch();
+      void resume.refetch();
+    };
+    return (
+      <View style={[styles.screen, styles.centered, { paddingTop: insetTop, paddingBottom: insetBottom }]}>
+        <ErrorState error={userViews.error} onRetry={retry} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.screen}>
@@ -96,6 +112,9 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  centered: {
+    justifyContent: "center",
   },
   loader: {
     marginTop: space(3),
