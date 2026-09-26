@@ -95,6 +95,10 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   the DeviceProfile, negotiates the stream and decides track switches. Never branch on engine or
   platform in core — add a capability flag. Native engine = react-native-video; web = `<video>` +
   hls.js (react-native-video's web player lacks HLS/tracks). Media URLs carry the token as `ApiKey`.
+- iOS/iPadOS device loop (from `apps/mobile`, `EXPO_TV` unset): `npx expo run:ios --device <udid>
+  --no-bundler` (UDID from `xcrun devicectl list devices`); loads JS from the running Metro over
+  Wi-Fi. Needs `expo-build-properties` `ios.enableSceneSupport` (crashes on launch without it) and
+  the ATS exception in `app.json` for `http://` servers.
 - Native builds: `npx expo prebuild --platform android` (add `EXPO_TV=1` and `--clean` for TV), then
   Gradle with JDK 17. `android/`/`ios/` are generated and gitignored; config lives in `app.json` +
   `plugins/`. Release builds need `plugins/withCleartextTraffic.js` for `http://` servers.

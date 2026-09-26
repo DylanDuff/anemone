@@ -57,7 +57,8 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
     subtitles) — implement `EngineProps` + a `PlayerCapabilities`.
   - [ ] Android: probe AC-3/E-AC-3/DTS decoders (currently always converted by the server) and HDR
     display support (currently SDR only, so HDR sources are tone-mapped by the server).
-  - [ ] iOS/tvOS: AV1 on capable hardware; untested on device so far.
+  - [ ] iOS/iPadOS: builds and launches on device (2026-09-26); **verify playback** — AVPlayer
+    profile, HLS-manifest subtitles, HDR. tvOS still unbuilt. AV1 on capable hardware.
   - [ ] Report stop when the app is backgrounded/killed mid-playback; PiP, AirPlay/Chromecast,
     now-playing/lock-screen controls (`NowPlayable`); playback speed; audio-only items.
   - [ ] Web: keyboard shortcuts (space, arrows); ASS/SSA are converted to WebVTT (styling lost).
