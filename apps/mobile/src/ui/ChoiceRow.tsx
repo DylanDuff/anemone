@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
   },
   options: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: space(1),
   },
 });

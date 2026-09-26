@@ -14,6 +14,7 @@ import {
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useOpenItem } from "../navigation/routes";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useContentLayout } from "../ui/contentLayout";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
 import { HeroCarousel } from "../ui/HeroCarousel";
 import { PosterRow } from "../ui/PosterRow";
@@ -33,11 +34,17 @@ export function HomeScreen() {
   const resume = useResumeItems(12);
   const openItem = useOpenItem();
 
+  // The hero bleeds beneath a top pill; only the end of the page needs to clear a bottom one.
+  const { insetBottom } = useContentLayout();
+
   const loading = viewsLoading || recent.isLoading;
 
   return (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={!isTV}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom }}
+        showsVerticalScrollIndicator={!isTV}
+      >
         {/*<View style={styles.topBar}>
           <Text style={styles.brand}>Anemone</Text>
           <Pressable onPress={() => void sessionController.signOut()}>
@@ -89,13 +96,12 @@ function LibraryRow({
   );
 }
 
+const CONTENT_PADDING_BOTTOM = space(2);
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  content: {
-    paddingBottom: space(2),
   },
   topBar: {
     flexDirection: "row",

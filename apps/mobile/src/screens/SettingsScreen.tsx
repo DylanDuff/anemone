@@ -11,9 +11,11 @@ import {
   useGlassBlurSetting,
   useGlassButtonsSetting,
   useHeroGlowSetting,
+  useNavigationLabelsSetting,
+  useNavigationPlacementSetting,
 } from "../settings";
 import { ChoiceRow } from "../ui/ChoiceRow";
-import { useContentLayout } from "../ui/contentLayout";
+import { useContentLayout, useIsCompact } from "../ui/contentLayout";
 import { space, theme } from "../ui/theme";
 import { ToggleRow } from "../ui/ToggleRow";
 import { isTV } from "../ui/tv";
@@ -23,11 +25,14 @@ import { isTV } from "../ui/tv";
  * reader of a setting updates as soon as it's toggled.
  */
 export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowseParamList, "Settings">) {
-  const { insetLeft, insetRight } = useContentLayout();
+  const { insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
   const heroGlow = useHeroGlowSetting();
   const glassBlur = useGlassBlurSetting();
   const glassButtons = useGlassButtonsSetting();
   const focusIndicator = useFocusIndicatorSetting();
+  const navigationPlacement = useNavigationPlacementSetting();
+  const navigationLabels = useNavigationLabelsSetting();
+  const compact = useIsCompact();
 
   useEffect(() => {
     navigation.setOptions({ title: "Settings" });
@@ -39,7 +44,12 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
       style={styles.screen}
       contentContainerStyle={[
         styles.content,
-        { paddingLeft: insetLeft, paddingRight: insetRight },
+        {
+          paddingLeft: insetLeft,
+          paddingRight: insetRight,
+          paddingTop: CONTENT_PADDING_TOP + insetTop,
+          paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom,
+        },
       ]}
     >
       <Text style={styles.title}>Settings</Text>
@@ -74,6 +84,35 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
       </View>
 
       <View style={styles.group}>
+        <Text style={styles.groupTitle}>Navigation</Text>
+        <ChoiceRow
+          label="Navigation position"
+          description={
+            compact
+              ? "Where the section pill sits on larger screens. Phones always show it along the bottom."
+              : "Which edge of the screen the section pill floats along."
+          }
+          options={[
+            { value: "left", label: "Left" },
+            { value: "right", label: "Right" },
+            { value: "top", label: "Top" },
+            { value: "bottom", label: "Bottom" },
+          ]}
+          value={navigationPlacement.value}
+          onChange={navigationPlacement.setValue}
+        />
+        {navigationPlacement.value === "top" || navigationPlacement.value === "bottom" ? (
+          <ToggleRow
+            nested
+            label="Show labels"
+            description="Section names under the icons. Off keeps the pill icon-only and slimmer."
+            value={navigationLabels.value}
+            onChange={navigationLabels.setValue}
+          />
+        ) : null}
+      </View>
+
+      <View style={styles.group}>
         <Text style={styles.groupTitle}>Focus</Text>
         <ChoiceRow
           label="Focus highlight"
@@ -90,14 +129,15 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
   );
 }
 
+const CONTENT_PADDING_TOP = space(4);
+const CONTENT_PADDING_BOTTOM = space(6);
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
   content: {
-    paddingTop: space(4),
-    paddingBottom: space(6),
     gap: space(3),
     maxWidth: 900,
   },

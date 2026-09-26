@@ -16,6 +16,14 @@ describe("AppSettingsKeys", () => {
         expect(await container.storedValues.get(AppSettingsKeys.glassBlur(false))).toBe(false);
         expect(await container.storedValues.get(AppSettingsKeys.glassButtons(false))).toBe(false);
         expect(await container.storedValues.get(AppSettingsKeys.focusIndicator("glow"))).toBe("glow");
+        expect(await container.storedValues.get(AppSettingsKeys.navigationPlacement("left"))).toBe("left");
+        expect(await container.storedValues.get(AppSettingsKeys.navigationLabels(true))).toBe(true);
+    });
+
+    it("round-trip a chosen navigation placement", async () => {
+        const container = await makeTestContainer();
+        await container.storedValues.set(AppSettingsKeys.navigationPlacement("left"), "top");
+        expect(await container.storedValues.get(AppSettingsKeys.navigationPlacement("left"))).toBe("top");
     });
 
     it("persist in the key/value store, even when SQL storage is available", async () => {

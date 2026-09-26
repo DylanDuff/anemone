@@ -100,7 +100,7 @@ function LibraryContent({
 }) {
   const ctx = useQueryContext();
   const openItem = useOpenItem();
-  const { width, insetLeft, insetRight } = useContentLayout();
+  const { width, insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
   const [filtersOpen, setFiltersOpen] = useState(false);
   // On TV, react-native-tvos wraps a list's ScrollView in an unstyled TVFocusGuideView, so
   // `flex: 1` has nothing to fill and the list collapses to ~1pt. Size it explicitly from the
@@ -158,10 +158,12 @@ function LibraryContent({
         keyExtractor={(item, index) => item.Id ?? String(index)}
         numColumns={isGrid ? columns : 1}
         columnWrapperStyle={isGrid ? styles.gridRow : undefined}
-        contentContainerStyle={[
-          styles.content,
-          { paddingLeft: insetLeft, paddingRight: insetRight },
-        ]}
+        contentContainerStyle={{
+          paddingLeft: insetLeft,
+          paddingRight: insetRight,
+          paddingTop: insetTop,
+          paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom,
+        }}
         ListHeaderComponent={header}
         ListFooterComponent={footer}
         ListEmptyComponent={empty}
@@ -205,6 +207,8 @@ function CenteredMessage({
   );
 }
 
+const CONTENT_PADDING_BOTTOM = space(6);
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -212,9 +216,6 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
-  },
-  content: {
-    paddingBottom: space(6),
   },
   header: {
     paddingTop: space(3),

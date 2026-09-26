@@ -9,7 +9,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback } from "react";
 
 /**
- * Top-level sections, shown beside the section switcher (rail / tab bar). Switching sections
+ * Top-level sections, shown beneath the section switcher (the navigation pill). Switching sections
  * swaps this nested stack's content without animation.
  */
 export type BrowseParamList = {

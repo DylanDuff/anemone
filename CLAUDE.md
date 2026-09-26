@@ -61,8 +61,10 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
 - A `.web` override must use the **same extension** as its base file (`tv.tsx` + `tv.web.tsx`).
   Metro resolves extension by extension, so `x.ts` beats `x.web.tsx` on web — silently.
 - Page layout: read `useContentLayout()` (`src/ui/contentLayout.tsx`), never `theme.gutter` or the
-  window width directly, inside browse pages. The section rail floats over full-width pages; content
-  starts at `insetLeft` and scrolls under it, hero artwork bleeds beneath it.
+  window width directly, inside browse pages. The navigation pill (`ui/SectionRail.tsx`) floats over
+  full-size pages on the edge chosen in Settings (left/right/top/bottom; phones: always a compact
+  bottom pill). Content starts inside `insetLeft`/`insetRight` and adds `insetTop`/`insetBottom` to
+  its own padding, then scrolls under the pill; hero artwork bleeds beneath it.
 - Frosted surfaces use `GlassSurface` (`src/ui/Glass.tsx`): Liquid Glass on iOS 26+, else
   `expo-blur`. Android blur only samples content inside a `GlassBackdrop`: wrap the content the
   glass floats over (a sibling rendered before it, never the glass itself), and wrap *both* in a

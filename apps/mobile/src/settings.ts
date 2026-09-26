@@ -9,6 +9,7 @@
 import {
   AppSettingsKeys,
   type FocusIndicator,
+  type NavigationPlacement,
   type StoredValueBinding,
   useStoredValue,
 } from "@anemone/core";
@@ -23,6 +24,10 @@ export const Settings = {
   glassButtons: AppSettingsKeys.glassButtons(false),
   /** A crisp outline reads best from a sofa; a soft glow suits pointer/touch screens. */
   focusIndicator: AppSettingsKeys.focusIndicator(isTV ? "outline" : "glow"),
+  /** The pill has always floated on the left; phones ignore this and use the bottom. */
+  navigationPlacement: AppSettingsKeys.navigationPlacement("left"),
+  /** Top/bottom pills label their icons by default; phones' compact pill never does. */
+  navigationLabels: AppSettingsKeys.navigationLabels(true),
 } as const;
 
 export function useHeroGlowSetting(): StoredValueBinding<boolean> {
@@ -46,4 +51,12 @@ export function useGlassButtons(): boolean {
 
 export function useFocusIndicatorSetting(): StoredValueBinding<FocusIndicator> {
   return useStoredValue(Settings.focusIndicator);
+}
+
+export function useNavigationPlacementSetting(): StoredValueBinding<NavigationPlacement> {
+  return useStoredValue(Settings.navigationPlacement);
+}
+
+export function useNavigationLabelsSetting(): StoredValueBinding<boolean> {
+  return useStoredValue(Settings.navigationLabels);
 }

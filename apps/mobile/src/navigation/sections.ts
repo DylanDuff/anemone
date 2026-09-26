@@ -7,7 +7,7 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import { CollectionType } from "@jellyfin/sdk/lib/generated-client/models/collection-type";
 import type { Section } from "./routes";
 
-/** One destination in the section switcher (rail on wide screens, tab bar on phones). */
+/** One destination in the section switcher (the navigation pill). */
 export interface SectionEntry {
   readonly key: string;
   readonly label: string;

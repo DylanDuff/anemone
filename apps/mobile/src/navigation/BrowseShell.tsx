@@ -10,8 +10,8 @@ import { LibraryScreen } from "../screens/LibraryScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
 import { ContentLayoutProvider, useIsCompact } from "../ui/contentLayout";
 import { GlassBackdrop, GlassScope } from "../ui/Glass";
-import { RAIL_CONTENT_INSET, SectionRail } from "../ui/SectionRail";
-import { SectionTabBar } from "../ui/SectionTabBar";
+import { useNavigationLabelsSetting, useNavigationPlacementSetting } from "../settings";
+import { type PillForm, SectionRail, usePillContentInsets } from "../ui/SectionRail";
 import { theme } from "../ui/theme";
 import { FocusGuide } from "../ui/tv";
 import {
@@ -51,17 +51,23 @@ function activeSection(route: BrowseProps["route"]): Section {
 }
 
 /**
- * The top-level browsing shell: the section switcher beside (or below) a nested stack showing the
- * current section. The switcher stays mounted across section changes, so D-pad focus stays put.
+ * The top-level browsing shell: the section switcher (a floating pill) over a nested stack showing
+ * the current section. The switcher stays mounted across section changes, so D-pad focus stays put.
  */
 export function BrowseShell({ route }: BrowseProps) {
   const { width } = useWindowDimensions();
   const entries = useSectionEntries(activeSection(route));
   const openSection = useOpenSection();
-  // Phones get a bottom tab bar instead of the rail.
+  // Phones always get a small icon-only pill along the bottom; wide screens choose in Settings.
   const compact = useIsCompact();
+  const placement = useNavigationPlacementSetting().value;
+  const labels = useNavigationLabelsSetting().value;
+  const form: PillForm = compact
+    ? { placement: "bottom", compact, labels: false }
+    : { placement, compact, labels };
+  const insets = usePillContentInsets(form);
   // The page's focus guide remembers its last focused item (`autoFocus`), so focusing the guide
-  // returns there — used when Back/Right dismisses the rail.
+  // returns there — used when Back (or the page's direction) dismisses the pill.
   const pageGuide = useRef<ComponentRef<typeof FocusGuide>>(null);
   const returnToPage = useCallback(() => pageGuide.current?.requestTVFocus?.(), []);
 
@@ -79,39 +85,29 @@ export function BrowseShell({ route }: BrowseProps) {
     </SectionStack.Navigator>
   );
 
-  if (compact) {
-    return (
-      <View style={styles.column}>
-        <View style={styles.content}>{sections}</View>
-        <SectionTabBar entries={entries} onSelect={openSection} />
-      </View>
-    );
-  }
-
   return (
     <GlassScope>
-      <View style={styles.row}>
-        {/* The page runs full width beneath the floating rail: content starts past it (and
-            scrolls under it), hero artwork bleeds beneath it. It's also what the rail's glass blurs. */}
+      <View style={styles.shell}>
+        {/* The page runs full size beneath the floating pill: content starts clear of it (and
+            scrolls under it), hero artwork bleeds beneath it. It's also what the pill's glass blurs. */}
         <FocusGuide ref={pageGuide} autoFocus style={styles.content}>
           <GlassBackdrop style={styles.content}>
-            <ContentLayoutProvider value={{ width, insetLeft: RAIL_CONTENT_INSET }}>
-              {sections}
-            </ContentLayoutProvider>
+            <ContentLayoutProvider value={{ width, ...insets }}>{sections}</ContentLayoutProvider>
           </GlassBackdrop>
         </FocusGuide>
-        <SectionRail entries={entries} onSelect={openSection} onDismiss={returnToPage} />
+        <SectionRail
+          entries={entries}
+          form={form}
+          onSelect={openSection}
+          onDismiss={returnToPage}
+        />
       </View>
     </GlassScope>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  column: {
+  shell: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },

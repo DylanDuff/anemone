@@ -19,21 +19,27 @@ export function useIsCompact(): boolean {
 export interface ContentLayout {
   /** Width of the page. Full-bleed elements (hero artwork) span all of it. */
   readonly width: number;
-  /** Where content starts from the left — past the floating section rail when there is one. */
+  /** Where content starts from the left — past the navigation pill when it floats on that side. */
   readonly insetLeft: number;
   readonly insetRight: number;
+  /**
+   * Room to leave above / below a page's content for a pill floating along the top / bottom edge
+   * (0 otherwise). Add to the page's own padding; hero artwork ignores it and bleeds beneath.
+   */
+  readonly insetTop: number;
+  readonly insetBottom: number;
 }
 
 const ContentLayoutContext = createContext<Partial<ContentLayout> | null>(null);
 
-/** Overrides the page layout for a subtree (the browse shell reserves room for its rail). */
+/** Overrides the page layout for a subtree (the browse shell reserves room for its pill). */
 export const ContentLayoutProvider = ContentLayoutContext.Provider;
 
 /**
- * The current page's layout. Pages run full width — the section rail floats over them — so rows,
- * grids and captions start at `insetLeft` and scroll underneath the rail, while hero artwork uses
- * the full `width` and bleeds beneath it. Outside the browse shell this is the window with the
- * standard gutter.
+ * The current page's layout. Pages run full size — the navigation pill floats over them — so rows,
+ * grids and captions start inside the insets and scroll underneath the pill, while hero artwork
+ * uses the full `width` and bleeds beneath it. Outside the browse shell this is the window with
+ * the standard gutter.
  */
 export function useContentLayout(): ContentLayout {
   const { width } = useWindowDimensions();
@@ -42,5 +48,7 @@ export function useContentLayout(): ContentLayout {
     width: override?.width ?? width,
     insetLeft: override?.insetLeft ?? theme.gutter,
     insetRight: override?.insetRight ?? theme.gutter,
+    insetTop: override?.insetTop ?? 0,
+    insetBottom: override?.insetBottom ?? 0,
   };
 }

@@ -10,6 +10,11 @@ export type FocusIndicator = "outline" | "glow";
 
 export const focusIndicatorValues: readonly FocusIndicator[] = ["outline", "glow"];
 
+/** Which window edge the section switcher (navigation pill) floats along on wide screens. */
+export type NavigationPlacement = "left" | "right" | "top" | "bottom";
+
+export const navigationPlacementValues: readonly NavigationPlacement[] = ["left", "right", "top", "bottom"];
+
 /**
  * Device-wide app settings from the Settings screen, kept in the key/value store (not SQL): they
  * describe what *this device* should render — e.g. heavy visual effects a weak TV can't afford —
@@ -54,6 +59,24 @@ export const AppSettingsKeys = {
     focusIndicator: (defaultValue: FocusIndicator): StoredValueKey<FocusIndicator> =>
         storedKey<FocusIndicator>({
             field: "settings.focusIndicator",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /** Where the navigation pill sits on wide screens (phones always put it at the bottom). */
+    navigationPlacement: (defaultValue: NavigationPlacement): StoredValueKey<NavigationPlacement> =>
+        storedKey<NavigationPlacement>({
+            field: "settings.navigationPlacement",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /** Labels under the icons when the navigation pill runs along the top or bottom. */
+    navigationLabels: (defaultValue: boolean): StoredValueKey<boolean> =>
+        storedKey<boolean>({
+            field: "settings.navigationLabels",
             ownerID: APP_OWNER_ID,
             storage: "defaults",
             default: defaultValue,

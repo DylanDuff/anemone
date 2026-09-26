@@ -38,6 +38,8 @@ export {
     AppSettingsKeys,
     type FocusIndicator,
     focusIndicatorValues,
+    type NavigationPlacement,
+    navigationPlacementValues,
 } from "./data/keys/appSettingsKeys";
 export { ServerKeys } from "./data/keys/serverKeys";
 export { UserKeys } from "./data/keys/userKeys";

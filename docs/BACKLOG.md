@@ -125,6 +125,12 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   "See all". Pages size from `useContentWidth()` (window minus rail).
 - ✅ Rail is a floating glass pill (`GlassSurface`: `expo-glass-effect` on iOS 26+, `expo-blur`
   elsewhere incl. Android TV); pages run full width beneath it via `useContentLayout()` insets.
+- ✅ **Navigation position** setting (Left | Right | Top | Bottom, default Left) for wide screens.
+  Side pills expand on focus/hover and push that side's inset past the pill; top/bottom pills are
+  horizontal, never expand, keep the standard gutter and reserve `insetTop`/`insetBottom`. "Show
+  labels" (top/bottom only) puts names under the icons. Phones always get a compact icon-only
+  bottom pill — the old `SectionTabBar` is gone. D-pad: the direction toward the page (or Back)
+  returns focus to it. Untested on TV/tablet so far.
 - ✅ **Settings section** (`/settings`, gear at the bottom of the rail/tab bar): "Hero glow" and
   "Glass blur" toggles, persisted per device (`AppSettingsKeys` in core, defaults in
   `apps/mobile/src/settings.ts`). Glass blur defaults off on TV. Sub-setting "Glass buttons"
