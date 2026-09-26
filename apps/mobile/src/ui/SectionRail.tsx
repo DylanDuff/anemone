@@ -16,7 +16,10 @@ import { space, theme } from "./theme";
 import { FocusGuide, isTV, type RemoteEvent, useHardwareBack, useRemoteEvents } from "./tv";
 
 const RAIL_MARGIN = space(2);
+/** Phones: the least room left below the pill (screens without a home indicator). */
 const COMPACT_MARGIN = space(1);
+/** Phones: how far the pill sinks into the bottom safe area — the home indicator sits well below. */
+const COMPACT_SAFE_AREA_TUCK = space(1);
 const RAIL_COLLAPSED_WIDTH = 64;
 const RAIL_EXPANDED_WIDTH = 220;
 const ITEM_SIZE = 48;
@@ -24,8 +27,15 @@ const RAIL_PADDING = (RAIL_COLLAPSED_WIDTH - ITEM_SIZE) / 2;
 /** Horizontal pill items: icon over label. */
 const LABELLED_ITEM_HEIGHT = 56;
 /** Phones: a smaller, icon-only pill. */
-const COMPACT_ITEM_SIZE = 40;
-const COMPACT_PADDING = 6;
+const COMPACT_ITEM_SIZE = 46;
+const COMPACT_PADDING = 7;
+const ICON_SIZE = 22;
+/**
+ * Phones: while the page is scrolled down the pill shrinks to this thickness (40pt items, 6pt
+ * padding), as iOS tab bars minimise. A transform, anchored at its bottom edge.
+ */
+const COMPACT_MINIMIZED_THICKNESS = 52;
+const COMPACT_MINIMIZED_SCALE = COMPACT_MINIMIZED_THICKNESS / (COMPACT_ITEM_SIZE + COMPACT_PADDING * 2);
 
 /**
  * On TV the pill rests smaller and grows to full size while it has focus, so it takes little room
@@ -85,9 +95,15 @@ function pillThickness(form: PillForm): number {
   return (hasUnderLabels(form) ? LABELLED_ITEM_HEIGHT : ITEM_SIZE) + RAIL_PADDING * 2;
 }
 
-/** Distance from the window edge to the pill: the safe area plus a margin. */
+/**
+ * Distance from the window edge to the pill: the safe area plus a margin. Phones sit lower, tucked
+ * a little into the safe area like a native tab bar.
+ */
 function edgeOffset({ placement, compact }: PillForm, safeArea: EdgeInsets): number {
-  return safeArea[placement] + (compact ? COMPACT_MARGIN : RAIL_MARGIN);
+  if (compact) {
+    return Math.max(safeArea[placement] - COMPACT_SAFE_AREA_TUCK, COMPACT_MARGIN);
+  }
+  return safeArea[placement] + RAIL_MARGIN;
 }
 
 /**
@@ -122,11 +138,14 @@ export function usePillContentInsets(form: PillForm): Omit<ContentLayout, "width
 export function SectionRail({
   entries,
   form,
+  minimized = false,
   onSelect,
   onDismiss,
 }: {
   entries: readonly SectionEntry[];
   form: PillForm;
+  /** Shrink while the page scrolls (phones; see `useScrollMinimize`). */
+  minimized?: boolean;
   onSelect: (section: Section) => void;
   /** Return focus to the page (Back, or the direction of the page, while the pill is focused). */
   onDismiss: () => void;
@@ -147,19 +166,24 @@ export function SectionRail({
   const labelledUnder = hasUnderLabels(form);
   const labelled = expanded || labelledUnder;
 
-  const scale = useRef(new Animated.Value(REST_SCALE)).current;
+  // TV: rests small, full size with focus. Phones: minimised while the page scrolls down.
+  const targetScale = isTV
+    ? focusedWithin
+      ? 1
+      : REST_SCALE
+    : compact && minimized
+      ? COMPACT_MINIMIZED_SCALE
+      : 1;
+  const scale = useRef(new Animated.Value(targetScale)).current;
   useEffect(() => {
-    if (!isTV) {
-      return;
-    }
     const animation = Animated.timing(scale, {
-      toValue: focusedWithin ? 1 : REST_SCALE,
+      toValue: targetScale,
       duration: SCALE_DURATION_MS,
       useNativeDriver: true,
     });
     animation.start();
     return () => animation.stop();
-  }, [focusedWithin, scale]);
+  }, [targetScale, scale]);
 
   // Back — or the direction of the page — while the pill has focus closes it and returns to where
   // you were, rather than navigating back / jumping to whatever is geometrically nearest.
@@ -203,7 +227,7 @@ export function SectionRail({
             <View style={vertical ? styles.glyphCell : null}>
               <Icon
                 name={iconVariant(entry.icon, entry.active)}
-                size={compact ? 20 : 22}
+                size={ICON_SIZE}
                 color={focused ? theme.colors.chipActiveText : theme.colors.text}
               />
             </View>

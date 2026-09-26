@@ -14,6 +14,7 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import { useOpenItem } from "../navigation/routes";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
+import { usePageScrollHandler } from "../ui/pageScroll";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
 import { HeroCarousel } from "../ui/HeroCarousel";
 import { PosterRow } from "../ui/PosterRow";
@@ -30,6 +31,7 @@ export function HomeScreen() {
   const recent = useLatestInLibrary(undefined, 12);
   const resume = useResumeItems(12);
   const openItem = useOpenItem();
+  const onPageScroll = usePageScrollHandler();
 
   // The hero bleeds beneath a top pill; only the end of the page needs to clear a bottom one.
   const { insetBottom } = useContentLayout();
@@ -41,6 +43,8 @@ export function HomeScreen() {
       <ScrollView
         contentContainerStyle={{ paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom }}
         showsVerticalScrollIndicator={showsPageScrollIndicator}
+        onScroll={onPageScroll}
+        scrollEventThrottle={16}
       >
         <HeroCarousel api={ctx.api} items={recent.data ?? []} onPressItem={openItem} />
 

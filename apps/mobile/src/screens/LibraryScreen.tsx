@@ -26,6 +26,7 @@ import {
 } from "react-native";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
 import { showsPageScrollIndicator, useCardWidths, useContentLayout } from "../ui/contentLayout";
+import { usePageScrollHandler } from "../ui/pageScroll";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
@@ -105,6 +106,7 @@ function LibraryContent({
   const openItem = useOpenItem();
   const { width, insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const onPageScroll = usePageScrollHandler();
   // On TV, react-native-tvos wraps a list's ScrollView in an unstyled TVFocusGuideView, so
   // `flex: 1` has nothing to fill and the list collapses to ~1pt. Size it explicitly from the
   // wrapper instead.
@@ -154,6 +156,8 @@ function LibraryContent({
     >
       <FlatList
         showsVerticalScrollIndicator={showsPageScrollIndicator}
+        onScroll={onPageScroll}
+        scrollEventThrottle={16}
         // Changing column count requires a fresh list.
         key={isGrid ? `grid-${columns}` : "list"}
         style={isTV && listHeight != null ? { height: listHeight } : styles.list}

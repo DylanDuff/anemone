@@ -9,6 +9,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-nat
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
 import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
+import { usePageScrollHandler } from "../ui/pageScroll";
 import { PERSON_ROW_GAP, PersonCard } from "../ui/PersonCard";
 import { PosterRow } from "../ui/PosterRow";
 import { Shelf } from "../ui/Shelf";
@@ -29,6 +30,7 @@ export function SearchScreen({ navigation }: NativeStackScreenProps<BrowseParamL
   const openItem = useOpenItem();
   const { insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
   const [text, setText] = useState("");
+  const onPageScroll = usePageScrollHandler();
   const searchTerm = useDebouncedValue(text.trim(), SEARCH_DEBOUNCE_MS);
   const { categories, people, isLoading, isEmpty } = useSearchResults(searchTerm);
 
@@ -47,6 +49,8 @@ export function SearchScreen({ navigation }: NativeStackScreenProps<BrowseParamL
       style={styles.screen}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={showsPageScrollIndicator}
+      onScroll={onPageScroll}
+      scrollEventThrottle={16}
       contentContainerStyle={{
         paddingTop: CONTENT_PADDING_TOP + insetTop,
         paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom,

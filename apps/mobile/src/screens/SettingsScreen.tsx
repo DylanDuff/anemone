@@ -16,6 +16,7 @@ import {
 } from "../settings";
 import { ChoiceRow } from "../ui/ChoiceRow";
 import { showsPageScrollIndicator, useContentLayout, useIsCompact } from "../ui/contentLayout";
+import { usePageScrollHandler } from "../ui/pageScroll";
 import { space, theme } from "../ui/theme";
 import { ToggleRow } from "../ui/ToggleRow";
 import { AccountSection } from "./settings/AccountSection";
@@ -33,6 +34,7 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
   const navigationPlacement = useNavigationPlacementSetting();
   const navigationLabels = useNavigationLabelsSetting();
   const compact = useIsCompact();
+  const onPageScroll = usePageScrollHandler();
 
   useEffect(() => {
     navigation.setOptions({ title: "Settings" });
@@ -41,6 +43,8 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
   return (
     <ScrollView
       showsVerticalScrollIndicator={showsPageScrollIndicator}
+      onScroll={onPageScroll}
+      scrollEventThrottle={16}
       style={styles.screen}
       contentContainerStyle={[
         styles.content,
