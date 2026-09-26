@@ -166,14 +166,14 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: theme.radii.pill,
-    backgroundColor: theme.colors.placeholder,
+    backgroundColor: theme.colors.dot,
   },
   dotActive: {
     backgroundColor: theme.colors.accent,
     width: 20,
   },
   dotEmphasised: {
-    backgroundColor: theme.colors.muted,
+    backgroundColor: theme.colors.dotEmphasised,
   },
   dotActiveEmphasised: {
     backgroundColor: theme.colors.white,

@@ -33,6 +33,9 @@ const colors = {
   borderStrong: "rgba(255,255,255,0.22)",
   /** Dividers between groups of controls. */
   separator: "rgba(255,255,255,0.18)",
+  /** Inactive page dots (hero); brighter while the dots have D-pad focus. */
+  dot: "rgba(255,255,255,0.35)",
+  dotEmphasised: "rgba(255,255,255,0.6)",
   /** Unfilled part of a seek/progress track. */
   track: "rgba(255,255,255,0.3)",
   /** Tint of glass surfaces when live blur is off. */
