@@ -49,6 +49,9 @@ importers:
       expo-status-bar:
         specifier: ~57.0.1
         version: 57.0.1(expo@57.0.21)(react-native-tvos@0.86.2-0)(react@19.2.3)
+      hls.js:
+        specifier: ^1.7.2
+        version: 1.7.2
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -67,6 +70,9 @@ importers:
       react-native-screens:
         specifier: ~4.26.2
         version: 4.26.2(react-native-tvos@0.86.2-0)(react@19.2.3)
+      react-native-video:
+        specifier: 6.19.2
+        version: 6.19.2(react-native-tvos@0.86.2-0)(react@19.2.3)
       react-native-web:
         specifier: ~0.21.0
         version: 0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -2262,6 +2268,9 @@ packages:
   hermes-parser@0.36.1:
     resolution: {integrity: sha512-GApNk4zLHi2UWoWZZkx7LNCOSzLSc5lB55pZ/PhK7ycFeg7u5LcF88p/WbpIi1XUDtE0MpHE3uRR3u3KB7TjSQ==}
 
+  hls.js@1.7.2:
+    resolution: {integrity: sha512-CW/pPvSOFIRsosbwxrYaE9ERmpTo5fbTqL7wCvuCFlqW1Bmb1K5fXsY7yiH95rmlr4rVuA7UXHbM/cIXQ6AXwg==}
+
   hosted-git-info@7.0.2:
     resolution: {integrity: sha512-puUZAUKT5m8Zzvs72XWy3HtvVbTWljRE66cP60bxJzAqf2DgICo7lYTY2IHUmLnNpjYvw5bvmoHvPc0QO2a62w==}
     engines: {node: ^16.14.0 || >=18.0.0}
@@ -2938,6 +2947,12 @@ packages:
         optional: true
       '@types/react':
         optional: true
+
+  react-native-video@6.19.2:
+    resolution: {integrity: sha512-gh5dBMGSHywKr8+p4azRXrFQgT+QTmS1tI4sz6kVRjSENORfsrGGLQzmyo/7S9m+ZOTLWQJ3h8ONaXxR4F2Fcw==}
+    peerDependencies:
+      react: '*'
+      react-native: '*'
 
   react-native-web@0.21.2:
     resolution: {integrity: sha512-SO2t9/17zM4iEnFvlu2DA9jqNbzNhoUP+AItkoCOyFmDMOhUnBBznBDCYN92fGdfAkfQlWzPoez6+zLxFNsZEg==}
@@ -6098,6 +6113,8 @@ snapshots:
     dependencies:
       hermes-estree: 0.36.1
 
+  hls.js@1.7.2: {}
+
   hosted-git-info@7.0.2:
     dependencies:
       lru-cache: 10.4.3
@@ -6966,6 +6983,11 @@ snapshots:
       - react-native
       - supports-color
       - utf-8-validate
+
+  react-native-video@6.19.2(react-native-tvos@0.86.2-0)(react@19.2.3):
+    dependencies:
+      react: 19.2.3
+      react-native: react-native-tvos@0.86.2-0(@babel/core@7.29.7)(@types/react@19.2.18)(react-native-tvos@0.86.2-0)(react@19.2.3)
 
   react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
