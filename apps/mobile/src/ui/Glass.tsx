@@ -5,7 +5,7 @@
 import { BlurTargetView, BlurView } from "expo-blur";
 import { GlassView, isGlassEffectAPIAvailable, isLiquidGlassAvailable } from "expo-glass-effect";
 import { createContext, type ReactNode, type RefObject, useContext, useRef } from "react";
-import { type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
+import { Platform, type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
 import { useGlassBlurSetting } from "../settings";
 
 /**
@@ -116,7 +116,7 @@ export function GlassFill({ radius }: { radius: number }) {
       // reduction factor still gives a real blur (radius ≈ 15). A thin edge defines the glass.
       intensity={GLASS_FILL_INTENSITY}
       blurReductionFactor={GLASS_FILL_REDUCTION}
-      style={[StyleSheet.absoluteFill, styles.fillEdge, { borderRadius: radius }]}
+      style={[StyleSheet.absoluteFill, styles.fillEdge, styles.fillBehind, { borderRadius: radius }]}
     />
   );
 }
@@ -129,6 +129,9 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(255,255,255,0.22)",
   },
+  // Safari composites `backdrop-filter` layers out of paint order at times, drawing the blur over
+  // the host's icon. Pin it beneath the host's content (the host is a stacking context, below).
+  fillBehind: Platform.OS === "web" ? { zIndex: -1 } : {},
   // BlurView doesn't clip its own blur to borderRadius without this.
   clip: {
     overflow: "hidden",
@@ -139,4 +142,9 @@ const styles = StyleSheet.create({
 });
 
 /** For an element hosting a `GlassFill`: drop its translucent fill and clip the blur to its shape. */
-export const glassFillHost: ViewStyle = { backgroundColor: "transparent", overflow: "hidden" };
+export const glassFillHost: ViewStyle = {
+  backgroundColor: "transparent",
+  overflow: "hidden",
+  // Web: its own stacking context, so the fill's negative z-index stays inside it.
+  ...(Platform.OS === "web" ? { zIndex: 0 } : null),
+};
