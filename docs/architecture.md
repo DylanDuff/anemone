@@ -81,10 +81,31 @@ Each is a factory taking the `AnemoneContainer` (and, where relevant, a `ServerS
 (`query/queryKeys.ts`), e.g. `userViewsQuery`, `resumeItemsQuery`, `nextUpQuery`,
 `latestInLibraryQuery`, `itemQuery`, `seasonsQuery`, `episodesQuery`, `searchItemsQuery`,
 `libraryItemsInfiniteQuery`. `query/hooks.ts` wraps them as hooks (`useUserViews`,
-`useLibraryItems`, `useItem`, `useSearch`, …) plus `useSetItemPlayed` (mutation with cache
-invalidation). The Home screen is a composition of the resume/next-up/latest/genres queries; the
-paging library is a single infinite query (page grows until a short page — Swiftfin's `hasNextPage`
-rule).
+`useLibraryItems`, `useItem`, `useSearch`, …) plus `useSetItemPlayed` / `useSetItemFavorite`
+(mutations called with `{ itemID, enabled }`). The Home screen is a composition of the
+resume/next-up/latest/genres queries; the paging library is a single infinite query (page grows
+until a short page — Swiftfin's `hasNextPage` rule).
+
+**Item detail.** `itemQuery` fetches the *full* item (`LibraryApi.getItem`: overview, people,
+studios, media sources). Related data is keyed *under* the item via
+`jellyfinKeys.itemRelation(user, itemID, relation)` — `similarItemsQuery`, `specialFeaturesQuery`
+(theme songs excluded), `localTrailersQuery`, `additionalPartsQuery` (enabled only when
+`PartCount > 1`) and `seriesPlayTargetQuery` (next-up → in-progress → first episode, via the pure
+`seriesPlayTarget`). Played/favorite mutations invalidate every per-user item surface
+(`resumeItems`, `nextUp`, `allItem`, `allItems`, `allEpisodes`) so all screens stay consistent.
+
+**Library filters.** `query/libraryFilters.ts` holds a JSON-serialisable `LibraryFilters` (sort
+field + order, unplayed/favorites traits, genre names) and `libraryItemsRequest(parent, filters)`,
+which layers them on `libraryParentRequest`. Non-name sorts add `SortName` as a tiebreaker for
+stable paging. Filters and grid/list mode persist per user per library via
+`UserKeys.libraryFilters` / `UserKeys.libraryDisplayType`, read in React with
+`useStoredValue(key)` — which caches the value in TanStack Query so every reader updates on write,
+and exposes `isLoaded` so screens can wait before issuing the first page request.
+
+**Display helpers.** `jellyfin/mediaInfo.ts` derives resolution/HDR/codec/channel labels and
+per-version summaries from `MediaSources`; `itemMetadataLabels` gives the "2019 · PG-13 · 1h 52m ·
+★ 7.8" facts line; `backdropImageSource` / `logoImageSource` fall back to the parent's art so
+episodes show series imagery.
 
 ## Wiring a UI
 

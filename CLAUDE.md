@@ -10,7 +10,7 @@ is a pure-TypeScript package** so the same logic drives every platform and any f
 packages/core/   @anemone/core — platform-agnostic business logic. NO react-native, NO expo.
                  Tested in plain Node (vitest + better-sqlite3). This is the primary deliverable.
 apps/mobile/     @anemone/mobile — Expo (SDK 57) shell. Injects platform adapters into core and
-                 (later) renders the UI. iOS/Android now; TV targets are backlog.
+                 renders the UI. iOS/Android, Android TV (tvOS untested) and web.
 ```
 
 pnpm workspace, `node-linker=hoisted` (required for React Native + pnpm). Root `pnpm-workspace.yaml`
@@ -51,6 +51,55 @@ Later Swiftfin view models use a macro: `@CasePathable` actions each carry a `tr
 and side effects emit `Event`s. Ported as a framework-agnostic reducer store (see
 `stateful/createStateful.ts`); React consumers bind with `useStateful`. Pure data-fetching VMs
 (Home, libraries, item detail, search) use **TanStack Query** instead — caching/pagination for free.
+
+## App shell (apps/mobile)
+
+- React Navigation native stack (`src/navigation/`), id-only params + web linking.
+- `react-native` is **react-native-tvos** (supports phone + TV). Never import TV APIs
+  (`TVFocusGuideView`, `useTVEventHandler`, `Platform.isTV`) directly — use `src/ui/tv.tsx`, which has
+  a `.web.tsx` stand-in because react-native-web lacks them.
+- A `.web` override must use the **same extension** as its base file (`tv.tsx` + `tv.web.tsx`).
+  Metro resolves extension by extension, so `x.ts` beats `x.web.tsx` on web — silently.
+- Page layout: read `useContentLayout()` (`src/ui/contentLayout.tsx`), never `theme.gutter` or the
+  window width directly, inside browse pages. The section rail floats over full-width pages; content
+  starts at `insetLeft` and scrolls under it, hero artwork bleeds beneath it.
+- Frosted surfaces use `GlassSurface` (`src/ui/Glass.tsx`): Liquid Glass on iOS 26+, else
+  `expo-blur`. Android blur only samples content inside a `GlassBackdrop`: wrap the content the
+  glass floats over (a sibling rendered before it, never the glass itself), and wrap *both* in a
+  `GlassScope`, which owns the shared blur-target ref.
+- Device settings: keys in core `AppSettingsKeys` (key/value storage, caller-supplied default);
+  the app's platform defaults and hooks live in `apps/mobile/src/settings.ts`. Components read them
+  with those hooks — never a module-level flag.
+- Phone vs wide layouts: `useIsCompact()` (`src/ui/contentLayout.tsx`, <700pt and not TV).
+- Icons: Ionicons via `Icon` (`src/ui/Icon.tsx`) only — never import `@expo/vector-icons`
+  directly. `iconVariant(base, filled)` picks filled (active/current) vs `-outline`.
+- Every interactive element is a `Focusable` (`src/ui/Focusable.tsx`) so D-pad/keyboard focus is
+  consistent. Artwork marks focus with `FocusRing` (outline ring, or tvOS-style sheen) inside the
+  clipped container + `focusGlow()` on it + `focusLift` — the indicator is a Setting. On web
+  "focused" = hover or keyboard focus (never click focus), eased by `hoverTransition`.
+- Horizontal rows (`Shelf`) are TV focus guides and reserve `focusRoom` padding so the lift/glow
+  isn't clipped; derive any new clip padding from it.
+- **TV list gotcha:** react-native-tvos wraps FlatList's ScrollView in an unstyled
+  `TVFocusGuideView`, so `flex: 1` collapses the list to ~1pt on TV. Give lists an explicit height
+  on TV (see `LibraryScreen`). Diagnose layout bugs with `onLayout` logging + `adb shell dumpsys
+  activity top` before theorising.
+- Always size image requests: `imagePixelWidth(layoutWidth)` → `maxWidth`. Unsized requests decode
+  full-res (up to 4K) frames and got the app lmkd-killed on a 1.8 GB TV.
+- TV home hero (`src/ui/TVHero.tsx`): one mounted slide (crossfade), focus order actions → slide
+  dots (left/right change slide) → rows. The touch/web hero is `HeroCarousel`.
+- Perf on the test TV (32-bit ARM, Android 12): live blur and many masked fades are the heaviest
+  effects; they're behind Settings (glass blur defaults off on TV). Judge perf on release builds —
+  debug adds ~200 MB native heap.
+- Native builds: `npx expo prebuild --platform android` (add `EXPO_TV=1` and `--clean` for TV), then
+  Gradle with JDK 17. `android/`/`ios/` are generated and gitignored; config lives in `app.json` +
+  `plugins/`. Release builds need `plugins/withCleartextTraffic.js` for `http://` servers.
+- Android TV loop (from `apps/mobile/android`, `ANDROID_SERIAL=<tv>`,
+  `JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home`):
+  `./gradlew app:installDebug -PreactNativeArchitectures=armeabi-v7a` then
+  `adb reverse tcp:8081 tcp:8081` — the debug build loads JS from the running Metro (`pnpm mobile`),
+  so JS edits hot-reload; rebuild only for native deps / `app.json` / plugins. `installRelease`
+  bundles JS (use for perf). Dev menu: `adb shell input keyevent 82`. Screenshots:
+  `adb exec-out screencap -p`.
 
 ## Conventions
 

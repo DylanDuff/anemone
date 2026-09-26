@@ -13,17 +13,26 @@ up later. Grouped by area. Update this as items are completed or added.
 
 ## Platform / app shell (UI phase)
 
-- [ ] **TV targets** (tvOS, Android TV): needs `react-native-tvos` + `@react-native-tvos/config-tv`.
-  Business logic is already TV-agnostic; only the app shell + UI need TV wiring.
+- ✅ **Android TV target**: `react-native` is aliased to `react-native-tvos@0.86.2-0` (0.86.3-0 was
+  under the 15-day window — bump once it ages) + `@react-native-tvos/config-tv` (off by default;
+  `EXPO_TV=1 npx expo prebuild --clean` for TV). D-pad focus system: `ui/Focusable.tsx`
+  (`Focusable`, `FocusRing`, `FocusWithin`), `ui/tv.ts` (+ `.web.tsx` stand-ins), shelves as
+  `FocusGuide autoFocus`, `TVHero` (single mounted slide, crossfade, edge-press changes slide).
+- [ ] Bump `react-native-tvos` to `0.86.3-0` (matches RN 0.86.3) once it passes the 15-day window
+  (published 2026-09-18 → eligible 2026-10-03).
+- [ ] **tvOS**: untested; needs `appleTVImages` in the config-tv plugin and a Mac/Xcode build.
+- [ ] Android TV **banner** (`androidTVBanner`, 320×180) — the launcher currently uses the icon.
+- [ ] Focus polish: animated focus lift on TV (web already eases), TV-sized type/spacing pass,
+  library grid "jump to letter", long-press menus.
+- [ ] Home shows nothing on failed requests — add error states with retry (hit this with release
+  builds blocking cleartext HTTP before `plugins/withCleartextTraffic.js`).
 - [x] `@expo/ui` installed; UI uses its **universal** components (browser-testable via
   react-native-web). `expo-router` still not installed — navigation is currently simple
   session/state-based; add routing when the screen count grows.
-- [ ] **`@expo/ui` on native** needs the config plugin + a dev build; only web is exercised so far.
+- ✅ **`@expo/ui` on native**: connect/sign-in screens render on Android TV (debug + release).
 - [ ] Web `SecureStore` is a `localStorage` stub (NOT secure) for dev only — never ship it.
-- [ ] Dev client / prebuild: `expo-sqlite`, `expo-secure-store`, `react-native-mmkv` are native
-  modules — the app needs a custom dev build (not Expo Go). Wire `expo prebuild` / EAS later.
-- [ ] Implement the real Expo platform adapters in `apps/mobile` (SecureStore/KeyValueStore/DB/Logger)
-  and call `configureContainer(...)` at app startup.
+- ✅ Native builds: `expo prebuild` (+ `EXPO_TV=1` for TV) and Gradle; see CLAUDE.md for the TV loop.
+- ✅ Expo platform adapters (MMKV / secure-store / expo-sqlite) wired via `configureAnemone`.
 
 ## Business logic — deferred view models & services
 
@@ -61,8 +70,11 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   Swiftfin rewrites it from the response URL after proxy redirects. Add response-URL handling.
 - [ ] **Local server discovery**: `ConnectToServerViewModel.localServers` is present but unpopulated;
   wire the SDK's HTTP `discovery` service (and/or a native UDP broadcast) later.
-- [ ] **Library setting keys** (`libraryDisplayType`, `libraryFilters`, etc.): current-user-scoped
-  `StoredValues` keys whose defaults read from `Defaults`; port with the library UI + `FilterViewModel`.
+- ✅ **Library setting keys**: `UserKeys.libraryDisplayType` / `libraryFilters` (per user, per
+  library) + `useStoredValue`. Defaults are fixed (`grid`, name ascending) rather than read from
+  `AppDefaults.Customization.Library` — wire that fallback when a settings screen exists.
+- [ ] Remaining Swiftfin filters: tags, years, traits beyond played/favorite, letter picker; genre
+  list comes from `getGenres` rather than `/Items/Filters` (`getQueryFilters`).
 - [ ] **Device profile / playback capabilities**: needed for real playback URLs; deferred with the
   media player.
 
@@ -85,13 +97,49 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   nearest chapter). For the pixel-exact frame at the resume second, use Jellyfin trickplay tiles
   (`item.Trickplay`, `/Videos/{id}/Trickplay/{width}/{tileIndex}.jpg`) — needs sprite cropping
   (a clipping View + offset Image), so it was deferred. Request `ItemFields.Trickplay` when doing it.
-- [ ] **Item-detail screen** (tapping a poster/hero is currently a no-op). Then wire `onPressItem`.
-- [ ] "See all" library screen is a plain text list — make it a poster grid.
+- ✅ **Navigation**: React Navigation native stack (`navigation/RootStack.tsx`), id-only params
+  with web linking (`/library/:libraryID`, `/item/:itemID`) so refresh/back work in the browser.
+  Auth screens remain state-based in `AppNavigator`.
+- ✅ **Section switcher**: `Browse` shell (`navigation/BrowseShell.tsx`) with a nested section stack
+  (Home / one library). Wide screens + TV: collapsing icon rail (`ui/SectionRail.tsx`, expands on
+  focus/hover); phones < 700pt: bottom tab bar (`ui/SectionTabBar.tsx`). Home rows no longer have
+  "See all". Pages size from `useContentWidth()` (window minus rail).
+- ✅ Rail is a floating glass pill (`GlassSurface`: `expo-glass-effect` on iOS 26+, `expo-blur`
+  elsewhere incl. Android TV); pages run full width beneath it via `useContentLayout()` insets.
+- ✅ **Settings section** (`/settings`, gear at the bottom of the rail/tab bar): "Hero glow" and
+  "Glass blur" toggles, persisted per device (`AppSettingsKeys` in core, defaults in
+  `apps/mobile/src/settings.ts`). Glass blur defaults off on TV. Sub-setting "Glass buttons"
+  (opt-in, only while blur is on) frosts the translucent action buttons; the hero slide and item
+  header each have their own `GlassScope` so Android can blur the artwork beneath them.
+  "Focus highlight" (Outline | Glow) under Focus: outline default on TV, glow elsewhere;
+  `useFocusIndicator()` + `FocusRing` / `focusGlow()` in `ui/Focusable.tsx`. Rows reserve
+  `focusRoom` (lift + glow reach) so the glow isn't clipped.
+- [ ] Revisit TV blur cost: blur only while the rail is expanded, or a static pre-blurred backdrop;
+  measure on a release build. More settings (sign out, server/user) belong on the Settings page.
+- [ ] Release-build memory check on TV: debug build sits at ~200 MB native heap / ~400 MB PSS on a
+  1.8 GB box and got killed by lmkd once. Images are now sized via `imagePixelWidth()`.
+- ✅ Ionicons (`@expo/vector-icons`) everywhere via `ui/Icon.tsx` — rail/tabs, actions, chips,
+  badges, chevrons.
+- [ ] **Sign out** has no UI (the Home button is commented out) — add it to the Settings page, along
+  with server/user switching.
+- ✅ **Library screen**: responsive poster grid / list toggle, infinite scroll, sort + direction,
+  unplayed/favorites/genre filters, all persisted per library.
+- ✅ **Item screen**: cinematic backdrop + logo header, facts & media badges, Play/Resume target,
+  played/favorite toggles, overview, season picker + episodes (series), season episodes, box-set
+  members, cast, additional parts/trailers/special features, similar items, About (credits +
+  per-version media info).
+- [ ] **Playback**: the Play button only shows "Playback isn't available yet" — wire when the media
+  player exists. Trailers/extras currently open their own item page for the same reason.
+- [ ] **Person page**: cast cards are focusable (TV focus ring/lift) but pressing is a no-op; Swiftfin
+  opens a library filtered by person (`personIds`). Wire `onPress` in `screens/item/CastRow.tsx`.
+- ✅ Hover/focus states: `Focusable` (hover-driven + eased on web, D-pad on TV).
+- ✅ Home hero reuses the item page's `ItemTitleBlock` (title art, facts, Play/played/favorite) and `backdropImageSource`.
+- [ ] Verify the native stack on iOS (Android/Android TV verified).
 - [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).
 - [ ] Search screen (VM/hook exist: `useSearch`).
 - [ ] PIN / biometric access-policy capture on sign-in (currently always `none`).
-- [ ] Proper navigation (expo-router) and back-stack; TV focus handling.
-- [ ] Hero should prefer real backdrops; verify image auth on servers that require `api_key`.
+
+- [ ] Verify image auth on servers that require `api_key` (hero/backdrops use `backdropImageSource`).
 - [ ] A shared theme/typography layer so screens don't hand-set colors (connect/sign-in still use
   the Expo UI light `Screen`; home uses the dark RN theme — unify later).
 
