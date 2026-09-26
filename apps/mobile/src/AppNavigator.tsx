@@ -6,13 +6,12 @@ import { type ServerState, useCurrentSession } from "@anemone/core";
 import { Host, Text } from "@expo/ui";
 import { useState } from "react";
 import { ConnectServerScreen } from "./screens/ConnectServerScreen";
-import { HomeScreen } from "./screens/HomeScreen";
+import { RootStack } from "./navigation/RootStack";
 import { SignInScreen } from "./screens/SignInScreen";
 
 /**
- * Minimal session-driven flow: connect → sign in → library. When a session exists the library is
- * shown; otherwise the user connects to a server and signs in. Proper routing (expo-router) and the
- * select-user screen are follow-ups — see docs/BACKLOG.md.
+ * Session-driven flow: connect → sign in → the signed-in navigation stack (`RootStack`). The auth
+ * steps stay state-based; the select-user screen is a follow-up — see docs/BACKLOG.md.
  */
 export function AppNavigator() {
     const { session, isLoading } = useCurrentSession();
@@ -27,7 +26,7 @@ export function AppNavigator() {
     }
 
     if (session) {
-        return <HomeScreen />;
+        return <RootStack />;
     }
 
     if (!server) {

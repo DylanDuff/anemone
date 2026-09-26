@@ -1,0 +1,96 @@
+//
+// AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
+//
+
+import {
+  type Api,
+  displayTitle,
+  useEpisodes,
+  useSeasons,
+  useSeriesPlayTarget,
+} from "@anemone/core";
+import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
+import { useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import { Chip } from "../../ui/Chip";
+import { space } from "../../ui/theme";
+import { EpisodeShelf } from "./EpisodeShelf";
+
+/**
+ * A series' season picker and the selected season's episodes (Swiftfin `EpisodeSelector`). Opens
+ * on the season containing the Play button's episode, else the first season.
+ */
+export function SeasonsSection({
+  api,
+  series,
+  onPressEpisode,
+}: {
+  api: Api;
+  series: BaseItemDto & { Id: string };
+  onPressEpisode: (episode: BaseItemDto) => void;
+}) {
+  const { data: seasons = [] } = useSeasons(series.Id);
+  const { data: playTarget } = useSeriesPlayTarget(series.Id);
+  const [chosenSeasonID, setChosenSeasonID] = useState<string>();
+
+  const selectedSeasonID =
+    chosenSeasonID ?? playTarget?.SeasonId ?? seasons[0]?.Id ?? undefined;
+  const { data: episodes = [], isLoading } = useEpisodes(series.Id, selectedSeasonID);
+
+  if (seasons.length === 0) {
+    return null;
+  }
+
+  const picker =
+    seasons.length > 1 ? (
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.picker}>
+        {seasons.map((season, index) => (
+          <Chip
+            key={season.Id ?? index}
+            label={displayTitle(season)}
+            selected={season.Id === selectedSeasonID}
+            onPress={() => setChosenSeasonID(season.Id ?? undefined)}
+          />
+        ))}
+      </ScrollView>
+    ) : undefined;
+
+  return (
+    <EpisodeShelf
+      api={api}
+      title="Episodes"
+      header={picker}
+      episodes={episodes}
+      isLoading={isLoading}
+      onPressEpisode={onPressEpisode}
+    />
+  );
+}
+
+/** A season opened directly: just its episodes. */
+export function SeasonEpisodes({
+  api,
+  season,
+  onPressEpisode,
+}: {
+  api: Api;
+  season: BaseItemDto & { Id: string; SeriesId: string };
+  onPressEpisode: (episode: BaseItemDto) => void;
+}) {
+  const { data: episodes = [], isLoading } = useEpisodes(season.SeriesId, season.Id);
+  return (
+    <EpisodeShelf
+      api={api}
+      title="Episodes"
+      episodes={episodes}
+      isLoading={isLoading}
+      onPressEpisode={onPressEpisode}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  picker: {
+    gap: space(1),
+  },
+});

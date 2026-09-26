@@ -1,0 +1,81 @@
+//
+// AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
+//
+
+import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
+import { type NavigatorScreenParams, useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useCallback } from "react";
+
+/**
+ * Top-level sections, shown beside the section switcher (rail / tab bar). Switching sections
+ * swaps this nested stack's content without animation.
+ */
+export type BrowseParamList = {
+  Home: undefined;
+  Library: { libraryID: string };
+  Settings: undefined;
+};
+
+/**
+ * Signed-in routes. `Browse` hosts the sections; item pages open full-screen over it. Params are
+ * ids only so every screen is linkable — on web the URL survives a refresh and the browser back
+ * button walks the stack.
+ */
+export type RootStackParamList = {
+  Browse: NavigatorScreenParams<BrowseParamList> | undefined;
+  Item: { itemID: string };
+};
+
+export type AppNavigation = NativeStackNavigationProp<RootStackParamList>;
+
+export function useAppNavigation(): AppNavigation {
+  return useNavigation<AppNavigation>();
+}
+
+/** A press handler that opens an item's detail page. Items without an id are ignored. */
+export function useOpenItem(): (item: BaseItemDto) => void {
+  const navigation = useAppNavigation();
+  return useCallback(
+    (item: BaseItemDto) => {
+      if (item.Id) {
+        navigation.push("Item", { itemID: item.Id });
+      }
+    },
+    [navigation],
+  );
+}
+
+/** A section to show in `Browse`: Home, a library by id, or Settings. */
+export type Section =
+  | { kind: "home" }
+  | { kind: "library"; libraryID: string }
+  | { kind: "settings" };
+
+/**
+ * Switch the `Browse` content to a section. Home pops back to the section root; a library replaces
+ * whichever library is showing (the section stack is at most Home → one library), so Back from any
+ * library returns Home.
+ */
+export function useOpenSection(): (section: Section) => void {
+  const navigation = useAppNavigation();
+  return useCallback(
+    (section: Section) => {
+      switch (section.kind) {
+        case "home":
+          navigation.navigate("Browse", { screen: "Home" });
+          break;
+        case "library":
+          navigation.navigate("Browse", {
+            screen: "Library",
+            params: { libraryID: section.libraryID },
+          });
+          break;
+        case "settings":
+          navigation.navigate("Browse", { screen: "Settings" });
+          break;
+      }
+    },
+    [navigation],
+  );
+}
