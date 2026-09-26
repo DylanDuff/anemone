@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
-import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
+import { useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { PERSON_ROW_GAP, PersonCard } from "../ui/PersonCard";
 import { PosterRow } from "../ui/PosterRow";
@@ -48,7 +48,7 @@ export function SearchScreen({ navigation }: NativeStackScreenProps<BrowseParamL
     <ScrollView
       style={styles.screen}
       keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={showsPageScrollIndicator}
+      showsVerticalScrollIndicator={false}
       onScroll={onPageScroll}
       scrollEventThrottle={16}
       contentContainerStyle={{

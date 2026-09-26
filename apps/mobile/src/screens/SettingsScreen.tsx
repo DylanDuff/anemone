@@ -15,7 +15,7 @@ import {
   useNavigationPlacementSetting,
 } from "../settings";
 import { ChoiceRow } from "../ui/ChoiceRow";
-import { showsPageScrollIndicator, useContentLayout, useIsCompact } from "../ui/contentLayout";
+import { useContentLayout, useIsCompact } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { space, theme } from "../ui/theme";
 import { ToggleRow } from "../ui/ToggleRow";
@@ -42,7 +42,7 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
 
   return (
     <ScrollView
-      showsVerticalScrollIndicator={showsPageScrollIndicator}
+      showsVerticalScrollIndicator={false}
       onScroll={onPageScroll}
       scrollEventThrottle={16}
       style={styles.screen}

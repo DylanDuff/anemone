@@ -70,8 +70,9 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   primitives), keep navigator options constant, and keep high-frequency UI state (scroll-driven pill
   shrink) in an external store that only its consumer subscribes to (`ui/pageScroll.tsx`) — never
   in `BrowseShell` state. Missing this made iPhone page changes visibly laggy.
-- Page ScrollViews use `showsPageScrollIndicator` (off on TV and web): Safari's classic scrollbar
-  takes a gutter from the window and breaks the full-bleed hero/rows.
+- Page ScrollViews hide their scroll indicators (`showsVerticalScrollIndicator={false}`) on every
+  platform: Safari's classic scrollbar takes a gutter from the window and breaks the full-bleed
+  hero/rows, and elsewhere they're clutter.
 - Side margins come from the layout insets (`gutterFor(compact)`: 50pt, 20pt on phones) — never
   `theme.gutter` in a stylesheet.
 - Poster / 16:9 card sizes (incl. episodes and extras) come from `useCardWidths()` (smaller when compact), never

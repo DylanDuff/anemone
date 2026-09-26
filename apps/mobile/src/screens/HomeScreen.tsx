@@ -13,7 +13,7 @@ import {
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useOpenItem } from "../navigation/routes";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
-import { showsPageScrollIndicator, useContentLayout } from "../ui/contentLayout";
+import { useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
 import { HeroCarousel } from "../ui/HeroCarousel";
@@ -42,7 +42,7 @@ export function HomeScreen() {
     <View style={styles.screen}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom }}
-        showsVerticalScrollIndicator={showsPageScrollIndicator}
+        showsVerticalScrollIndicator={false}
         onScroll={onPageScroll}
         scrollEventThrottle={16}
       >

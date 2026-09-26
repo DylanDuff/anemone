@@ -25,7 +25,7 @@ import {
   View,
 } from "react-native";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
-import { showsPageScrollIndicator, useCardWidths, useContentLayout } from "../ui/contentLayout";
+import { useCardWidths, useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { Collapsible } from "../ui/Collapsible";
 import { Poster } from "../ui/Poster";
@@ -158,7 +158,7 @@ function LibraryContent({
       onLayout={isTV ? (event) => setListHeight(event.nativeEvent.layout.height) : undefined}
     >
       <FlatList
-        showsVerticalScrollIndicator={showsPageScrollIndicator}
+        showsVerticalScrollIndicator={false}
         onScroll={onPageScroll}
         scrollEventThrottle={16}
         // Changing column count requires a fresh list.
