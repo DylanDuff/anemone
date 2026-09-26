@@ -14,8 +14,8 @@ apps/mobile/     @anemone/mobile — Expo (SDK 57) shell. Injects platform adapt
 ```
 
 pnpm workspace, `node-linker=hoisted` (required for React Native + pnpm). Root `pnpm-workspace.yaml`
-enforces a **15-day minimum release age** on every dependency, with a one-time approved exclusion
-for `@jellyfin/sdk` and `onlyBuiltDependencies` for `better-sqlite3`/`esbuild`.
+enforces a **15-day minimum release age** on every dependency (no exclusions), and
+`onlyBuiltDependencies` for `better-sqlite3`/`esbuild`.
 
 ## The one rule that makes cross-platform work
 

@@ -5,9 +5,8 @@ up later. Grouped by area. Update this as items are completed or added.
 
 ## Dependencies / tooling
 
-- [ ] **Upgrade `@jellyfin/sdk` 1.0.0 → keep current once aged.** Installed under a one-time
-  15-day-rule exclusion (`minimumReleaseAgeExclude`). Once 1.0.0 is >15 days old (after ~2026-09-26),
-  remove the exclusion from `pnpm-workspace.yaml`.
+- ✅ `@jellyfin/sdk` 1.0.0 passed the 15-day window (published 2026-09-11); the one-time
+  `minimumReleaseAgeExclude` is removed from `pnpm-workspace.yaml` (2026-09-27).
 - [ ] Add `oxlint` + `oxfmt` config and a `lint`/`format` script (user has them installed globally).
 - [ ] CI: run `pnpm core:test` + `pnpm core:typecheck` on push.
 
@@ -59,8 +58,8 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
     subtitles) — implement `EngineProps` + a `PlayerCapabilities`.
   - [ ] Android: probe AC-3/E-AC-3/DTS decoders (currently always converted by the server) and HDR
     display support (currently SDR only, so HDR sources are tone-mapped by the server).
-  - [ ] iOS/iPadOS: builds and launches on device (2026-09-26); **verify playback** — AVPlayer
-    profile, HLS-manifest subtitles, HDR. tvOS still unbuilt. AV1 on capable hardware.
+  - [ ] iOS/iPadOS: runs on device (iPhone 14 Pro, 2026-09-27); **verify playback** — AVPlayer
+    profile, HLS-manifest subtitles, HDR. tvOS runs in the simulator. AV1 on capable hardware.
   - [ ] Report stop when the app is backgrounded/killed mid-playback; PiP, AirPlay/Chromecast,
     now-playing/lock-screen controls (`NowPlayable`); playback speed; audio-only items.
   - [ ] Web: keyboard shortcuts (space, arrows); ASS/SSA are converted to WebVTT (styling lost).
@@ -166,7 +165,7 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - [ ] Person page: episodes / guest roles, and a full filterable library of the person's items.
 - ✅ Hover/focus states: `Focusable` (hover-driven + eased on web, D-pad on TV).
 - ✅ Home hero reuses the item page's `ItemTitleBlock` (title art, facts, Play/played/favorite) and `backdropImageSource`.
-- [ ] Verify the native stack on iOS (Android/Android TV verified).
+- ✅ Native stack verified on iOS (iPhone 14 Pro), Android and Android TV.
 - [ ] Select-user screen (multiple saved users) — VM exists (`createSelectUserViewModel`).
 - ✅ **Search** section in the pill: debounced field, then Movies / Shows / Episodes / Collections
   / People shelves (`useSearchResults`, `searchItemScopes`, `searchPeopleQuery`).
