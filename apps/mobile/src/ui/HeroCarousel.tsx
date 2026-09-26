@@ -4,7 +4,7 @@
 
 import { type Api, displayTitle } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
@@ -58,16 +58,26 @@ function SwipeCarousel({
   const indexRef = useRef(0);
   const [active, setActive] = useState(0);
 
-  useEffect(() => {
-    if (items.length <= 1) {
+  // Auto-advance only once the carousel has been still for a full interval: any scrolling (a swipe,
+  // a trackpad, or our own advance) restarts the countdown from the slide it lands on, and a finger
+  // resting on it holds it. So browsing by hand never fights the timer.
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dragging = useRef(false);
+  const scheduleAdvance = useCallback(() => {
+    clearTimeout(advanceTimer.current);
+    if (items.length <= 1 || dragging.current) {
       return;
     }
-    const timer = setInterval(() => {
+    advanceTimer.current = setTimeout(() => {
       const next = (indexRef.current + 1) % items.length;
       scrollRef.current?.scrollTo({ x: next * width, animated: true });
     }, HERO_AUTO_ADVANCE_MS);
-    return () => clearInterval(timer);
   }, [items.length, width]);
+
+  useEffect(() => {
+    scheduleAdvance();
+    return () => clearTimeout(advanceTimer.current);
+  }, [scheduleAdvance]);
 
   if (items.length === 0) {
     return <View style={{ height: geometry.height }} />;
@@ -79,6 +89,7 @@ function SwipeCarousel({
     if (index !== active) {
       setActive(index);
     }
+    scheduleAdvance();
   };
 
   return (
@@ -90,6 +101,14 @@ function SwipeCarousel({
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
+        onScrollBeginDrag={() => {
+          dragging.current = true;
+          clearTimeout(advanceTimer.current);
+        }}
+        onScrollEndDrag={() => {
+          dragging.current = false;
+          scheduleAdvance();
+        }}
       >
         {items.map((item, index) => (
           <GlassScope key={item.Id ?? index}>
