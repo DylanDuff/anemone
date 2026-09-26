@@ -77,6 +77,12 @@ function useInsetStyle() {
   return { paddingLeft: insetLeft, paddingRight: insetRight };
 }
 
+/**
+ * The row is pulled up under whatever sits above it (see `headerRow`), and its transparent padding
+ * would otherwise swallow that content's presses, hover and clicks — keep it on top.
+ */
+const ABOVE_ROW = { zIndex: 1 } as const;
+
 const styles = StyleSheet.create({
   section: {
     marginTop: space(3),
@@ -87,6 +93,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     // The row below adds `focusRoom` of its own top padding.
     marginBottom: space(1.5) - focusRoom,
+    ...ABOVE_ROW,
   },
   header: {
     color: theme.colors.text,
@@ -109,6 +116,7 @@ const styles = StyleSheet.create({
   accessory: {
     marginTop: focusRoom,
     marginBottom: space(1.5) - focusRoom,
+    ...ABOVE_ROW,
   },
   // Vertical padding keeps a focused item's lift and glow inside the ScrollView's clip.
   row: {
