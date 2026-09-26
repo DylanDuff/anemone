@@ -4,7 +4,7 @@
 
 import type { NavigationPlacement } from "@anemone/core";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { Animated, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Animated, Easing, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { type EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Section } from "../navigation/routes";
 import type { SectionEntry } from "../navigation/sections";
@@ -14,6 +14,7 @@ import { GlassSurface } from "./Glass";
 import { Icon, iconVariant } from "./Icon";
 import { space, theme } from "./theme";
 import { FocusGuide, isTV, type RemoteEvent, useHardwareBack, useRemoteEvents } from "./tv";
+import { useKeyboardShown } from "./useKeyboardShown";
 
 const RAIL_MARGIN = space(2);
 /** Phones: the least room left below the pill (screens without a home indicator). */
@@ -44,6 +45,9 @@ const COMPACT_MINIMIZED_SCALE = COMPACT_MINIMIZED_THICKNESS / (COMPACT_ITEM_SIZE
 const TV_REST_SCALE = 0.8;
 const REST_SCALE = isTV ? TV_REST_SCALE : 1;
 const SCALE_DURATION_MS = 180;
+
+/** Extra distance a bottom pill slides past the screen edge while hidden, so its shadow goes too. */
+const HIDDEN_OVERSHOOT = space(3);
 
 /** Breathing room between a side pill and the content beside it. */
 const SIDE_CONTENT_GAP = space(3);
@@ -203,6 +207,23 @@ export function SectionRail({
   });
 
   const offset = edgeOffset(form, safeArea);
+
+  // A bottom pill slides off screen while the keyboard is up (typing a search) and back after,
+  // in step with the keyboard's own animation.
+  const keyboard = useKeyboardShown();
+  const hidden = placement === "bottom" && keyboard.shown;
+  const hiddenDistance = offset + pillThickness(form) + HIDDEN_OVERSHOOT;
+  const slide = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const animation = Animated.timing(slide, {
+      toValue: hidden ? hiddenDistance : 0,
+      duration: keyboard.durationMs,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [hidden, hiddenDistance, keyboard.durationMs, slide]);
   const margin = compact ? COMPACT_MARGIN : RAIL_MARGIN;
   const itemSize = compact ? COMPACT_ITEM_SIZE : ITEM_SIZE;
   const itemHeight = labelledUnder ? LABELLED_ITEM_HEIGHT : itemSize;
@@ -273,7 +294,7 @@ export function SectionRail({
         }}
         style={[
           styles.pillShadow,
-          { borderRadius: pillRadius, transformOrigin: edge.transformOrigin, transform: [{ scale }] },
+          { borderRadius: pillRadius, transformOrigin: edge.transformOrigin, transform: [{ translateY: slide }, { scale }] },
         ]}
       >
         <GlassSurface
