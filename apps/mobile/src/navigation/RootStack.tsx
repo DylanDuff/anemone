@@ -5,6 +5,7 @@
 import { DarkTheme, type LinkingOptions, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ItemScreen } from "../screens/ItemScreen";
+import { PlayerScreen } from "../screens/PlayerScreen";
 import { theme } from "../ui/theme";
 import { BrowseShell } from "./BrowseShell";
 import type { RootStackParamList } from "./routes";
@@ -24,6 +25,10 @@ const linking: LinkingOptions<RootStackParamList> = {
         },
       },
       Item: "item/:itemID",
+      Player: {
+        path: "play/:itemID",
+        parse: { startTicks: Number },
+      },
     },
   },
 };
@@ -61,6 +66,17 @@ export function RootStack() {
       >
         <Stack.Screen name="Browse" component={BrowseShell} />
         <Stack.Screen name="Item" component={ItemScreen} />
+        <Stack.Screen
+          name="Player"
+          component={PlayerScreen}
+          options={{
+            animation: "fade",
+            contentStyle: { backgroundColor: "#000000" },
+            statusBarHidden: true,
+            navigationBarHidden: true,
+            autoHideHomeIndicator: true,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

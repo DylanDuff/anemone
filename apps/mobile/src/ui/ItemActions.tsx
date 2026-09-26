@@ -14,8 +14,8 @@ import {
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
-import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { usePlayItem } from "../navigation/routes";
 import { useGlassButtons } from "../settings";
 import { Focusable, focusLift } from "./Focusable";
 import { GlassFill, glassFillHost } from "./Glass";
@@ -66,12 +66,9 @@ function SeriesPlayButton({ seriesID, preferFocus }: { seriesID: string; preferF
   return target ? <PlayButton target={target} preferFocus={preferFocus} /> : null;
 }
 
-/**
- * Starts `target`. Playback is not built yet (see docs/BACKLOG.md), so pressing it explains that
- * rather than silently doing nothing.
- */
+/** Plays `target`, resuming from its saved position. */
 function PlayButton({ target, preferFocus }: { target: BaseItemDto; preferFocus: boolean }) {
-  const [notice, setNotice] = useState(false);
+  const playItem = usePlayItem();
   const glass = useGlassButtons();
   const fraction = playedFraction(target) ?? 0;
   const remaining = fraction > 0 ? progressLabel(target) : undefined;
@@ -79,7 +76,7 @@ function PlayButton({ target, preferFocus }: { target: BaseItemDto; preferFocus:
   return (
     <View style={styles.play}>
       <Focusable
-        onPress={() => setNotice(true)}
+        onPress={() => playItem(target)}
         accessibilityRole="button"
         hasTVPreferredFocus={preferFocus}
         style={({ pressed, focused }) => [
@@ -113,7 +110,6 @@ function PlayButton({ target, preferFocus }: { target: BaseItemDto; preferFocus:
           <Text style={styles.remaining}>{remaining} left</Text>
         </View>
       ) : null}
-      {notice ? <Text style={styles.notice}>Playback isn't available yet.</Text> : null}
     </View>
   );
 }
@@ -245,10 +241,6 @@ const styles = StyleSheet.create({
     width: 120,
   },
   remaining: {
-    color: theme.colors.muted,
-    fontSize: 12,
-  },
-  notice: {
     color: theme.colors.muted,
     fontSize: 12,
   },

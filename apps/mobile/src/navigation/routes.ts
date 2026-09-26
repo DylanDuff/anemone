@@ -2,6 +2,7 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
+import { playbackPositionTicks } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { type NavigatorScreenParams, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -25,6 +26,8 @@ export type BrowseParamList = {
 export type RootStackParamList = {
   Browse: NavigatorScreenParams<BrowseParamList> | undefined;
   Item: { itemID: string };
+  /** `startTicks` resumes from a position; `mediaSourceID` picks a version. */
+  Player: { itemID: string; startTicks?: number; mediaSourceID?: string };
 };
 
 export type AppNavigation = NativeStackNavigationProp<RootStackParamList>;
@@ -40,6 +43,22 @@ export function useOpenItem(): (item: BaseItemDto) => void {
     (item: BaseItemDto) => {
       if (item.Id) {
         navigation.push("Item", { itemID: item.Id });
+      }
+    },
+    [navigation],
+  );
+}
+
+/** A press handler that plays an item, resuming from its saved position if it has one. */
+export function usePlayItem(): (item: BaseItemDto) => void {
+  const navigation = useAppNavigation();
+  return useCallback(
+    (item: BaseItemDto) => {
+      if (item.Id) {
+        navigation.push("Player", {
+          itemID: item.Id,
+          startTicks: playbackPositionTicks(item) || undefined,
+        });
       }
     },
     [navigation],
