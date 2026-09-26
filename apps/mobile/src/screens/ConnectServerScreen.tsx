@@ -3,49 +3,51 @@
 //
 
 import {
-    createConnectToServerViewModel,
-    type ServerState,
-    useContainer,
-    useStateful,
-    useStatefulEvents,
+  createConnectToServerViewModel,
+  type ServerState,
+  useContainer,
+  useStateful,
+  useStatefulEvents,
 } from "@anemone/core";
-import { Button, Text, TextInput } from "@expo/ui";
 import { useEffect, useMemo, useRef } from "react";
-import { Screen } from "../ui/Screen";
+import { Button } from "../ui/Button";
+import { Screen, ScreenNote } from "../ui/Screen";
+import { TextField } from "../ui/TextField";
 
 /** Enter a Jellyfin server URL and connect. Calls `onConnected` once the server is reachable. */
 export function ConnectServerScreen({ onConnected }: { onConnected: (server: ServerState) => void }) {
-    const container = useContainer();
-    const vm = useMemo(() => createConnectToServerViewModel(container), [container]);
-    const url = useRef("");
+  const container = useContainer();
+  const vm = useMemo(() => createConnectToServerViewModel(container), [container]);
+  const url = useRef("");
 
-    useEffect(() => () => vm.dispose(), [vm]);
+  useEffect(() => () => vm.dispose(), [vm]);
 
-    const { state, error } = useStateful(vm);
-    useStatefulEvents(vm, (event) => {
-        if (event.kind === "connected" || event.kind === "duplicateServer") {
-            onConnected(event.server);
-        }
-    });
+  const { state, error } = useStateful(vm);
+  useStatefulEvents(vm, (event) => {
+    if (event.kind === "connected" || event.kind === "duplicateServer") {
+      onConnected(event.server);
+    }
+  });
 
-    const connecting = state === "connecting";
+  const connect = () => vm.send({ kind: "connect", url: url.current });
 
-    return (
-        <Screen title="Connect to Server">
-            <Text textStyle={{ color: "#555" }}>Enter the address of your Jellyfin server.</Text>
-            <TextInput
-                placeholder="https://demo.jellyfin.org"
-                keyboardType="url"
-                autoFocus
-                onChangeText={(text) => {
-                    url.current = text;
-                }}
-            />
-            <Button
-                label={connecting ? "Connecting…" : "Connect"}
-                onPress={() => vm.send({ kind: "connect", url: url.current })}
-            />
-            {error ? <Text textStyle={{ color: "#c0392b" }}>{error.message}</Text> : null}
-        </Screen>
-    );
+  return (
+    <Screen title="Connect to Server">
+      <ScreenNote>Enter the address of your Jellyfin server.</ScreenNote>
+      <TextField
+        placeholder="https://demo.jellyfin.org"
+        keyboardType="url"
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="go"
+        autoFocus
+        onChangeText={(text) => {
+          url.current = text;
+        }}
+        onSubmit={connect}
+      />
+      <Button label="Connect" busy={state === "connecting"} onPress={connect} />
+      {error ? <ScreenNote error>{error.message}</ScreenNote> : null}
+    </Screen>
+  );
 }

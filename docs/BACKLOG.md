@@ -20,7 +20,9 @@ up later. Grouped by area. Update this as items are completed or added.
   `FocusGuide autoFocus`, `TVHero` (single mounted slide, crossfade, edge-press changes slide).
 - [ ] Bump `react-native-tvos` to `0.86.3-0` (matches RN 0.86.3) once it passes the 15-day window
   (published 2026-09-18 → eligible 2026-10-03).
-- [ ] **tvOS**: untested; needs `appleTVImages` in the config-tv plugin and a Mac/Xcode build.
+- [ ] **tvOS**: builds and runs in the Apple TV simulator (2026-09-26, `EXPO_TV=1` prebuild of
+  `ios/`); still needs `appleTVImages` in the config-tv plugin, a device run, and a check of the
+  native `@expo/ui` switches/text fields (SwiftUI) inside the RN focus engine.
 - [ ] Android TV **banner** (`androidTVBanner`, 320×180) — the launcher currently uses the icon.
 - [ ] Focus polish: animated focus lift on TV (web already eases), TV-sized type/spacing pass,
   library grid "jump to letter", long-press menus.
@@ -167,8 +169,9 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - [ ] PIN / biometric access-policy capture on sign-in (currently always `none`).
 
 - [ ] Verify image auth on servers that require `api_key` (hero/backdrops use `backdropImageSource`).
-- [ ] A shared theme/typography layer so screens don't hand-set colors (connect/sign-in still use
-  the Expo UI light `Screen`; home uses the dark RN theme — unify later).
+- ✅ Theme layer (`ui/theme.ts`): colours, type scale, weights, radii drive every screen,
+  connect/sign-in included. Form controls are platform-native via `@expo/ui` where it fits
+  (`ui/nativeControls.ts`): iOS/iPadOS/tvOS and Android phones; themed ones on Android TV and web.
 
 ## Completed (foundation run)
 

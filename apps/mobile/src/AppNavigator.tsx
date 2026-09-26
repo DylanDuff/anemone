@@ -3,8 +3,9 @@
 //
 
 import { type ServerState, useCurrentSession } from "@anemone/core";
-import { Host, Text } from "@expo/ui";
 import { useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { theme } from "./ui/theme";
 import { ConnectServerScreen } from "./screens/ConnectServerScreen";
 import { RootStack } from "./navigation/RootStack";
 import { SignInScreen } from "./screens/SignInScreen";
@@ -18,11 +19,7 @@ export function AppNavigator() {
     const [server, setServer] = useState<ServerState | null>(null);
 
     if (isLoading) {
-        return (
-            <Host style={{ flex: 1, padding: 24 }}>
-                <Text>Loading…</Text>
-            </Host>
-        );
+        return <LoadingScreen />;
     }
 
     if (session) {
@@ -35,3 +32,21 @@ export function AppNavigator() {
 
     return <SignInScreen server={server} onBack={() => setServer(null)} />;
 }
+
+/** A themed full-screen spinner, while the app starts or restores its session. */
+export function LoadingScreen() {
+    return (
+        <View style={styles.loading}>
+            <ActivityIndicator color={theme.colors.accent} />
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    loading: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: theme.colors.background,
+    },
+});

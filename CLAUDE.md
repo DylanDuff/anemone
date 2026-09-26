@@ -10,7 +10,7 @@ is a pure-TypeScript package** so the same logic drives every platform and any f
 packages/core/   @anemone/core — platform-agnostic business logic. NO react-native, NO expo.
                  Tested in plain Node (vitest + better-sqlite3). This is the primary deliverable.
 apps/mobile/     @anemone/mobile — Expo (SDK 57) shell. Injects platform adapters into core and
-                 renders the UI. iOS/Android, Android TV (tvOS untested) and web.
+                 renders the UI. iOS/Android, Android TV, tvOS (simulator-tested) and web.
 ```
 
 pnpm workspace, `node-linker=hoisted` (required for React Native + pnpm). Root `pnpm-workspace.yaml`
@@ -82,6 +82,9 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
 - Theme (`src/ui/theme.ts`) drives every colour, font size/weight and corner radius: compose
   `theme.type.*` (+ `theme.weight.*` overrides), `theme.colors.*`, `theme.radii.*`, `space()`. No
   literals in components — add a token instead.
+- Form controls: `TextField`, `Switch`, `Button` (`src/ui/`). Text fields and switches are the
+  platform's own via `@expo/ui` when `nativeControls` (iOS/iPadOS/tvOS, Android phones — tvOS fields
+  open the system keyboard), themed RN ones on Android TV and web. Screens never branch on it.
 - Icons: Ionicons via `Icon` (`src/ui/Icon.tsx`) only — never import `@expo/vector-icons`
   directly. `iconVariant(base, filled)` picks filled (active/current) vs `-outline`.
 - Every interactive element is a `Focusable` (`src/ui/Focusable.tsx`) so D-pad/keyboard focus is

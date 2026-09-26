@@ -2,17 +2,17 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
+import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Focusable } from "./Focusable";
+import { nativeControls } from "./nativeControls";
+import { Switch } from "./Switch";
 import { space, theme } from "./theme";
 
-const TRACK_WIDTH = 48;
-const TRACK_HEIGHT = 28;
-const THUMB_SIZE = 22;
-
 /**
- * A settings row: label and description with an on/off switch. The whole row is one focus target,
- * so the D-pad (Select) or a click/tap toggles it.
+ * A settings row: label and description with an on/off switch. With native switches the switch is
+ * the control (as in the platform's own settings); otherwise the whole row is one focus target, so
+ * the D-pad (Select) or a click/tap toggles it.
  */
 export function ToggleRow({
   label,
@@ -28,6 +28,24 @@ export function ToggleRow({
   /** A sub-setting of the row above: indented to show it depends on it. */
   nested?: boolean;
 }) {
+  const content = (focused: boolean): ReactNode => (
+    <>
+      <View style={styles.text}>
+        <Text style={[styles.label, focused ? styles.labelFocused : null]}>{label}</Text>
+        {description ? (
+          <Text style={[styles.description, focused ? styles.descriptionFocused : null]}>
+            {description}
+          </Text>
+        ) : null}
+      </View>
+      <Switch value={value} onValueChange={onChange} />
+    </>
+  );
+
+  if (nativeControls) {
+    return <View style={[styles.row, nested ? styles.nested : null]}>{content(false)}</View>;
+  }
+
   return (
     <Focusable
       onPress={() => onChange(!value)}
@@ -41,21 +59,7 @@ export function ToggleRow({
         pressed ? styles.pressed : null,
       ]}
     >
-      {({ focused }) => (
-        <>
-          <View style={styles.text}>
-            <Text style={[styles.label, focused ? styles.labelFocused : null]}>{label}</Text>
-            {description ? (
-              <Text style={[styles.description, focused ? styles.descriptionFocused : null]}>
-                {description}
-              </Text>
-            ) : null}
-          </View>
-          <View style={[styles.track, value ? styles.trackOn : null]}>
-            <View style={[styles.thumb, value ? styles.thumbOn : null]} />
-          </View>
-        </>
-      )}
+      {({ focused }) => content(focused)}
     </Focusable>
   );
 }
@@ -96,24 +100,5 @@ const styles = StyleSheet.create({
   },
   descriptionFocused: {
     color: theme.colors.chipActiveMuted,
-  },
-  track: {
-    width: TRACK_WIDTH,
-    height: TRACK_HEIGHT,
-    borderRadius: TRACK_HEIGHT / 2,
-    padding: (TRACK_HEIGHT - THUMB_SIZE) / 2,
-    backgroundColor: theme.colors.placeholder,
-  },
-  trackOn: {
-    backgroundColor: theme.colors.accent,
-  },
-  thumb: {
-    width: THUMB_SIZE,
-    height: THUMB_SIZE,
-    borderRadius: THUMB_SIZE / 2,
-    backgroundColor: theme.colors.white,
-  },
-  thumbOn: {
-    alignSelf: "flex-end",
   },
 });
