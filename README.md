@@ -9,8 +9,11 @@ logic is a shared, platform-agnostic package** and the UI is a thin, fast-to-ite
 
 The **business logic layer is built and tested**; the UI comes next.
 
-- ✅ `@anemone/core` — foundation (DI, persistence, session, auth) + view models. 54 tests.
-- 🚧 UI (screens/components), TV targets, media playback, downloads, admin — see
+- ✅ `@anemone/core` — foundation (DI, persistence, session, auth), view models, and playback
+  (device profiles, stream negotiation, track switching, progress reporting).
+- ✅ Video playback on iOS/Android/Android TV (react-native-video) and web (hls.js) — see
+  [`docs/playback.md`](docs/playback.md).
+- 🚧 Remaining UI, tvOS, playback follow-ups, downloads, admin — see
   [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
 ## Layout
@@ -50,7 +53,8 @@ const container = await configureAnemone();
 ```
 
 See **[`docs/architecture.md`](docs/architecture.md)** for the full design (DI, persistence, the
-`@Stateful` reducer pattern, the query layer, and the Swiftfin→TypeScript mapping) and
+`@Stateful` reducer pattern, the query layer, and the Swiftfin→TypeScript mapping),
+**[`docs/playback.md`](docs/playback.md)** for the player (engines, negotiation, subtitles), and
 **[`CLAUDE.md`](CLAUDE.md)** for conventions.
 
 ## License

@@ -44,9 +44,28 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   editor, genres/people/studios/tags editors, subtitle search, remote images.
 - [ ] **Downloads** (`Services/DownloadManager`, `DownloadTask`, `DownloadListViewModel`): offline
   media. Ties into native file storage — needs a platform adapter.
-- [ ] **Media player manager** (`Objects/MediaPlayerManager/*`): playback queue, now-playing,
-  proxies, trickplay/preview images, device profiles, playback compatibility. Deeply tied to native
-  video playback (VLCKit/AVKit) — the RN equivalent (e.g. a video player module) is a separate track.
+- ✅ **Media player manager — first cut** (see [`docs/playback.md`](playback.md)): device profiles
+  from engine capabilities, PlaybackInfo negotiation, audio/subtitle switching (local or
+  re-negotiated), start/progress/stop reporting, player screen on react-native-video + hls.js (web).
+- [ ] **Playback follow-ups** (Swiftfin `MediaPlayerManager` remainder):
+  - [ ] Queue / next-episode autoplay and "Up next" prompt (`EpisodeMediaPlayerQueue`).
+  - [ ] Trickplay / chapter preview images on the seek bar (`PreviewImageProvider`).
+  - [ ] Max bitrate setting + "compatibility mode" (Swiftfin `PlaybackBitrate`,
+    `PlaybackCompatibility`); `resolvePlayback` already takes `maxBitrate`.
+  - [ ] Version picker for items with several media sources (`mediaSourceID` route param exists).
+  - [ ] Opt-in **mpv/VLC engine** adapter for broad direct play (ASS styling, DTS/TrueHD, image
+    subtitles) — implement `EngineProps` + a `PlayerCapabilities`.
+  - [ ] Android: probe AC-3/E-AC-3/DTS decoders (currently always converted by the server) and HDR
+    display support (currently SDR only, so HDR sources are tone-mapped by the server).
+  - [ ] iOS/tvOS: AV1 on capable hardware; untested on device so far.
+  - [ ] Report stop when the app is backgrounded/killed mid-playback; PiP, AirPlay/Chromecast,
+    now-playing/lock-screen controls (`NowPlayable`); playback speed; audio-only items.
+  - [ ] Web: keyboard shortcuts (space, arrows); ASS/SSA are converted to WebVTT (styling lost).
+  - [ ] **Chrome (macOS) decode failure**: an MKV 1080p H.264 item (remuxed, video copied,
+    manifest `avc1.640028`) fails with `DECODER_ERROR_NOT_SUPPORTED … kUnsupportedConfig` →
+    hls.js `mediaSourceRequiresReset`. Same in jellyfin-web on Chrome; plays in Safari. Suspect
+    Hi10P mis-reported as 8-bit — check the item's Media Info and `chrome://media-internals`.
+    Possible fix: on a decode error, re-negotiate once with video stream copy disabled.
 - [ ] **Localization view models** (`ViewModels/Localization/*`): countries, cultures, parental ratings.
 - [ ] **Programs / live TV** (`ProgramsViewModel`, `ChannelLibraryViewModel`, `ChannelProgram`).
 - [ ] **Reset password / local user security** beyond sign-in basics.
@@ -57,8 +76,8 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 
 - [ ] **Value observation / reactivity for `StoredValues`** (Swiftfin's `_Observable`): current port
   is read/write; add change subscriptions when a UI needs live settings updates.
-- [ ] **Device profile / playback capabilities** (`Objects/PlaybackDeviceProfile`, `DeviceProfile`):
-  needed for constructing playback URLs; deferred with the media player.
+- ✅ **Device profile / playback capabilities**: `playback/deviceProfile.ts` from an engine's
+  `PlayerCapabilities`.
 - [ ] **Strings / i18n** (`Shared/Strings`, `L10n`): port the localization catalog. For now,
   user-facing strings are inlined/English.
 - [ ] Schema migrations framework (Drizzle migrations) — start with a single initial schema; add
@@ -75,8 +94,7 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   `AppDefaults.Customization.Library` — wire that fallback when a settings screen exists.
 - [ ] Remaining Swiftfin filters: tags, years, traits beyond played/favorite, letter picker; genre
   list comes from `getGenres` rather than `/Items/Filters` (`getQueryFilters`).
-- [ ] **Device profile / playback capabilities**: needed for real playback URLs; deferred with the
-  media player.
+- ✅ **Device profile / playback capabilities**: see `docs/playback.md`.
 
 ## Basic UI (built)
 
@@ -128,8 +146,8 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   played/favorite toggles, overview, season picker + episodes (series), season episodes, box-set
   members, cast, additional parts/trailers/special features, similar items, About (credits +
   per-version media info).
-- [ ] **Playback**: the Play button only shows "Playback isn't available yet" — wire when the media
-  player exists. Trailers/extras currently open their own item page for the same reason.
+- ✅ **Playback**: Play/Resume opens the player (`usePlayItem`).
+- [ ] Trailers/extras still open their own item page; play them directly with `usePlayItem`.
 - [ ] **Person page**: cast cards are focusable (TV focus ring/lift) but pressing is a no-op; Swiftfin
   opens a library filtered by person (`personIds`). Wire `onPress` in `screens/item/CastRow.tsx`.
 - ✅ Hover/focus states: `Focusable` (hover-driven + eased on web, D-pad on TV).

@@ -90,6 +90,11 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
 - Perf on the test TV (32-bit ARM, Android 12): live blur and many masked fades are the heaviest
   effects; they're behind Settings (glass blur defaults off on TV). Judge perf on release builds —
   debug adds ~200 MB native heap.
+- Playback (`docs/playback.md`): engines sit behind `player/engine.ts` (`EngineProps`) and describe
+  themselves with a core `PlayerCapabilities` (`player/capabilities.ts` + `.web.ts`); core builds
+  the DeviceProfile, negotiates the stream and decides track switches. Never branch on engine or
+  platform in core — add a capability flag. Native engine = react-native-video; web = `<video>` +
+  hls.js (react-native-video's web player lacks HLS/tracks). Media URLs carry the token as `ApiKey`.
 - Native builds: `npx expo prebuild --platform android` (add `EXPO_TV=1` and `--clean` for TV), then
   Gradle with JDK 17. `android/`/`ios/` are generated and gitignored; config lives in `app.json` +
   `plugins/`. Release builds need `plugins/withCleartextTraffic.js` for `http://` servers.
