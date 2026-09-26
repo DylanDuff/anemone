@@ -149,8 +149,9 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   1.8 GB box and got killed by lmkd once. Images are now sized via `imagePixelWidth()`.
 - ✅ Ionicons (`@expo/vector-icons`) everywhere via `ui/Icon.tsx` — rail/tabs, actions, chips,
   badges, chevrons.
-- [ ] **Sign out** has no UI (the Home button is commented out) — add it to the Settings page, along
-  with server/user switching.
+- ✅ **Sign out**: Settings → Account shows the user and server, Sign out confirms inline
+  (`screens/settings/AccountSection.tsx`).
+- [ ] Server/user switching from Settings (select-user VM exists).
 - ✅ **Library screen**: responsive poster grid / list toggle, infinite scroll, sort + direction,
   unplayed/favorites/genre filters, all persisted per library.
 - ✅ **Item screen**: cinematic backdrop + logo header, facts & media badges, Play/Resume target,

@@ -18,6 +18,7 @@ import { ChoiceRow } from "../ui/ChoiceRow";
 import { showsPageScrollIndicator, useContentLayout, useIsCompact } from "../ui/contentLayout";
 import { space, theme } from "../ui/theme";
 import { ToggleRow } from "../ui/ToggleRow";
+import { AccountSection } from "./settings/AccountSection";
 
 /**
  * Device settings (a top-level section). Values persist per device and apply immediately — every
@@ -52,6 +53,11 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
       ]}
     >
       <Text style={styles.title}>Settings</Text>
+
+      <View style={styles.group}>
+        <Text style={styles.groupTitle}>Account</Text>
+        <AccountSection />
+      </View>
 
       <View style={styles.group}>
         <Text style={styles.groupTitle}>Visual effects</Text>

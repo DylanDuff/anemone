@@ -21,6 +21,7 @@ export function Button({
   icon,
   busy = false,
   disabled = false,
+  preferFocus = false,
 }: {
   label: string;
   onPress: () => void;
@@ -29,12 +30,15 @@ export function Button({
   /** Shows a spinner and ignores presses (e.g. while signing in). */
   busy?: boolean;
   disabled?: boolean;
+  /** Take D-pad focus when it appears (TV), e.g. the confirm step of a destructive action. */
+  preferFocus?: boolean;
 }) {
   const inactive = busy || disabled;
   return (
     <Focusable
       onPress={onPress}
       disabled={inactive}
+      hasTVPreferredFocus={preferFocus}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: inactive, busy }}
