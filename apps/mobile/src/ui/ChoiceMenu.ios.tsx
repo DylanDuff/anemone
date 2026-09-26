@@ -14,6 +14,7 @@ export function ChoiceMenu<Value extends string>({
   choices,
   value,
   onChange,
+  glass,
 }: ChoiceMenuProps<Value>) {
   const current = currentChoice(choices, value);
   if (!current) {
@@ -24,7 +25,7 @@ export function ChoiceMenu<Value extends string>({
       <Menu
         label={
           <RNHostView matchContents>
-            <ChipFace label={current.label} icon={current.icon} />
+            <ChipFace label={current.label} icon={current.icon} glass={glass} />
           </RNHostView>
         }
       >

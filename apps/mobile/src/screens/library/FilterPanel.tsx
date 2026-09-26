@@ -10,10 +10,15 @@ import {
   useGenres,
 } from "@anemone/core";
 import { StyleSheet, Text, View } from "react-native";
+import { useGlassButtons } from "../../settings";
 import { Chip } from "../../ui/Chip";
+import { GlassFill, glassFillHost } from "../../ui/Glass";
 import { space, theme } from "../../ui/theme";
 
-/** Played/favorite traits and the library's genres, as toggle chips. */
+/**
+ * Played/favorite traits and the library's genres, as toggle chips. The panel is frosted like the
+ * toolbar chips (Settings → Glass buttons); its chips stay plain, as glass on glass only hazes.
+ */
 export function FilterPanel({
   libraryID,
   filters,
@@ -25,9 +30,11 @@ export function FilterPanel({
 }) {
   const { data: genres } = useGenres(libraryID);
   const genreNames = (genres ?? []).map((genre) => genre.Name).filter(Boolean) as string[];
+  const glass = useGlassButtons();
 
   return (
-    <View style={styles.panel}>
+    <View style={[styles.panel, glass ? glassFillHost : null]}>
+      {glass ? <GlassFill radius={theme.radii.lg} /> : null}
       <Text style={styles.label}>Show</Text>
       <View style={styles.chips}>
         <Chip

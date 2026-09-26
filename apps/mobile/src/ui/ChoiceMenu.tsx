@@ -21,6 +21,7 @@ export function ChoiceMenu<Value extends string>({
   value,
   onChange,
   accessibilityLabel,
+  glass,
 }: ChoiceMenuProps<Value>) {
   const anchor = useRef<View>(null);
   const [position, setPosition] = useState<{ top: number; left: number }>();
@@ -40,6 +41,7 @@ export function ChoiceMenu<Value extends string>({
       <Chip
         label={current.label}
         icon={current.icon}
+        glass={glass}
         accessibilityLabel={`${accessibilityLabel}: ${current.label}`}
         onPress={open}
       />

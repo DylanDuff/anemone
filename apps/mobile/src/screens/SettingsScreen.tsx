@@ -85,7 +85,7 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
           <ToggleRow
             nested
             label="Glass buttons"
-            description="Also blur behind the translucent buttons and detail chips over artwork (Play, played, favourite, info; year, rating, quality)."
+            description="Also blur behind the translucent buttons and chips: over artwork (Play, played, favourite, info; year, rating, quality) and the library toolbar."
             value={glassButtons.value}
             onChange={glassButtons.setValue}
           />

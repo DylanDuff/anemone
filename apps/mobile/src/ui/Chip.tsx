@@ -3,18 +3,22 @@
 //
 
 import { StyleSheet, Text, View } from "react-native";
+import { useGlassButtons } from "../settings";
 import { Focusable, focusLift } from "./Focusable";
+import { GlassFill, glassFillHost } from "./Glass";
 import { Icon, type IconName } from "./Icon";
 import { space, theme } from "./theme";
 
 /**
  * A pill-shaped toggle used for sort fields, filters, seasons and view toggles. Selected chips are
  * accent-filled; the focused chip is white, so focus stays distinguishable from selection on TV.
+ * `glass` frosts resting chips like the action buttons (Settings → Glass buttons).
  */
 export function Chip({
   label,
   icon,
   selected = false,
+  glass = false,
   onPress,
   accessibilityLabel,
 }: {
@@ -22,9 +26,11 @@ export function Chip({
   label?: string;
   icon?: IconName;
   selected?: boolean;
+  glass?: boolean;
   onPress: () => void;
   accessibilityLabel?: string;
 }) {
+  const frosted = useGlassButtons() && glass && !selected;
   return (
     <Focusable
       onPress={onPress}
@@ -33,12 +39,18 @@ export function Chip({
       accessibilityLabel={accessibilityLabel ?? label}
       style={({ pressed, focused }) => [
         styles.chip,
+        frosted && !focused ? glassFillHost : null,
         selected ? styles.selected : null,
         focused ? [styles.focused, focusLift] : null,
         pressed ? styles.pressed : null,
       ]}
     >
-      {({ focused }) => <ChipContent label={label} icon={icon} focused={focused} />}
+      {({ focused }) => (
+        <>
+          {frosted && !focused ? <GlassFill radius={theme.radii.pill} /> : null}
+          <ChipContent label={label} icon={icon} focused={focused} />
+        </>
+      )}
     </Focusable>
   );
 }
@@ -47,9 +59,19 @@ export function Chip({
  * A chip's look without its press handling, for native controls that own the tap themselves (the
  * trigger of a native menu, see `ChoiceMenu`).
  */
-export function ChipFace({ label, icon }: { label?: string; icon?: IconName }) {
+export function ChipFace({
+  label,
+  icon,
+  glass = false,
+}: {
+  label?: string;
+  icon?: IconName;
+  glass?: boolean;
+}) {
+  const frosted = useGlassButtons() && glass;
   return (
-    <View style={styles.chip}>
+    <View style={[styles.chip, frosted ? glassFillHost : null]}>
+      {frosted ? <GlassFill radius={theme.radii.pill} /> : null}
       <ChipContent label={label} icon={icon} focused={false} />
     </View>
   );

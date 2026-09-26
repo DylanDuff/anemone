@@ -21,6 +21,8 @@ export interface ChoiceMenuProps<Value extends string> {
   readonly onChange: (value: Value) => void;
   /** What the menu picks (e.g. "Layout"), for screen readers. */
   readonly accessibilityLabel: string;
+  /** Frost the chip like the action buttons (see `Chip`). */
+  readonly glass?: boolean;
 }
 
 /** The choice matching `value`, falling back to the first. */

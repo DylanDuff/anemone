@@ -67,6 +67,7 @@ export function LibraryToolbar({
       <View style={styles.group}>
         {compact ? (
           <ChoiceMenu
+            glass
             choices={SORT_CHOICES}
             value={filters.sort}
             onChange={(field) => onChangeFilters(withSortField(filters, field))}
@@ -75,6 +76,7 @@ export function LibraryToolbar({
         ) : (
           SORT_CHOICES.map((choice) => (
             <Chip
+              glass
               key={choice.value}
               label={choice.label}
               selected={filters.sort === choice.value}
@@ -83,6 +85,7 @@ export function LibraryToolbar({
           ))
         )}
         <Chip
+          glass
           icon={ascending ? "arrow-up" : "arrow-down"}
           accessibilityLabel={ascending ? "Ascending" : "Descending"}
           onPress={() =>
@@ -96,6 +99,7 @@ export function LibraryToolbar({
 
       <View style={styles.group}>
         <Chip
+          glass
           icon="options-outline"
           label={filterCount > 0 ? `Filters · ${filterCount}` : "Filters"}
           selected={filtersOpen}
@@ -103,6 +107,7 @@ export function LibraryToolbar({
         />
         {compact ? (
           <ChoiceMenu
+            glass
             choices={DISPLAY_CHOICES}
             value={displayType}
             onChange={onChangeDisplayType}
@@ -111,6 +116,7 @@ export function LibraryToolbar({
         ) : (
           DISPLAY_CHOICES.map((choice) => (
             <Chip
+              glass
               key={choice.value}
               icon={choice.icon}
               label={choice.label}
