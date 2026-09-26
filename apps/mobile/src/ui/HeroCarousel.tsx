@@ -2,7 +2,7 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
-import type { Api } from "@anemone/core";
+import { type Api, displayTitle } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -19,7 +19,8 @@ import {
   SlideArtwork,
   SlideDots,
 } from "./HeroSlide";
-import { useContentLayout } from "./contentLayout";
+import { useContentLayout, useIsCompact } from "./contentLayout";
+import { Focusable } from "./Focusable";
 import { GlassScope } from "./Glass";
 import { ItemTitleBlock } from "./ItemTitleBlock";
 import { isTV } from "./tv";
@@ -37,7 +38,10 @@ export function HeroCarousel(props: {
   return isTV ? <TVHero {...props} /> : <SwipeCarousel {...props} />;
 }
 
-/** Full-bleed paging carousel; each slide's ⓘ action opens the item. */
+/**
+ * Full-bleed paging carousel. Each slide's ⓘ action opens the item; phones drop the actions (they
+ * live on the item page) and make the whole slide the way in instead (a swipe cancels the tap).
+ */
 function SwipeCarousel({
   api,
   items,
@@ -48,6 +52,7 @@ function SwipeCarousel({
   onPressItem?: (item: BaseItemDto) => void;
 }) {
   const { width, insetLeft, insetRight } = useContentLayout();
+  const compact = useIsCompact();
   const geometry = heroGeometry(width);
   const scrollRef = useRef<ScrollView>(null);
   const indexRef = useRef(0);
@@ -88,7 +93,14 @@ function SwipeCarousel({
       >
         {items.map((item, index) => (
           <GlassScope key={item.Id ?? index}>
-            <View style={{ width, height: geometry.slideHeight }}>
+            <Focusable
+              onPress={compact ? () => onPressItem?.(item) : undefined}
+              disabled={!compact}
+              accessible={compact}
+              accessibilityRole={compact ? "button" : undefined}
+              accessibilityLabel={compact ? displayTitle(item) : undefined}
+              style={{ width, height: geometry.slideHeight }}
+            >
               <SlideArtwork api={api} item={item} width={width} geometry={geometry} />
               <View style={[
                 heroStyles.caption,
@@ -97,13 +109,13 @@ function SwipeCarousel({
                 <ItemTitleBlock
                   api={api}
                   item={item}
-                  // Neighbours stay mounted so actions are ready mid-swipe; the rest skip their
-                  // play-target fetches.
-                  showActions={Math.abs(index - active) <= 1}
+                  // Phones: no actions (they're on the item page). Elsewhere neighbours stay mounted
+                  // so actions are ready mid-swipe; the rest skip their play-target fetches.
+                  showActions={!compact && Math.abs(index - active) <= 1}
                   onOpenDetails={onPressItem}
                 />
               </View>
-            </View>
+            </Focusable>
           </GlassScope>
         ))}
       </ScrollView>

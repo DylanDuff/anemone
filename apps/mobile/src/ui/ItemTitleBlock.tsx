@@ -24,8 +24,9 @@ import { useIsCompact } from "./contentLayout";
 import { imagePixelWidth } from "./imageSize";
 
 /** Title-art box; logos are `contain`-fitted, so wide and tall logos both stay inside it. */
-const LOGO_WIDTH = 300;
-const LOGO_HEIGHT = 100;
+const LOGO_BOX = { width: 300, height: 100 };
+/** Phones: a smaller box, so the logo doesn't crowd the artwork. */
+const COMPACT_LOGO_BOX = { width: 210, height: 70 };
 
 /**
  * Backdrop height for cinematic headers (item page, home hero): scales with the window but stays
@@ -59,11 +60,13 @@ export function ItemTitleBlock({
   /** Adds an ⓘ action that opens the item page. */
   onOpenDetails?: (item: BaseItemDto) => void;
 }) {
-  const logo = logoImageSource(api, item, { maxWidth: imagePixelWidth(LOGO_WIDTH) }).url;
+  // Wide screens (TV, web, tablets): actions and details share one row; phones stack them.
+  const compact = useIsCompact();
+  const split = !compact;
+  const logoBox = compact ? COMPACT_LOGO_BOX : LOGO_BOX;
+  const logo = logoImageSource(api, item, { maxWidth: imagePixelWidth(logoBox.width) }).url;
   const isEpisode = item.Type === BaseItemKind.Episode;
   const locator = isEpisode ? seasonEpisodeLabel(item) : undefined;
-  // Wide screens (TV, web, tablets): actions and details share one row; phones stack them.
-  const split = !useIsCompact();
   const actions = showActions ? (
     <ItemActions
       item={item}
@@ -94,7 +97,7 @@ export function ItemTitleBlock({
       ) : null}
 
       {logo && !isEpisode ? (
-        <TitleLogo uri={logo} label={displayTitle(item)} />
+        <TitleLogo uri={logo} label={displayTitle(item)} box={logoBox} />
       ) : (
         <Text numberOfLines={2} style={styles.title}>
           {locator ? `${locator} · ${displayTitle(item)}` : displayTitle(item)}
@@ -122,14 +125,22 @@ export function ItemTitleBlock({
  * the actions below). `contain` alone centres it, and `Image` has no content position, so once
  * the logo loads the box shrinks to the fitted size.
  */
-function TitleLogo({ uri, label }: { uri: string; label: string }) {
+function TitleLogo({
+  uri,
+  label,
+  box,
+}: {
+  uri: string;
+  label: string;
+  box: { width: number; height: number };
+}) {
   const [aspectRatio, setAspectRatio] = useState<number>();
   const fitted =
     aspectRatio == null
-      ? null
-      : aspectRatio >= LOGO_WIDTH / LOGO_HEIGHT
-        ? { width: LOGO_WIDTH, height: LOGO_WIDTH / aspectRatio }
-        : { width: LOGO_HEIGHT * aspectRatio, height: LOGO_HEIGHT };
+      ? box
+      : aspectRatio >= box.width / box.height
+        ? { width: box.width, height: box.width / aspectRatio }
+        : { width: box.height * aspectRatio, height: box.height };
 
   return (
     <Image
@@ -222,9 +233,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   logo: {
-    width: LOGO_WIDTH,
     maxWidth: "100%",
-    height: LOGO_HEIGHT,
     alignSelf: "flex-start",
   },
   title: {
