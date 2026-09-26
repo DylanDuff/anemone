@@ -157,7 +157,7 @@ describe("itemMetadataLabels", () => {
         ).toEqual(["2019", "PG-13", formatHoursMinutes(112 * 60), "★ 7.8"]);
     });
 
-    it("shows a year range for series and omits runtime", () => {
+    it("shows a year range for ended series and omits runtime", () => {
         expect(
             itemMetadataLabels({
                 Type: BaseItemKind.Series,
@@ -168,7 +168,7 @@ describe("itemMetadataLabels", () => {
         ).toEqual(["2008–2013"]);
         expect(
             itemMetadataLabels({ Type: BaseItemKind.Series, ProductionYear: 2022, Status: "Continuing" }),
-        ).toEqual(["2022–"]);
+        ).toEqual(["2022"]);
     });
 });
 

@@ -169,7 +169,7 @@ export function progressLabel(item: BaseItemDto): string | undefined {
     return formatHoursMinutes(ticksToSeconds(total - position));
 }
 
-/** "2019", or for a series its run: "2008–2013" when ended, "2022–" while continuing. */
+/** "2019", or for a series that has ended its run: "2008–2013". Continuing series show "2022". */
 function yearLabel(item: BaseItemDto): string | undefined {
     const year = item.ProductionYear != null ? String(item.ProductionYear) : premiereYear(item);
     if (!year || item.Type !== BaseItemKind.Series) {
@@ -179,7 +179,7 @@ function yearLabel(item: BaseItemDto): string | undefined {
     if (endYear && endYear !== year) {
         return `${year}–${endYear}`;
     }
-    return item.Status === "Continuing" ? `${year}–` : year;
+    return year;
 }
 
 /**
@@ -195,7 +195,6 @@ export function itemMetadataLabels(item: BaseItemDto): string[] {
     ].filter((label): label is string => Boolean(label));
 }
 
-/** Four-digit premiere year, if known (Swiftfin `premiereDateYear`). */
 /** An ISO date as a long, localised date ("2 September 1964" / "September 2, 1964"). */
 export function formatLongDate(isoDate: string | null | undefined): string | undefined {
     if (!isoDate) {
@@ -228,6 +227,7 @@ export function personLifeLabels(item: BaseItemDto): string[] {
     return labels;
 }
 
+/** Four-digit premiere year, if known (Swiftfin `premiereDateYear`). */
 export function premiereYear(item: BaseItemDto): string | undefined {
     if (!item.PremiereDate) {
         return undefined;
