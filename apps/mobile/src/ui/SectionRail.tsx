@@ -329,6 +329,10 @@ export function SectionRail({
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
+                  // Scrolls only when there are more sections than fit; iOS would otherwise
+                  // rubber-band the pill even when everything is on screen.
+                  alwaysBounceHorizontal={false}
+                  overScrollMode="never"
                   style={styles.rowScroll}
                   contentContainerStyle={[
                     styles.itemsRow,
