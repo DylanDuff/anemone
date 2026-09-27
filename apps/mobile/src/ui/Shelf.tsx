@@ -10,9 +10,28 @@ import { Icon } from "./Icon";
 import { space, theme } from "./theme";
 import { FocusGuide } from "./tv";
 
-/** A section title, optionally tappable with a "See all" affordance. */
-export function SectionHeader({ title, onPress }: { title: string; onPress?: () => void }) {
+/**
+ * A section title, optionally tappable with a "See all" affordance, or with a control at its far
+ * end (`trailing`, e.g. the season menu), in which case the title itself isn't a button.
+ */
+export function SectionHeader({
+  title,
+  onPress,
+  trailing,
+}: {
+  title: string;
+  onPress?: () => void;
+  trailing?: ReactNode;
+}) {
   const insets = useInsetStyle();
+  if (trailing) {
+    return (
+      <View style={[styles.headerRow, styles.headerRowTrailing, insets]}>
+        <Text style={styles.header}>{title}</Text>
+        {trailing}
+      </View>
+    );
+  }
   return (
     <Focusable onPress={onPress} disabled={!onPress} style={[styles.headerRow, insets]}>
       {({ focused }) => (
@@ -44,6 +63,7 @@ export function Shelf({
   onPressTitle,
   gap = space(1.5),
   accessory,
+  trailing,
   children,
 }: {
   title: string;
@@ -51,12 +71,14 @@ export function Shelf({
   gap?: number;
   /** Rendered between the title and the row — e.g. a season picker. */
   accessory?: ReactNode;
+  /** Rendered at the far end of the title's line — e.g. the compact season menu. */
+  trailing?: ReactNode;
   children: ReactNode;
 }) {
   const insets = useInsetStyle();
   return (
     <View style={styles.section}>
-      <SectionHeader title={title} onPress={onPressTitle} />
+      <SectionHeader title={title} onPress={onPressTitle} trailing={trailing} />
       {accessory ? <View style={[styles.accessory, insets]}>{accessory}</View> : null}
       <FocusGuide autoFocus style={styles.rowGuide}>
         <ScrollView
@@ -94,6 +116,10 @@ const styles = StyleSheet.create({
     // The row below adds `focusRoom` of its own top padding.
     marginBottom: space(1.5) - focusRoom,
     ...ABOVE_ROW,
+  },
+  // A control beside the title is taller than the text; centre them on each other.
+  headerRowTrailing: {
+    alignItems: "center",
   },
   header: {
     ...theme.type.heading,

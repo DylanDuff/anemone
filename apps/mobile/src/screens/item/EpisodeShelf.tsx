@@ -22,7 +22,8 @@ import { imagePixelWidth } from "../../ui/imageSize";
 
 /**
  * A horizontal row of episode cards (Swiftfin `EpisodeHStack`) with loading/empty states. `header`
- * sits between the title and the cards — the season picker on a series page.
+ * sits between the title and the cards, `trailing` at the end of the title's line — the season
+ * picker on a series page (chips / a menu).
  */
 export function EpisodeShelf({
   api,
@@ -30,6 +31,7 @@ export function EpisodeShelf({
   episodes,
   isLoading,
   header,
+  trailing,
   onPressEpisode,
 }: {
   api: Api;
@@ -37,13 +39,14 @@ export function EpisodeShelf({
   episodes: readonly BaseItemDto[];
   isLoading: boolean;
   header?: ReactNode;
+  trailing?: ReactNode;
   onPressEpisode: (episode: BaseItemDto) => void;
 }) {
   const cardWidth = useCardWidths().episodeCard;
   // Loading / empty states hold the row's height so the page doesn't jump.
   const statusHeight = (cardWidth * 9) / 16;
   return (
-    <Shelf title={title} accessory={header}>
+    <Shelf title={title} accessory={header} trailing={trailing}>
       {isLoading ? (
         <ActivityIndicator color={theme.colors.accent} style={[styles.status, { height: statusHeight }]} />
       ) : episodes.length === 0 ? (
