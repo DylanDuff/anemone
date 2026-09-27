@@ -85,6 +85,7 @@ import {
     searchItemScopes,
     searchItemsQuery,
     searchPeopleQuery,
+    searchFilterIncludes,
     searchScopeRequest,
     seriesPlayTargetQuery,
     itemsByIDsQuery,
@@ -93,7 +94,11 @@ import {
     specialFeaturesQuery,
     userViewsQuery,
 } from "../src/query/queries";
-import { groupSearchItems, withRecentItem } from "../src/query/recentSearchItems";
+import {
+    filterSearchGroups,
+    groupSearchItems,
+    withRecentItem,
+} from "../src/query/recentSearchItems";
 import type { QueryContext } from "../src/query/queryContext";
 
 const ctx: QueryContext = { api: {} as never, userID: "u1" };
@@ -127,6 +132,29 @@ describe("query option builders", () => {
         );
         expect(byKey).toEqual({ movies: ["m2", "m1"], shows: ["s1"], episodes: [], collections: [] });
         expect(groups.people.map((person) => person.Id)).toEqual(["p1"]);
+    });
+
+    it("searchFilterIncludes gates which categories are fetched", () => {
+        expect(searchFilterIncludes("all", "movies")).toBe(true);
+        expect(searchFilterIncludes("all", "people")).toBe(true);
+        expect(searchFilterIncludes("movies", "movies")).toBe(true);
+        expect(searchFilterIncludes("movies", "people")).toBe(false);
+        expect(searchFilterIncludes("people", "shows")).toBe(false);
+    });
+
+    it("filterSearchGroups keeps only the chosen category", () => {
+        const groups = groupSearchItems([
+            { Id: "m1", Type: "Movie" },
+            { Id: "p1", Type: "Person" },
+            { Id: "s1", Type: "Series" },
+        ]);
+        expect(filterSearchGroups(groups, "all")).toBe(groups);
+        const movies = filterSearchGroups(groups, "movies");
+        expect(movies.categories.map((category) => category.scope.key)).toEqual(["movies"]);
+        expect(movies.people).toEqual([]);
+        const people = filterSearchGroups(groups, "people");
+        expect(people.categories).toEqual([]);
+        expect(people.people.map((person) => person.Id)).toEqual(["p1"]);
     });
 
     it("withRecentItem moves an item to the front, without duplicates, capped", () => {

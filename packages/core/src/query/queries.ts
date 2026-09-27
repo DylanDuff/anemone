@@ -346,6 +346,20 @@ export const searchItemScopes = [
 
 export type SearchItemScope = (typeof searchItemScopes)[number];
 
+/** Which of Search's categories to show — and fetch: all of them, one item category, or people. */
+export type SearchFilter = "all" | SearchItemScope["key"] | "people";
+
+export const searchFilters: readonly SearchFilter[] = [
+    "all",
+    ...searchItemScopes.map((scope) => scope.key),
+    "people",
+];
+
+/** Whether `filter` shows the category `key` (an item scope's key, or "people"). */
+export function searchFilterIncludes(filter: SearchFilter, key: SearchItemScope["key"] | "people"): boolean {
+    return filter === "all" || filter === key;
+}
+
 /** The request for one search category. */
 export function searchScopeRequest(scope: SearchItemScope): ItemsRequest {
     return { includeItemTypes: [...scope.itemTypes], limit: SEARCH_RESULT_LIMIT };

@@ -36,6 +36,8 @@ import {
     searchItemScopes,
     searchItemsQuery,
     searchPeopleQuery,
+    type SearchFilter,
+    searchFilterIncludes,
     searchScopeRequest,
     seriesPlayTargetQuery,
     serverInfoQuery,
@@ -104,18 +106,24 @@ export interface SearchCategoryResults {
 
 /**
  * Every search category for `searchTerm` at once (Swiftfin `SearchViewModel`): items per
- * `searchItemScopes` entry, plus people. `isEmpty` is true only once everything has loaded with no
+ * `searchItemScopes` entry, plus people. Categories `filter` leaves out aren't requested at all
+ * (each is cached on its own, so widening the filter only fetches what's missing). `isEmpty` is true only once everything has loaded with no
  * results and no failure, so a screen can tell "nothing found" from "still looking" or "failed";
  * `error` is the first failure and `retry` refetches every category.
  */
-export function useSearchResults(searchTerm: string) {
+export function useSearchResults(searchTerm: string, filter: SearchFilter = "all") {
     const ctx = useQueryContext();
+    const hasTerm = searchTerm.trim().length > 0;
     const categories = useQueries({
-        queries: searchItemScopes.map((scope) =>
-            searchItemsQuery(ctx, searchTerm, searchScopeRequest(scope)),
-        ),
+        queries: searchItemScopes.map((scope) => ({
+            ...searchItemsQuery(ctx, searchTerm, searchScopeRequest(scope)),
+            enabled: hasTerm && searchFilterIncludes(filter, scope.key),
+        })),
     });
-    const people = useQuery(searchPeopleQuery(ctx, searchTerm));
+    const people = useQuery({
+        ...searchPeopleQuery(ctx, searchTerm),
+        enabled: hasTerm && searchFilterIncludes(filter, "people"),
+    });
 
     const results: SearchCategoryResults[] = searchItemScopes.map((scope, index) => ({
         scope,

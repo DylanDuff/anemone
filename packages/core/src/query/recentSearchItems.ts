@@ -13,7 +13,13 @@ import { useCallback } from "react";
 import { UserKeys } from "../data/keys/userKeys";
 import { useQueryContext } from "../react/context";
 import { useStoredValue } from "../react/useStoredValue";
-import { itemsByIDsQuery, type SearchItemScope, searchItemScopes } from "./queries";
+import {
+    itemsByIDsQuery,
+    type SearchFilter,
+    searchFilterIncludes,
+    type SearchItemScope,
+    searchItemScopes,
+} from "./queries";
 
 /** How many recently viewed items Search keeps. */
 export const RECENT_SEARCH_LIMIT = 20;
@@ -49,6 +55,19 @@ export function groupSearchItems(items: readonly BaseItemDto[]): SearchItemGroup
             ),
         })),
         people: items.filter((item) => item.Type === BaseItemKind.Person),
+    };
+}
+
+/** `groups` narrowed to `filter`'s category (unchanged for "all"). */
+export function filterSearchGroups(groups: SearchItemGroups, filter: SearchFilter): SearchItemGroups {
+    if (filter === "all") {
+        return groups;
+    }
+    return {
+        categories: groups.categories.filter((category) =>
+            searchFilterIncludes(filter, category.scope.key),
+        ),
+        people: searchFilterIncludes(filter, "people") ? groups.people : [],
     };
 }
 
