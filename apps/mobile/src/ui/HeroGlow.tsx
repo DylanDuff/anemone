@@ -4,7 +4,8 @@
 
 import { type Api, backdropImageSource } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
-import { Image, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+import { Artwork } from "./Artwork";
 import { BottomFade } from "./BottomFade";
 import { useHeroGlowSetting } from "../settings";
 
@@ -41,12 +42,7 @@ export function SlideGlow({ api, item, height }: { api: Api; item: BaseItemDto; 
   // whatever sits beneath it.
   return (
     <BottomFade solidUntil={GLOW.fadeFrom} style={[styles.container, { height }]}>
-      <Image
-        source={{ uri: url }}
-        blurRadius={GLOW.blurRadius}
-        resizeMode="cover"
-        style={styles.image}
-      />
+      <Artwork uri={url} blurRadius={GLOW.blurRadius} style={styles.image} />
     </BottomFade>
   );
 }

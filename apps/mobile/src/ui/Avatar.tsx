@@ -3,7 +3,8 @@
 //
 
 import type { ReactNode } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Artwork } from "./Artwork";
 import { focusGlow, hoverTransition, useFocusIndicator } from "./Focusable";
 import { theme } from "./theme";
 
@@ -47,7 +48,7 @@ export function Avatar({
       ]}
     >
       <Text style={[styles.initials, { fontSize: size * INITIALS_SCALE }]}>{initials(name)}</Text>
-      {imageURL ? <Image source={{ uri: imageURL }} style={styles.image} resizeMode="cover" /> : null}
+      {imageURL ? <Artwork uri={imageURL} style={styles.image} /> : null}
       {children}
     </View>
   );

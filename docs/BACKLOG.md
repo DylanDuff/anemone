@@ -150,8 +150,11 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   Quick Connect authorise, user profile image (Swiftfin `ServerUserSettings/*`).
 - [ ] Admin: API keys, server logs, scheduled tasks (Swiftfin's "Advanced" dashboard section).
 - [ ] Admin: session remote control (pause/stop/message), multi-select delete for devices/users.
-- [ ] Switch artwork to `expo-image` for its memory + disk cache (previously seen images appear
-  without waiting on the server). After the admin work; needs install approval.
+- ✅ Artwork via `expo-image` (`ui/Artwork.tsx`): disk cache across launches (plus memory off TV),
+  BlurHash placeholders on posters and hero backdrops, short fade-in.
+- [ ] Drop the temporary `minimumReleaseAgeExclude: [expo]` in `pnpm-workspace.yaml` after 9 Oct
+  2026 (expo 57.0.25 then meets the 15-day rule).
+- [ ] BlurHash placeholders for landscape cards (callers pass a URL only today).
 - [ ] iOS/Android settings lists stop above the phone pill (a native list can't scroll under it)
   and don't report page scroll, so the phone pill doesn't shrink on Settings.
 - [ ] Verify the native settings lists on device: iPhone, iPad, tvOS (menu picker + focus), Android

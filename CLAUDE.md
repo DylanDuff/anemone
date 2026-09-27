@@ -115,7 +115,8 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   `TVFocusGuideView`, so `flex: 1` collapses the list to ~1pt on TV. Give lists an explicit height
   on TV (see `LibraryScreen`). Diagnose layout bugs with `onLayout` logging + `adb shell dumpsys
   activity top` before theorising.
-- Always size image requests: `imagePixelWidth(layoutWidth)` → `maxWidth`. Unsized requests decode
+- Server images render through `Artwork` (`src/ui/Artwork.tsx`, expo-image: disk cache, BlurHash
+  placeholder, fade) — never React Native's `Image`. Always size image requests: `imagePixelWidth(layoutWidth)` → `maxWidth`. Unsized requests decode
   full-res (up to 4K) frames and got the app lmkd-killed on a 1.8 GB TV.
 - TV home hero (`src/ui/TVHero.tsx`): one mounted slide (crossfade), focus order actions → slide
   dots (left/right change slide) → rows. The touch/web hero is `HeroCarousel`.

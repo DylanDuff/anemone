@@ -13,7 +13,8 @@ import {
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Artwork } from "./Artwork";
 import { useGlassButtons } from "../settings";
 import { Focusable } from "./Focusable";
 import { GlassFill, glassFillHost } from "./Glass";
@@ -122,8 +123,8 @@ export function ItemTitleBlock({
 
 /**
  * The title-art logo, fitted inside the logo box but anchored to its leading edge (in line with
- * the actions below). `contain` alone centres it, and `Image` has no content position, so once
- * the logo loads the box shrinks to the fitted size.
+ * the actions below). Once the logo loads the box shrinks to the fitted size, so the actions sit
+ * right under it however wide or tall the logo is.
  */
 function TitleLogo({
   uri,
@@ -143,13 +144,14 @@ function TitleLogo({
         : { width: box.height * aspectRatio, height: box.height };
 
   return (
-    <Image
-      source={{ uri }}
+    <Artwork
+      uri={uri}
       style={[styles.logo, fitted]}
-      resizeMode="contain"
+      contentFit="contain"
+      contentPosition="left"
       accessibilityLabel={label}
-      onLoad={({ nativeEvent: { source } }) => {
-        if (source?.width && source.height) {
+      onLoad={({ source }) => {
+        if (source.width && source.height) {
           setAspectRatio(source.width / source.height);
         }
       }}

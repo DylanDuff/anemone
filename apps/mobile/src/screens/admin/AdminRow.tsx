@@ -3,7 +3,8 @@
 //
 
 import type { ReactNode } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Artwork } from "../../ui/Artwork";
 import { Focusable } from "../../ui/Focusable";
 import { Icon, type IconName } from "../../ui/Icon";
 import { space, theme } from "../../ui/theme";
@@ -112,7 +113,7 @@ export function RowIcon({ name, color = theme.colors.text }: { name: IconName; c
 export function RowPoster({ url }: { url: string | undefined }) {
   return (
     <View style={styles.poster}>
-      {url ? <Image source={{ uri: url }} style={styles.posterImage} resizeMode="cover" /> : null}
+      {url ? <Artwork uri={url} style={styles.posterImage} /> : null}
     </View>
   );
 }

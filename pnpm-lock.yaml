@@ -43,6 +43,9 @@ importers:
       expo-glass-effect:
         specifier: ~57.0.2
         version: 57.0.2(expo@57.0.25)(react-native-tvos@0.86.2-0)(react@19.2.3)
+      expo-image:
+        specifier: ~57.0.5
+        version: 57.0.5(expo@57.0.25)(react-native-tvos@0.86.2-0)(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
       expo-secure-store:
         specifier: ~57.0.3
         version: 57.0.3(expo@57.0.25)
@@ -2027,6 +2030,17 @@ packages:
       expo: '*'
       react: '*'
       react-native: '*'
+
+  expo-image@57.0.5:
+    resolution: {integrity: sha512-jOm5lofaIKXhQ7i0Hz3I5JuNULw/aghmpIPZXddwQcEtw8+wUhlozq3M7LbsOrcsBEapcG4jFs85DsfuFoz1tQ==}
+    peerDependencies:
+      expo: '*'
+      react: '*'
+      react-native: '*'
+      react-native-web: '*'
+    peerDependenciesMeta:
+      react-native-web:
+        optional: true
 
   expo-keep-awake@57.0.2:
     resolution: {integrity: sha512-GqgH746wtJImmsbyHmCQoi7cOslKuWQBbJHXr53S35Bpf5UvxCAztvnitUEd7D0QvFN2rvkOhylbZpgZZfBLlQ==}
@@ -5812,6 +5826,15 @@ snapshots:
       expo: 57.0.25(@babel/core@7.29.7)(@expo/dom-webview@57.0.1)(react-dom@19.2.3(react@19.2.3))(react-native-tvos@0.86.2-0)(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
       react: 19.2.3
       react-native: react-native-tvos@0.86.2-0(@babel/core@7.29.7)(@types/react@19.2.18)(react-native-tvos@0.86.2-0)(react@19.2.3)
+
+  expo-image@57.0.5(expo@57.0.25)(react-native-tvos@0.86.2-0)(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3):
+    dependencies:
+      expo: 57.0.25(@babel/core@7.29.7)(@expo/dom-webview@57.0.1)(react-dom@19.2.3(react@19.2.3))(react-native-tvos@0.86.2-0)(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
+      react: 19.2.3
+      react-native: react-native-tvos@0.86.2-0(@babel/core@7.29.7)(@types/react@19.2.18)(react-native-tvos@0.86.2-0)(react@19.2.3)
+      sf-symbols-typescript: 2.2.0
+    optionalDependencies:
+      react-native-web: 0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
 
   expo-keep-awake@57.0.2(expo@57.0.25)(react@19.2.3):
     dependencies:

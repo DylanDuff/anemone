@@ -4,7 +4,8 @@
 
 import { type Api, displayTitle, ImageType, isPlayed, itemImageSource } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Artwork } from "./Artwork";
 import {
   Focusable,
   focusGlow,
@@ -45,7 +46,7 @@ export function Poster({
   const cardWidths = useCardWidths();
   const width = widthOverride ?? cardWidths.poster;
   const indicator = useFocusIndicator();
-  const url = itemImageSource(api, item, ImageType.Primary, { maxWidth: imagePixelWidth(width) }).url;
+  const image = itemImageSource(api, item, ImageType.Primary, { maxWidth: imagePixelWidth(width) });
   const title = displayTitle(item);
   const badge = watchedBadge(item);
   const imageSize = { width, height: width / theme.poster.aspectRatio };
@@ -66,7 +67,9 @@ export function Poster({
             <Text numberOfLines={3} style={styles.placeholderText}>
               {title}
             </Text>
-            {url ? <Image source={{ uri: url }} style={styles.cover} resizeMode="cover" /> : null}
+            {image.url ? (
+              <Artwork uri={image.url} blurHash={image.blurHash} style={styles.cover} />
+            ) : null}
             {badge ? (
               <View style={styles.badge}>
                 {badge === "played" ? (

@@ -7,7 +7,8 @@
 
 import { type Api, backdropImageSource } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
-import { Image, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Artwork } from "./Artwork";
 import { BottomFade } from "./BottomFade";
 import { GlassBackdrop } from "./Glass";
 import { Icon } from "./Icon";
@@ -51,7 +52,7 @@ export function SlideArtwork({
   width: number;
   geometry: HeroGeometry;
 }) {
-  const url = backdropImageSource(api, item, { maxWidth: imagePixelWidth(width) }).url;
+  const backdrop = backdropImageSource(api, item, { maxWidth: imagePixelWidth(width) });
 
   // The backdrop the slide's glass buttons blur (Settings → Glass buttons); render the slide's
   // caption inside the same `GlassScope`.
@@ -62,8 +63,8 @@ export function SlideArtwork({
         solidUntil={SLIDE_SOLID_UNTIL}
         style={[styles.artwork, { height: geometry.height }]}
       >
-        {url ? (
-          <Image source={{ uri: url }} style={styles.image} resizeMode="cover" />
+        {backdrop.url ? (
+          <Artwork uri={backdrop.url} blurHash={backdrop.blurHash} style={styles.image} />
         ) : (
           <View style={[styles.image, styles.placeholder]} />
         )}

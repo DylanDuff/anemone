@@ -3,7 +3,8 @@
 //
 
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Artwork } from "./Artwork";
 import {
   Focusable,
   focusGlow,
@@ -62,7 +63,7 @@ export function LandscapeCard({
             style={[styles.thumb, { width, height }, hoverTransition, focusGlow(indicator, focused)]}
           >
             {imageURL ? (
-              <Image source={{ uri: imageURL }} style={{ width, height }} resizeMode="cover" />
+              <Artwork uri={imageURL} style={{ width, height }} />
             ) : null}
             {progress ? <ProgressBar fraction={progress} style={styles.progress} /> : null}
             <FocusRing visible={focused} radius={theme.radii.md} />
