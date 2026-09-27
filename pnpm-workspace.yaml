@@ -4,6 +4,9 @@ packages:
 
 # Only install package versions published at least 15 days ago.
 minimumReleaseAge: 21600 # minutes (15 days)
+# Temporary: expo 57.0.25 (24 Sep) is pinned for the iOS scene-support fix; drop after 9 Oct 2026.
+minimumReleaseAgeExclude:
+  - expo
 
 # Native/postinstall build scripts allowed to run (needed for Node-based core tests).
 onlyBuiltDependencies:
