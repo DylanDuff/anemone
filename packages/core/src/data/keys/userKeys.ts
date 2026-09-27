@@ -66,6 +66,15 @@ export const UserKeys = {
             default: defaultLibraryFilters,
         }),
 
+    /** Items opened from Search, most recent first (ids; see `withRecentItem`). */
+    recentSearchItems: (userID: string): StoredValueKey<string[]> =>
+        storedKey<string[]>({
+            field: "recentSearchItems",
+            ownerID: userID,
+            storage: "sql",
+            default: () => [],
+        }),
+
     /** The optional PIN hint for a user id. */
     pinHint: (id: string): StoredValueKey<string> =>
         storedKey<string>({

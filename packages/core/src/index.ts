@@ -228,6 +228,7 @@ export {
     searchPeopleQuery,
     seriesPlayTargetQuery,
     serverInfoQuery,
+    itemsByIDsQuery,
     similarItemsQuery,
     specialFeaturesQuery,
     userViewsQuery,
@@ -371,3 +372,13 @@ export {
     type SessionProgress,
     sessionProgress,
 } from "./admin/sessions";
+
+// Search
+export {
+    groupSearchItems,
+    RECENT_SEARCH_LIMIT,
+    type RecentSearchItems,
+    type SearchItemGroups,
+    useRecentSearchItems,
+    withRecentItem,
+} from "./query/recentSearchItems";

@@ -30,11 +30,11 @@ import { usePageScrollHandler } from "../ui/pageScroll";
 import { Collapsible } from "../ui/Collapsible";
 import { ErrorState } from "../ui/ErrorState";
 import { PAGE_PADDING_BOTTOM, PageHeader } from "../ui/PageHeader";
+import { ItemListRow } from "../ui/ItemListRow";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
 import { FilterPanel } from "./library/FilterPanel";
-import { LibraryListRow } from "./library/LibraryListRow";
 import { LibraryToolbar } from "./library/LibraryToolbar";
 
 const GRID_GAP = 25;
@@ -187,7 +187,7 @@ function LibraryContent({
           isGrid ? (
             <Poster api={ctx.api} item={item} width={posterWidth} onPress={openItem} />
           ) : (
-            <LibraryListRow api={ctx.api} item={item} onPress={openItem} />
+            <ItemListRow api={ctx.api} item={item} onPress={openItem} />
           )
         }
       />

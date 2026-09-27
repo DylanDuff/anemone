@@ -33,6 +33,7 @@ export function PageHeader({
   title,
   detail,
   back = false,
+  action,
   children,
   style,
 }: {
@@ -41,6 +42,8 @@ export function PageHeader({
   detail?: string;
   /** A sub-page: the Back chevron replaces the title (except on TV, where the remote goes back). */
   back?: boolean;
+  /** A control at the far end of the title row (e.g. Search's "Clear recents"). */
+  action?: ReactNode;
   /** The page's controls: a search field, filter chips, a toolbar. */
   children?: ReactNode;
   /** Spacing overrides for a host that spaces the header itself (the native settings lists). */
@@ -65,6 +68,7 @@ export function PageHeader({
             {detail ? <Text style={styles.detail}>{detail}</Text> : null}
           </>
         )}
+        {action ? <View style={styles.action}>{action}</View> : null}
       </View>
       {children}
     </View>
@@ -87,6 +91,9 @@ const styles = StyleSheet.create({
     ...theme.type.title,
     color: theme.colors.text,
     flexShrink: 1,
+  },
+  action: {
+    marginLeft: "auto",
   },
   detail: {
     ...theme.type.callout,

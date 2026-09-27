@@ -46,6 +46,29 @@ export function serverInfoQuery(ctx: QueryContext) {
     });
 }
 
+/**
+ * Items by id, in the order given (the server returns them in its own order). Ids that no longer
+ * resolve (deleted items) are dropped.
+ */
+export function itemsByIDsQuery(ctx: QueryContext, ids: readonly string[]) {
+    return queryOptions({
+        queryKey: jellyfinKeys.items(ctx.userID, { ids }),
+        queryFn: async (): Promise<BaseItemDto[]> => {
+            const response = await getLibraryApi(ctx.api).getItems({
+                userId: ctx.userID,
+                ids: [...ids],
+                enableUserData: true,
+            });
+            const byID = new Map((response.data.Items ?? []).map((item) => [item.Id, item]));
+            return ids.flatMap((id) => {
+                const item = byID.get(id);
+                return item ? [item] : [];
+            });
+        },
+        enabled: ids.length > 0,
+    });
+}
+
 /** The user's libraries/views (Swiftfin `getUserViews`). */
 export function userViewsQuery(ctx: QueryContext) {
     return queryOptions({

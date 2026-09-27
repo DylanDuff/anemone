@@ -87,11 +87,13 @@ import {
     searchPeopleQuery,
     searchScopeRequest,
     seriesPlayTargetQuery,
+    itemsByIDsQuery,
     serverInfoQuery,
     similarItemsQuery,
     specialFeaturesQuery,
     userViewsQuery,
 } from "../src/query/queries";
+import { groupSearchItems, withRecentItem } from "../src/query/recentSearchItems";
 import type { QueryContext } from "../src/query/queryContext";
 
 const ctx: QueryContext = { api: {} as never, userID: "u1" };
@@ -105,6 +107,33 @@ beforeEach(() => {
 });
 
 describe("query option builders", () => {
+    it("itemsByIDsQuery keeps the requested order and drops missing ids", async () => {
+        const opts = itemsByIDsQuery(ctx, ["i2", "gone", "i1"]);
+        const items = await opts.queryFn!(fnCtx);
+        expect(items.map((item) => item.Id)).toEqual(["i2", "i1"]);
+        expect(calls.getItems).toMatchObject({ userId: "u1", ids: ["i2", "gone", "i1"] });
+    });
+
+    it("groupSearchItems splits items into search's rows, keeping their order", () => {
+        const groups = groupSearchItems([
+            { Id: "m2", Type: "Movie" },
+            { Id: "p1", Type: "Person" },
+            { Id: "s1", Type: "Series" },
+            { Id: "m1", Type: "Movie" },
+            { Id: "f1", Type: "Folder" },
+        ]);
+        const byKey = Object.fromEntries(
+            groups.categories.map((category) => [category.scope.key, category.items.map((item) => item.Id)]),
+        );
+        expect(byKey).toEqual({ movies: ["m2", "m1"], shows: ["s1"], episodes: [], collections: [] });
+        expect(groups.people.map((person) => person.Id)).toEqual(["p1"]);
+    });
+
+    it("withRecentItem moves an item to the front, without duplicates, capped", () => {
+        expect(withRecentItem(["a", "b", "c"], "b")).toEqual(["b", "a", "c"]);
+        expect(withRecentItem(["a", "b"], "c", 2)).toEqual(["c", "a"]);
+    });
+
     it("serverInfoQuery returns the public system info", async () => {
         const opts = serverInfoQuery(ctx);
         expect(opts.queryKey).toEqual(["jellyfin", "u1", "serverInfo"]);

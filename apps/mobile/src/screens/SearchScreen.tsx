@@ -2,49 +2,61 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
-import { personFromItem, useQueryContext, useSearchResults } from "@anemone/core";
+import {
+  type Api,
+  type SearchItemGroups,
+  useQueryContext,
+  useRecentSearchItems,
+  useSearchResults,
+} from "@anemone/core";
+import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { type BrowseParamList, useOpenItem } from "../navigation/routes";
-import { useContentLayout } from "../ui/contentLayout";
+import { useContentLayout, useIsCompact } from "../ui/contentLayout";
+import { Chip } from "../ui/Chip";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { ErrorState } from "../ui/ErrorState";
+import { ItemListRow } from "../ui/ItemListRow";
 import { dockClearance, KeyboardDock } from "../ui/KeyboardDock";
 import { PAGE_PADDING_BOTTOM, PageHeader } from "../ui/PageHeader";
-import { PERSON_ROW_GAP, PersonCard } from "../ui/PersonCard";
-import { PosterRow } from "../ui/PosterRow";
-import { Shelf } from "../ui/Shelf";
 import { TextField } from "../ui/TextField";
 import { space, theme } from "../ui/theme";
 import { isTV } from "../ui/tv";
-import { EpisodeShelf } from "./item/EpisodeShelf";
 
 /** Wait this long after the last keystroke before searching. */
 const SEARCH_DEBOUNCE_MS = 300;
 
 /**
  * Search across the server (a top-level section, Swiftfin `SearchView`): a shelf per category —
- * Movies, Shows, Episodes, Collections, People — each hidden when it has no matches. The field is
- * docked at the bottom, within thumb reach and riding above the keyboard (`KeyboardDock`); on TV,
- * where the system keyboard takes the whole screen, it sits in the header instead.
+ * Movies, Shows, Episodes, Collections, People — each hidden when it has no matches. Before a
+ * search, the same rows show what was last opened from results (per user), cleared from the header's
+ * "Clear recents". The field is
+ * docked at the bottom on phones, within thumb reach and riding above the keyboard
+ * (`KeyboardDock`); everywhere else (web, tablets, TV) it sits in the header.
  */
 export function SearchScreen(_props: NativeStackScreenProps<BrowseParamList, "Search">) {
   const ctx = useQueryContext();
   const openItem = useOpenItem();
+  const recent = useRecentSearchItems();
+  // Opening a result also remembers it for "Recently viewed".
+  const openResult = (item: BaseItemDto) => {
+    recent.record(item);
+    openItem(item);
+  };
   const { insetLeft, insetRight, insetBottom } = useContentLayout();
   const [text, setText] = useState("");
   const [dockHeight, setDockHeight] = useState(0);
+  // Phones only: the field docks at the bottom, in thumb reach above the keyboard.
+  const compact = useIsCompact();
+  const docked = Platform.OS !== "web" && compact;
   const onPageScroll = usePageScrollHandler();
   const searchTerm = useDebouncedValue(text.trim(), SEARCH_DEBOUNCE_MS);
   const { categories, people, isLoading, isEmpty, error, retry } = useSearchResults(searchTerm);
 
-  const status = !searchTerm
-    ? "Find movies, shows, episodes and people."
-    : isEmpty
-      ? `No results for “${searchTerm}”.`
-      : undefined;
+  const status = searchTerm && isEmpty ? `No results for “${searchTerm}”.` : undefined;
 
   const field = (
     <TextField
@@ -74,56 +86,67 @@ export function SearchScreen(_props: NativeStackScreenProps<BrowseParamList, "Se
         onScroll={onPageScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{
-          paddingBottom: PAGE_PADDING_BOTTOM + insetBottom + (isTV ? 0 : dockClearance(dockHeight)),
+          paddingBottom: PAGE_PADDING_BOTTOM + insetBottom + (docked ? dockClearance(dockHeight) : 0),
         }}
       >
         <View style={{ paddingLeft: insetLeft, paddingRight: insetRight }}>
-          <PageHeader title="Search">{isTV ? field : null}</PageHeader>
+          <PageHeader
+            title="Search"
+            action={
+              !searchTerm && recent.items.length > 0 ? (
+                <Chip glass label="Clear recents" onPress={recent.clear} />
+              ) : undefined
+            }
+          >
+            {docked ? null : field}
+          </PageHeader>
           {status ? <Text style={styles.status}>{status}</Text> : null}
           {searchTerm && error ? <ErrorState error={error} onRetry={retry} /> : null}
           {searchTerm && isLoading ? (
             <ActivityIndicator style={styles.loader} color={theme.colors.accent} />
           ) : null}
+          {/* Before a search: what was last opened from results, in the same list. */}
+          <SearchList
+            api={ctx.api}
+            groups={searchTerm ? { categories, people } : recent.groups}
+            onOpen={openResult}
+          />
         </View>
-
-        {categories.map(({ scope, items }) =>
-          scope.key === "episodes" ? (
-            items.length > 0 ? (
-              <EpisodeShelf
-                key={scope.key}
-                api={ctx.api}
-                title={scope.title}
-                episodes={items}
-                isLoading={false}
-                onPressEpisode={openItem}
-              />
-            ) : null
-          ) : (
-            <PosterRow
-              key={scope.key}
-              title={scope.title}
-              api={ctx.api}
-              items={items}
-              onPressItem={openItem}
-            />
-          ),
-        )}
-
-        {people.length > 0 ? (
-          <Shelf title="People" gap={PERSON_ROW_GAP}>
-            {people.map((person, index) => (
-              <PersonCard
-                key={person.Id ?? index}
-                api={ctx.api}
-                person={personFromItem(person)}
-                onPress={() => openItem(person)}
-              />
-            ))}
-          </Shelf>
-        ) : null}
       </ScrollView>
-      {isTV ? null : <KeyboardDock onHeight={setDockHeight}>{field}</KeyboardDock>}
+      {docked ? <KeyboardDock onHeight={setDockHeight}>{field}</KeyboardDock> : null}
     </View>
+  );
+}
+
+/**
+ * Search's list — a small heading per category (then People), each followed by its rows in the
+ * library's list style — for results and recently viewed alike. Empty categories are left out.
+ */
+function SearchList({
+  api,
+  groups,
+  onOpen,
+}: {
+  api: Api;
+  groups: SearchItemGroups;
+  onOpen: (item: BaseItemDto) => void;
+}) {
+  const sections = [
+    ...groups.categories.map(({ scope, items }) => ({ key: scope.key, title: scope.title, items })),
+    { key: "people", title: "People", items: groups.people },
+  ].filter((section) => section.items.length > 0);
+
+  return (
+    <>
+      {sections.map((section) => (
+        <View key={section.key} style={styles.section}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          {section.items.map((item, index) => (
+            <ItemListRow key={item.Id ?? index} api={api} item={item} onPress={onOpen} />
+          ))}
+        </View>
+      ))}
+    </>
   );
 }
 
@@ -137,6 +160,14 @@ const styles = StyleSheet.create({
     ...theme.type.callout,
     color: theme.colors.muted,
     marginBottom: space(3),
+  },
+  section: {
+    marginBottom: space(3),
+  },
+  sectionTitle: {
+    ...theme.type.eyebrow,
+    color: theme.colors.muted,
+    marginBottom: space(0.5),
   },
   loader: {
     alignSelf: "flex-start",
