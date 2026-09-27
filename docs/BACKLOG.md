@@ -139,8 +139,17 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   "Focus highlight" (Outline | Glow) under Focus: outline default on TV, glow elsewhere;
   `useFocusIndicator()` + `FocusRing` / `focusGlow()` in `ui/Focusable.tsx`. Rows reserve
   `focusRoom` (lift + glow reach) so the glow isn't clipped.
+- ✅ **Settings hub** (`ui/settings/`): native grouped lists — SwiftUI `Form` on iOS/iPadOS/tvOS,
+  Material connected rows on Android phones — and themed rows on web/Android TV (`nativeControls`).
+  Hub = Account (inline) + Preferences (Navigation, Appearance) + About (app version, server name,
+  Jellyfin version, address), sub-pages via `SettingsPage` (`/settings/:page`).
+- [ ] Settings → Administration section (server dashboard) for admin users, as its own sub-pages.
+- [ ] iOS/Android settings lists stop above the phone pill (a native list can't scroll under it)
+  and don't report page scroll, so the phone pill doesn't shrink on Settings.
+- [ ] Verify the native settings lists on device: iPhone, iPad, tvOS (menu picker + focus), Android
+  phone (dropdown anchoring, row corner clipping).
 - [ ] Revisit TV blur cost: blur only while the rail is expanded, or a static pre-blurred backdrop;
-  measure on a release build. More settings (sign out, server/user) belong on the Settings page.
+  measure on a release build.
 - [ ] Release-build memory check on TV: debug build sits at ~200 MB native heap / ~400 MB PSS on a
   1.8 GB box and got killed by lmkd once. Images are now sized via `imagePixelWidth()`.
 - ✅ Ionicons (`@expo/vector-icons`) everywhere via `ui/Icon.tsx` — rail/tabs, actions, chips,

@@ -8,6 +8,7 @@ import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { HomeScreen } from "../screens/HomeScreen";
 import { LibraryScreen } from "../screens/LibraryScreen";
 import { SearchScreen } from "../screens/SearchScreen";
+import { SettingsPageScreen } from "../screens/settings/SettingsPageScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
 import { ContentLayoutProvider, useIsCompact } from "../ui/contentLayout";
 import { GlassBackdrop, GlassScope } from "../ui/Glass";
@@ -45,7 +46,7 @@ function activeSection(route: BrowseProps["route"]): Section {
     : route.params
       ? { name: route.params.screen, params: route.params.params }
       : undefined;
-  if (focused?.name === "Settings") {
+  if (focused?.name === "Settings" || focused?.name === "SettingsPage") {
     return { kind: "settings" };
   }
   if (focused?.name === "Search") {
@@ -94,6 +95,9 @@ export function BrowseShell({ route }: BrowseProps) {
       <SectionStack.Screen name="Search" component={SearchScreen} />
       <SectionStack.Screen name="Library" component={LibraryScreen} />
       <SectionStack.Screen name="Settings" component={SettingsScreen} />
+      <SectionStack.Group screenOptions={SETTINGS_PAGE_OPTIONS}>
+        <SectionStack.Screen name="SettingsPage" component={SettingsPageScreen} />
+      </SectionStack.Group>
     </SectionStack.Navigator>
   );
 
@@ -127,6 +131,9 @@ const SECTION_SCREEN_OPTIONS = {
   animation: "none",
   contentStyle: { backgroundColor: theme.colors.background },
 } as const;
+
+/** Settings sub-pages push like any drill-down (with the back swipe on iOS). */
+const SETTINGS_PAGE_OPTIONS = { animation: "default" } as const;
 
 const styles = StyleSheet.create({
   shell: {

@@ -38,12 +38,17 @@ import {
     searchPeopleQuery,
     searchScopeRequest,
     seriesPlayTargetQuery,
+    serverInfoQuery,
     similarItemsQuery,
     specialFeaturesQuery,
     userViewsQuery,
 } from "./queries";
 import type { QueryContext } from "./queryContext";
 import { jellyfinKeys } from "./queryKeys";
+
+export function useServerInfo() {
+    return useQuery(serverInfoQuery(useQueryContext()));
+}
 
 export function useUserViews() {
     return useQuery(userViewsQuery(useQueryContext()));

@@ -17,7 +17,12 @@ export type BrowseParamList = {
   Search: undefined;
   Library: { libraryID: string };
   Settings: undefined;
+  /** A page opened from the Settings hub. */
+  SettingsPage: { page: SettingsPageName };
 };
+
+/** The Settings hub's sub-pages. */
+export type SettingsPageName = "navigation" | "appearance" | "about";
 
 /**
  * Signed-in routes. `Browse` hosts the sections; item pages open full-screen over it. Params are

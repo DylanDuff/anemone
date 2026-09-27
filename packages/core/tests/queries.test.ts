@@ -52,6 +52,9 @@ vi.mock("../src/jellyfin/api", () => ({
         getSeasons: async () => ({ data: { Items: [{ Id: "s1" }] } }),
         getEpisodes: async () => ({ data: { Items: [{ Id: "e1" }] } }),
     }),
+    getSystemApi: () => ({
+        getPublicSystemInfo: async () => ({ data: { ServerName: "thinky", Version: "10.11.0" } }),
+    }),
     getUserViewApi: () => ({
         getUserViews: async (p: unknown) => {
             calls.getUserViews = p;
@@ -84,6 +87,7 @@ import {
     searchPeopleQuery,
     searchScopeRequest,
     seriesPlayTargetQuery,
+    serverInfoQuery,
     similarItemsQuery,
     specialFeaturesQuery,
     userViewsQuery,
@@ -101,6 +105,12 @@ beforeEach(() => {
 });
 
 describe("query option builders", () => {
+    it("serverInfoQuery returns the public system info", async () => {
+        const opts = serverInfoQuery(ctx);
+        expect(opts.queryKey).toEqual(["jellyfin", "u1", "serverInfo"]);
+        expect(await opts.queryFn!(fnCtx)).toEqual({ ServerName: "thinky", Version: "10.11.0" });
+    });
+
     it("userViewsQuery keys by user and unwraps Items", async () => {
         const opts = userViewsQuery(ctx);
         expect(opts.queryKey).toEqual(["jellyfin", "u1", "userViews"]);

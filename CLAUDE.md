@@ -84,6 +84,11 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
 - Device settings: keys in core `AppSettingsKeys` (key/value storage, caller-supplied default);
   the app's platform defaults and hooks live in `apps/mobile/src/settings.ts`. Components read them
   with those hooks — never a module-level flag.
+- Settings pages are built only from `ui/settings` (`SettingsList` → `SettingsSection` → `Toggle`/
+  `Choice`/`Link`/`Info`/`ActionSetting`). With `nativeControls` it's a SwiftUI `Form` / Compose
+  list (`NativeSettings.ios|android.tsx`), else themed rows (`ThemedSettings.tsx`). Pages never
+  branch on it; new row kinds must be added to all three kits (`SettingsKit` in `types.ts`). The hub
+  (`SettingsScreen`) links to sub-pages through the `SettingsPage` route (`screens/settings/`).
 - Phone vs wide layouts: `useIsCompact()` (`src/ui/contentLayout.tsx`, <700pt and not TV).
 - Theme (`src/ui/theme.ts`) drives every colour, font size/weight and corner radius: compose
   `theme.type.*` (+ `theme.weight.*` overrides), `theme.colors.*`, `theme.radii.*`, `space()`. No

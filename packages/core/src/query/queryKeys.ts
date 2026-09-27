@@ -14,6 +14,8 @@ export const jellyfinKeys = {
 
     userViews: (userID: string) => [...jellyfinKeys.user(userID), "userViews"] as const,
 
+    serverInfo: (userID: string) => [...jellyfinKeys.user(userID), "serverInfo"] as const,
+
     resumeItems: (userID: string) => [...jellyfinKeys.user(userID), "resumeItems"] as const,
 
     nextUp: (userID: string) => [...jellyfinKeys.user(userID), "nextUp"] as const,

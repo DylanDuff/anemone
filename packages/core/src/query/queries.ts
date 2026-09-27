@@ -10,6 +10,7 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { BaseItemDtoQueryResult } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto-query-result";
+import type { PublicSystemInfo } from "@jellyfin/sdk/lib/generated-client/models/public-system-info";
 import type { LibraryApiGetItemsRequest } from "@jellyfin/sdk/lib/generated-client/api/library-api";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import { ExtraType } from "@jellyfin/sdk/lib/generated-client/models/extra-type";
@@ -22,6 +23,7 @@ import {
     getLibraryApi,
     getPersonApi,
     getShowApi,
+    getSystemApi,
     getUserViewApi,
     getVideoApi,
 } from "../jellyfin/api";
@@ -33,6 +35,16 @@ import { jellyfinKeys } from "./queryKeys";
 export type ItemsRequest = Omit<LibraryApiGetItemsRequest, "userId">;
 
 export const DEFAULT_PAGE_SIZE = 50;
+
+/** The connected server's public info: its name, Jellyfin version, and OS (Settings → About). */
+export function serverInfoQuery(ctx: QueryContext) {
+    return queryOptions({
+        queryKey: jellyfinKeys.serverInfo(ctx.userID),
+        queryFn: async (): Promise<PublicSystemInfo> =>
+            (await getSystemApi(ctx.api).getPublicSystemInfo()).data,
+        staleTime: Infinity,
+    });
+}
 
 /** The user's libraries/views (Swiftfin `getUserViews`). */
 export function userViewsQuery(ctx: QueryContext) {

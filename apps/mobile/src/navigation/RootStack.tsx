@@ -23,6 +23,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           Library: "library/:libraryID",
           Search: "search",
           Settings: "settings",
+          SettingsPage: "settings/:page",
         },
       },
       Item: "item/:itemID",

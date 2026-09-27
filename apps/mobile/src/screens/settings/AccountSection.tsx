@@ -4,14 +4,12 @@
 
 import { useCurrentSession, useSessionController } from "@anemone/core";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Button } from "../../ui/Button";
-import { space, theme } from "../../ui/theme";
+import { ActionSetting, InfoSetting, SettingsSection } from "../../ui/settings";
 
 /**
  * Who's signed in, to which server. Switch User returns to the user picker, keeping this account;
  * Sign Out also removes it from this device, so it asks first — inline (no alert dialogs: they
- * don't exist on web and are awkward on TV); on TV focus jumps to the confirm button.
+ * don't exist on web and are awkward on TV); on TV focus jumps to the confirm row.
  */
 export function AccountSection() {
   const { session } = useCurrentSession();
@@ -32,73 +30,28 @@ export function AccountSection() {
   };
 
   return (
-    <View style={styles.row}>
-      <View style={styles.text}>
-        <Text style={styles.label}>{user.username}</Text>
-        <Text style={styles.description}>
-          {server.name} · {server.currentURL}
-        </Text>
-      </View>
+    <SettingsSection
+      title="Account"
+      footer={confirming ? `Sign out and remove ${user.username} from this device?` : undefined}
+    >
+      <InfoSetting label={user.username} description={`${server.name} · ${server.currentURL}`} />
       {confirming ? (
-        <View style={styles.actions}>
-          <Text style={styles.prompt}>Sign out and remove {user.username} from this device?</Text>
-          <Button
+        <>
+          <ActionSetting
             label="Sign Out"
-            variant="destructive"
+            destructive
             busy={signingOut}
             preferFocus
             onPress={signOut}
           />
-          <Button label="Cancel" variant="plain" onPress={() => setConfirming(false)} />
-        </View>
+          <ActionSetting label="Cancel" onPress={() => setConfirming(false)} />
+        </>
       ) : (
-        <View style={styles.actions}>
-          <Button label="Switch User" variant="secondary" icon="people-outline" onPress={switchUser} />
-          <Button
-            label="Sign Out"
-            variant="destructive"
-            icon="log-out-outline"
-            onPress={() => setConfirming(true)}
-          />
-        </View>
+        <>
+          <ActionSetting label="Switch User" onPress={switchUser} />
+          <ActionSetting label="Sign Out" destructive onPress={() => setConfirming(true)} />
+        </>
       )}
-    </View>
+    </SettingsSection>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: space(3),
-    paddingVertical: space(2),
-    paddingHorizontal: space(2.5),
-    borderRadius: theme.radii.lg,
-    backgroundColor: theme.colors.surface,
-  },
-  text: {
-    flex: 1,
-    minWidth: 220,
-    gap: space(0.5),
-  },
-  label: {
-    ...theme.type.label,
-    color: theme.colors.text,
-  },
-  description: {
-    ...theme.type.caption,
-    color: theme.colors.muted,
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: space(1),
-  },
-  prompt: {
-    ...theme.type.callout,
-    color: theme.colors.text,
-    marginRight: space(1),
-  },
-});

@@ -14,7 +14,7 @@ const THUMB_SIZE = 22;
 /**
  * An on/off switch. With `nativeControls` it's the platform's own (tinted with the accent) and
  * handles its own presses; otherwise it's a themed track and thumb that only *shows* the value —
- * the enclosing focus target (e.g. `ToggleRow`) does the toggling.
+ * the enclosing focus target (e.g. a themed `ToggleSetting`) does the toggling.
  */
 export function Switch({
   value,
