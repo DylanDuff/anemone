@@ -2,6 +2,7 @@
 // AnemoneReact is subject to the terms of the Mozilla Public License, v2.0.
 //
 
+import { useNavigationState } from "@react-navigation/native";
 import { createNativeStackNavigator, type NativeStackScreenProps } from "@react-navigation/native-stack";
 import { type ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
@@ -43,22 +44,21 @@ const SectionStack = createNativeStackNavigator<BrowseParamList>();
 
 type BrowseProps = NativeStackScreenProps<RootStackParamList, "Browse">;
 
-/** Minimal shape of a nested navigator's state as exposed on its parent route. */
+/** Minimal shape of the section stack's state, as nested in the root stack's state. */
 interface NestedState {
   readonly index?: number;
   readonly routes: ReadonlyArray<{ readonly name: string; readonly params?: object }>;
 }
 
 /**
- * The section currently shown, from the nested stack's state — or, before it has mounted (e.g. a
+ * The section currently shown, from the section stack's state — or, before it has mounted (e.g. a
  * deep link), from the params used to navigate here.
  */
-function activeSection(route: BrowseProps["route"]): Section {
-  const state = (route as { state?: NestedState }).state;
+function activeSection(state: NestedState | undefined, params: BrowseProps["route"]["params"]): Section {
   const focused = state
     ? state.routes[state.index ?? state.routes.length - 1]
-    : route.params
-      ? { name: route.params.screen, params: route.params.params }
+    : params
+      ? { name: params.screen, params: params.params }
       : undefined;
   if (focused?.name && isSettingsRoute(focused.name)) {
     return { kind: "settings" };
@@ -76,7 +76,12 @@ function activeSection(route: BrowseProps["route"]): Section {
  */
 export function BrowseShell({ route }: BrowseProps) {
   const { width } = useWindowDimensions();
-  const section = activeSection(route);
+  // Read from the navigation state tree, not `route`: the route prop doesn't carry the nested
+  // stack's state, so gestures (iOS swipe back) that change only the stack wouldn't update the pill.
+  const sectionState = useNavigationState(
+    (state) => state.routes.find((candidate) => candidate.key === route.key)?.state as NestedState | undefined,
+  );
+  const section = activeSection(sectionState, route.params);
   const entries = useSectionEntries(section);
   const openSection = useOpenSection();
   // Phones always get a small icon-only pill along the bottom; wide screens choose in Settings.
