@@ -8,6 +8,7 @@ import { Artwork } from "../../ui/Artwork";
 import { Focusable } from "../../ui/Focusable";
 import { Icon, type IconName } from "../../ui/Icon";
 import { space, theme } from "../../ui/theme";
+import { useAccent } from "../../settings";
 
 /** The width of a row's leading artwork, icon or avatar. */
 export const ROW_LEADING_SIZE = 48;
@@ -85,14 +86,14 @@ export function AdminRow({
   );
 }
 
-const BADGE_COLORS: Record<BadgeTone, string> = {
-  accent: theme.colors.accent,
+const BADGE_COLORS: Record<Exclude<BadgeTone, "accent">, string> = {
   muted: theme.colors.muted,
   error: theme.colors.error,
 };
 
 function Badge({ label, tone = "muted" }: RowBadge) {
-  const color = BADGE_COLORS[tone];
+  const accent = useAccent().color;
+  const color = tone === "accent" ? accent : BADGE_COLORS[tone];
   return (
     <View style={[styles.badge, { borderColor: color }]}>
       <Text style={[styles.badgeText, { color }]}>{label}</Text>

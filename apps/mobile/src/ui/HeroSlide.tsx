@@ -16,6 +16,7 @@ import { GLOW, SlideGlow } from "./HeroGlow";
 import { cinematicHeight } from "./ItemTitleBlock";
 import { space, theme } from "./theme";
 import { imagePixelWidth } from "./imageSize";
+import { useAccent } from "../settings";
 
 export const HERO_AUTO_ADVANCE_MS = 6000;
 
@@ -90,6 +91,7 @@ export function SlideDots({
   emphasised?: boolean;
   arrows?: boolean;
 }) {
+  const accent = useAccent().color;
   if (items.length <= 1) {
     return null;
   }
@@ -112,7 +114,11 @@ export function SlideDots({
           style={[
             styles.dot,
             emphasised ? styles.dotEmphasised : null,
-            index === active ? (emphasised ? styles.dotActiveEmphasised : styles.dotActive) : null,
+            index === active
+              ? emphasised
+                ? styles.dotActiveEmphasised
+                : [styles.dotActive, { backgroundColor: accent }]
+              : null,
           ]}
         />
       ))}
@@ -169,8 +175,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.radii.pill,
     backgroundColor: theme.colors.dot,
   },
+  // Filled with the accent inline (it's live).
   dotActive: {
-    backgroundColor: theme.colors.accent,
     width: 20,
   },
   dotEmphasised: {

@@ -16,7 +16,7 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import { StyleSheet, Text, View } from "react-native";
 import { usePlayItem } from "../navigation/routes";
-import { useGlassButtons } from "../settings";
+import { useAccent, useGlassButtons } from "../settings";
 import { Focusable, focusLift } from "./Focusable";
 import { GlassFill, glassFillHost } from "./Glass";
 import { Icon, type IconName } from "./Icon";
@@ -150,7 +150,7 @@ function RoundToggle({
   icon,
   label,
   active,
-  activeColor = theme.colors.accent,
+  activeColor,
   preferFocus = false,
   busy,
   onPress,
@@ -158,12 +158,14 @@ function RoundToggle({
   icon: IconName;
   label: string;
   active: boolean;
+  /** Defaults to the accent. */
   activeColor?: string;
   preferFocus?: boolean;
   busy: boolean;
   onPress: () => void;
 }) {
   const glass = useGlassButtons();
+  const accent = useAccent().color;
   return (
     <Focusable
       // Not `disabled` while busy: a disabled view drops D-pad focus on TV. Ignore presses instead.
@@ -190,7 +192,7 @@ function RoundToggle({
             name={icon}
             size={24}
             color={
-              active ? activeColor : focused ? theme.colors.chipActiveText : theme.colors.text
+              active ? (activeColor ?? accent) : focused ? theme.colors.chipActiveText : theme.colors.text
             }
           />
         </>

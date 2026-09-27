@@ -3,7 +3,7 @@
 //
 
 import { StyleSheet, Text, View } from "react-native";
-import { useGlassButtons } from "../settings";
+import { useAccent, useGlassButtons } from "../settings";
 import { Focusable, focusLift } from "./Focusable";
 import { GlassFill, glassFillHost } from "./Glass";
 import { Icon, type IconName } from "./Icon";
@@ -31,6 +31,7 @@ export function Chip({
   accessibilityLabel?: string;
 }) {
   const frosted = useGlassButtons() && glass && !selected;
+  const accent = useAccent();
   return (
     <Focusable
       onPress={onPress}
@@ -40,7 +41,7 @@ export function Chip({
       style={({ pressed, focused }) => [
         styles.chip,
         frosted && !focused ? glassFillHost : null,
-        selected ? styles.selected : null,
+        selected ? { backgroundColor: accent.color } : null,
         focused ? [styles.focused, focusLift] : null,
         pressed ? styles.pressed : null,
       ]}
@@ -48,7 +49,12 @@ export function Chip({
       {({ focused }) => (
         <>
           {frosted && !focused ? <GlassFill radius={theme.radii.pill} /> : null}
-          <ChipContent label={label} icon={icon} focused={focused} />
+          <ChipContent
+            label={label}
+            icon={icon}
+            focused={focused}
+            color={selected && !focused ? accent.onColor : undefined}
+          />
         </>
       )}
     </Focusable>
@@ -81,12 +87,15 @@ function ChipContent({
   label,
   icon,
   focused,
+  color: colorOverride,
 }: {
   label?: string;
   icon?: IconName;
   focused: boolean;
+  /** For a selected chip: the colour that reads on the accent. */
+  color?: string;
 }) {
-  const color = focused ? theme.colors.chipActiveText : theme.colors.text;
+  const color = colorOverride ?? (focused ? theme.colors.chipActiveText : theme.colors.text);
   return (
     <>
       {icon ? <Icon name={icon} size={CHIP_ICON_SIZE} color={color} /> : null}
@@ -106,9 +115,6 @@ const styles = StyleSheet.create({
     paddingVertical: space(0.875),
     borderRadius: theme.radii.pill,
     backgroundColor: theme.colors.chip,
-  },
-  selected: {
-    backgroundColor: theme.colors.accent,
   },
   focused: {
     backgroundColor: theme.colors.chipActive,

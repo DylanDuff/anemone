@@ -12,7 +12,7 @@ import {
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { useOpenItem } from "../navigation/routes";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { ContinueWatchingRow } from "../ui/ContinueWatchingRow";
@@ -20,6 +20,7 @@ import { ErrorState } from "../ui/ErrorState";
 import { HeroCarousel } from "../ui/HeroCarousel";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
+import { Spinner } from "../ui/Spinner";
 
 /**
  * The signed-in home: a hero carousel of recently-added items across all libraries, followed by a
@@ -76,7 +77,7 @@ export function HomeScreen() {
             />
           ))}
 
-          {loading ? <ActivityIndicator style={styles.loader} color={theme.colors.accent} /> : null}
+          {loading ? <Spinner style={styles.loader} /> : null}
         </View>
 
         <View style={styles.footer} />

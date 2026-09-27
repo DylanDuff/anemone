@@ -3,32 +3,58 @@
 //
 
 import {
+  useAccentColorSetting,
   useFocusIndicatorSetting,
   useGlassBlurSetting,
   useGlassButtonsSetting,
   useHeroGlowSetting,
 } from "../../settings";
-import { ChoiceSetting, SettingsList, SettingsSection, ToggleSetting } from "../../ui/settings";
-import { FOCUS_INDICATOR_OPTIONS } from "./options";
+import { useIsPhone } from "../../ui/contentLayout";
+import {
+  ChoiceSetting,
+  SettingsList,
+  SettingsSection,
+  SwatchSetting,
+  ToggleSetting,
+} from "../../ui/settings";
+import { ACCENT_COLOR_OPTIONS, FOCUS_INDICATOR_OPTIONS } from "./options";
 
-/** How focus is drawn, and the heavy visual effects a slow device may want off. */
+/**
+ * The accent colour, how focus is drawn (not on touch-only phones), and heavy effects a slow
+ * device may want off.
+ */
 export function AppearanceSettings() {
+  const accentColor = useAccentColorSetting();
   const focusIndicator = useFocusIndicatorSetting();
+  // Phones are touch-only: nothing is ever focused or hovered, so the highlight never shows.
+  const isPhone = useIsPhone();
   const heroGlow = useHeroGlowSetting();
   const glassBlur = useGlassBlurSetting();
   const glassButtons = useGlassButtonsSetting();
 
   return (
     <SettingsList title="Appearance" back>
-      <SettingsSection title="Focus">
-        <ChoiceSetting
-          label="Focus highlight"
-          description="How the highlighted poster, card or photo is marked."
-          options={FOCUS_INDICATOR_OPTIONS}
-          value={focusIndicator.value}
-          onChange={focusIndicator.setValue}
+      <SettingsSection title="Colour">
+        <SwatchSetting
+          label="Accent colour"
+          description="Used for selections, active sections, switches and progress."
+          options={ACCENT_COLOR_OPTIONS}
+          value={accentColor.value}
+          onChange={accentColor.setValue}
         />
       </SettingsSection>
+
+      {isPhone ? null : (
+        <SettingsSection title="Focus">
+          <ChoiceSetting
+            label="Focus highlight"
+            description="How the highlighted poster, card or photo is marked."
+            options={FOCUS_INDICATOR_OPTIONS}
+            value={focusIndicator.value}
+            onChange={focusIndicator.setValue}
+          />
+        </SettingsSection>
+      )}
 
       <SettingsSection
         title="Visual effects"

@@ -7,7 +7,7 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { type RootStackParamList, useAppNavigation, useOpenItem } from "../navigation/routes";
 import { BackButton } from "../ui/BackButton";
 import { ErrorState } from "../ui/ErrorState";
@@ -24,6 +24,7 @@ import { ItemHeader } from "./item/ItemHeader";
 import { ItemOverview } from "./item/ItemOverview";
 import { PersonDetail } from "./item/PersonDetail";
 import { SeasonEpisodes, SeasonsSection } from "./item/SeasonsSection";
+import { Spinner } from "../ui/Spinner";
 
 /**
  * Item detail for movies, series, seasons, episodes and box sets (Swiftfin `ItemView`). One
@@ -50,7 +51,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
         <View style={[styles.statusBack, { left: insetLeft, top: safeArea.top + PAGE_PADDING_TOP }]}>
           <BackButton compact />
         </View>
-        {isLoading ? <ActivityIndicator color={theme.colors.accent} /> : null}
+        {isLoading ? <Spinner /> : null}
         {error ? <ErrorState error={error} onRetry={() => void refetch()} /> : null}
         {!isLoading && !error ? <Text style={styles.statusText}>Item not found.</Text> : null}
       </View>

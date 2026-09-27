@@ -15,6 +15,35 @@ export type NavigationPlacement = "left" | "right" | "top" | "bottom";
 
 export const navigationPlacementValues: readonly NavigationPlacement[] = ["left", "right", "top", "bottom"];
 
+/** Where Search's field sits on phones: docked at the bottom (above the keyboard) or in the header. */
+export type SearchFieldPlacement = "top" | "bottom";
+
+export const searchFieldPlacementValues: readonly SearchFieldPlacement[] = ["top", "bottom"];
+
+/** The app's accent colour, from a fixed set of presets (the app maps each to its colour). */
+export type AccentColor =
+    | "violet"
+    | "blue"
+    | "teal"
+    | "green"
+    | "yellow"
+    | "orange"
+    | "red"
+    | "pink"
+    | "white";
+
+export const accentColorValues: readonly AccentColor[] = [
+    "violet",
+    "blue",
+    "teal",
+    "green",
+    "yellow",
+    "orange",
+    "red",
+    "pink",
+    "white",
+];
+
 /**
  * Device-wide app settings from the Settings screen, kept in the key/value store (not SQL): they
  * describe what *this device* should render — e.g. heavy visual effects a weak TV can't afford —
@@ -77,6 +106,24 @@ export const AppSettingsKeys = {
     navigationLabels: (defaultValue: boolean): StoredValueKey<boolean> =>
         storedKey<boolean>({
             field: "settings.navigationLabels",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /** The accent colour preset: selections, active states, switches, spinners. */
+    accentColor: (defaultValue: AccentColor): StoredValueKey<AccentColor> =>
+        storedKey<AccentColor>({
+            field: "settings.accentColor",
+            ownerID: APP_OWNER_ID,
+            storage: "defaults",
+            default: defaultValue,
+        }),
+
+    /** Where Search's field sits on phones (wider screens always keep it in the header). */
+    searchFieldPlacement: (defaultValue: SearchFieldPlacement): StoredValueKey<SearchFieldPlacement> =>
+        storedKey<SearchFieldPlacement>({
+            field: "settings.searchFieldPlacement",
             ownerID: APP_OWNER_ID,
             storage: "defaults",
             default: defaultValue,

@@ -5,6 +5,7 @@
 // never hand-set a colour, font size/weight or corner radius — they compose these tokens.
 //
 
+import type { AccentColor } from "@anemone/core";
 import type { TextStyle } from "react-native";
 import { isTV } from "./tv";
 
@@ -13,7 +14,6 @@ const colors = {
   surface: "#17171d",
   text: "#f5f5f7",
   muted: "#9a9aa6",
-  accent: "#7c5cff",
   error: "#ff6b6b",
   favorite: "#ff5c7a",
   white: "#ffffff",
@@ -48,6 +48,47 @@ const colors = {
   glowLight: "rgba(255,255,255,0.12)",
   glowShadow: "rgba(0,0,0,0.55)",
 } as const;
+
+/** An accent colour, the text/icon colour that reads on top of it, and its stand-in on white. */
+export interface AccentPalette {
+  readonly color: string;
+  readonly onColor: string;
+  /** The accent drawn *on* a white surface (the active tab): itself, unless too light to read. */
+  readonly onWhite: string;
+  /**
+   * A switch's "on" track. iOS draws its thumb white whatever the tint, so a white accent needs a
+   * darker track for the thumb to show.
+   */
+  readonly switchTrack: string;
+}
+
+/** A preset: drawn as itself on white and on switches unless `overrides` says otherwise. */
+function accent(
+  color: string,
+  onColor: string,
+  overrides: Partial<Pick<AccentPalette, "onWhite" | "switchTrack">> = {},
+): AccentPalette {
+  return { color, onColor, onWhite: color, switchTrack: color, ...overrides };
+}
+
+/**
+ * The accent presets (Settings → Appearance → Accent colour), tuned for the near-black background.
+ * Never read one directly: `useAccent()` (`src/settings.ts`) returns the chosen one, live.
+ */
+const accents: Record<AccentColor, AccentPalette> = {
+  violet: accent("#7c5cff", colors.white),
+  blue: accent("#2f7bff", colors.white),
+  teal: accent("#14b8a6", colors.background),
+  green: accent("#34c759", colors.background),
+  yellow: accent("#ffcc00", colors.background, { onWhite: colors.background }),
+  orange: accent("#ff8a1f", colors.background),
+  red: accent("#ff453a", colors.white),
+  pink: accent("#ff4f8b", colors.white),
+  white: accent(colors.white, colors.background, {
+    onWhite: colors.background,
+    switchTrack: colors.muted,
+  }),
+};
 
 const weight = {
   regular: "400",
@@ -107,6 +148,7 @@ const radii = {
 /** Dark, media-forward theme. */
 export const theme = {
   colors,
+  accents,
   weight,
   type,
   radii,

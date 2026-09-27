@@ -9,6 +9,7 @@ import { type ChoiceMenuProps, currentChoice } from "./choiceMenuTypes";
 import { Focusable } from "./Focusable";
 import { Icon } from "./Icon";
 import { space, theme } from "./theme";
+import { useAccent } from "../settings";
 
 const MENU_MIN_WIDTH = 180;
 
@@ -26,6 +27,7 @@ export function ChoiceMenu<Value extends string>({
   const anchor = useRef<View>(null);
   const [position, setPosition] = useState<{ top: number; left: number }>();
   const current = currentChoice(choices, value);
+  const accent = useAccent().color;
   if (!current) {
     return null;
   }
@@ -71,7 +73,7 @@ export function ChoiceMenu<Value extends string>({
                         <Icon
                           name="checkmark"
                           size={18}
-                          color={focused ? theme.colors.chipActiveText : theme.colors.accent}
+                          color={focused ? theme.colors.chipActiveText : accent}
                         />
                       ) : null}
                     </>

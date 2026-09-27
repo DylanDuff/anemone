@@ -7,12 +7,16 @@
 //
 
 import {
+  type AccentColor,
   AppSettingsKeys,
   type FocusIndicator,
   type NavigationPlacement,
+  type SearchFieldPlacement,
   type StoredValueBinding,
   useStoredValue,
 } from "@anemone/core";
+import { useIsPhone } from "./ui/contentLayout";
+import { type AccentPalette, theme } from "./ui/theme";
 import { isTV } from "./ui/tv";
 
 export const Settings = {
@@ -28,6 +32,10 @@ export const Settings = {
   navigationPlacement: AppSettingsKeys.navigationPlacement("left"),
   /** Top/bottom pills label their icons by default; phones' compact pill never does. */
   navigationLabels: AppSettingsKeys.navigationLabels(true),
+  /** The app's accent; violet has always been Anemone's. */
+  accentColor: AppSettingsKeys.accentColor("violet"),
+  /** Phones dock Search's field at the bottom, in thumb reach above the keyboard. */
+  searchFieldPlacement: AppSettingsKeys.searchFieldPlacement("bottom"),
 } as const;
 
 export function useHeroGlowSetting(): StoredValueBinding<boolean> {
@@ -59,4 +67,32 @@ export function useNavigationPlacementSetting(): StoredValueBinding<NavigationPl
 
 export function useNavigationLabelsSetting(): StoredValueBinding<boolean> {
   return useStoredValue(Settings.navigationLabels);
+}
+
+export function useSearchFieldPlacementSetting(): StoredValueBinding<SearchFieldPlacement> {
+  return useStoredValue(Settings.searchFieldPlacement);
+}
+
+/** Whether Search's field can dock at the bottom here: phones only (not web, tablets or TV). */
+export function useCanDockSearchField(): boolean {
+  return useIsPhone();
+}
+
+/** Whether Search's field is docked at the bottom (a phone, with the setting on Bottom). */
+export function useSearchFieldDocked(): boolean {
+  const canDock = useCanDockSearchField();
+  const placement = useSearchFieldPlacementSetting().value;
+  return canDock && placement === "bottom";
+}
+
+export function useAccentColorSetting(): StoredValueBinding<AccentColor> {
+  return useStoredValue(Settings.accentColor);
+}
+
+/**
+ * The accent in use — its colour and the colour that reads on it. Components read the accent only
+ * through this (never a static style), so changing the setting recolours the app at once.
+ */
+export function useAccent(): AccentPalette {
+  return theme.accents[useAccentColorSetting().value];
 }

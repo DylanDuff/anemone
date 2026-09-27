@@ -18,7 +18,6 @@ import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -36,6 +35,7 @@ import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
 import { FilterPanel } from "./library/FilterPanel";
 import { LibraryToolbar } from "./library/LibraryToolbar";
+import { Spinner } from "../ui/Spinner";
 
 const GRID_GAP = 25;
 
@@ -206,7 +206,7 @@ function CenteredMessage({
 }) {
   return (
     <View style={[styles.message, compact ? null : styles.fill]}>
-      {loading ? <ActivityIndicator color={theme.colors.accent} /> : null}
+      {loading ? <Spinner /> : null}
       {text ? <Text style={styles.messageText}>{text}</Text> : null}
     </View>
   );

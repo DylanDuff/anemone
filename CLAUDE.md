@@ -102,7 +102,9 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
 - Phone vs wide layouts: `useIsCompact()` (`src/ui/contentLayout.tsx`, <700pt and not TV).
 - Theme (`src/ui/theme.ts`) drives every colour, font size/weight and corner radius: compose
   `theme.type.*` (+ `theme.weight.*` overrides), `theme.colors.*`, `theme.radii.*`, `space()`. No
-  literals in components — add a token instead.
+  literals in components — add a token instead. The accent is a setting (9 presets, live): read it
+  with `useAccent()` (`src/settings.ts`, `.color` + `.onColor` for content on it) and apply it
+  inline — never in a module-level `StyleSheet`. Spinners are `Spinner`.
 - Form controls: `TextField`, `Switch`, `Button` (`src/ui/`). Text fields and switches are the
   platform's own via `@expo/ui` when `nativeControls` (iOS/iPadOS/tvOS, Android phones — tvOS fields
   open the system keyboard), themed RN ones on Android TV and web. Screens never branch on it.

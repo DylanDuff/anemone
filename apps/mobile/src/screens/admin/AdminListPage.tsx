@@ -3,7 +3,7 @@
 //
 
 import { type ReactElement, type ReactNode, useState } from "react";
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useContentLayout } from "../../ui/contentLayout";
 import { ErrorState } from "../../ui/ErrorState";
 import { usePageScrollHandler } from "../../ui/pageScroll";
@@ -11,6 +11,7 @@ import { PAGE_PADDING_BOTTOM, PageHeader } from "../../ui/PageHeader";
 import { SETTINGS_MAX_WIDTH } from "../../ui/settings/layout";
 import { space, theme } from "../../ui/theme";
 import { FocusGuide, isTV } from "../../ui/tv";
+import { Spinner } from "../../ui/Spinner";
 
 /** The parts of a (possibly paged) TanStack query an admin list needs. */
 export interface AdminListQuery<Item> {
@@ -70,7 +71,7 @@ export function AdminListPage<Item>({
   );
 
   const empty = isLoading ? (
-    <ActivityIndicator color={theme.colors.accent} style={styles.message} />
+    <Spinner style={styles.message} />
   ) : error ? (
     <ErrorState error={error} onRetry={() => void refetch()} />
   ) : (
@@ -99,7 +100,7 @@ export function AdminListPage<Item>({
         ListEmptyComponent={empty}
         ListFooterComponent={
           isFetchingNextPage ? (
-            <ActivityIndicator color={theme.colors.accent} style={styles.message} />
+            <Spinner style={styles.message} />
           ) : null
         }
         refreshControl={

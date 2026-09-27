@@ -9,6 +9,8 @@ import { PlayerScreen } from "../screens/PlayerScreen";
 import { theme } from "../ui/theme";
 import { BrowseShell } from "./BrowseShell";
 import type { RootStackParamList } from "./routes";
+import { useMemo } from "react";
+import { useAccent } from "../settings";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,16 +48,18 @@ const linking: LinkingOptions<RootStackParamList> = {
   },
 };
 
-const navigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: theme.colors.background,
-    card: theme.colors.background,
-    primary: theme.colors.accent,
-    text: theme.colors.text,
-  },
-};
+function navigationTheme(accent: string) {
+  return {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      background: theme.colors.background,
+      card: theme.colors.background,
+      primary: accent,
+      text: theme.colors.text,
+    },
+  };
+}
 
 /**
  * The signed-in navigation stack: `Browse` (section switcher + Home / a library) with item pages
@@ -63,10 +67,12 @@ const navigationTheme = {
  * hidden.
  */
 export function RootStack() {
+  const accent = useAccent().color;
+  const navTheme = useMemo(() => navigationTheme(accent), [accent]);
   return (
     <NavigationContainer
       linking={linking}
-      theme={navigationTheme}
+      theme={navTheme}
       documentTitle={{
         formatter: (options) => (options?.title ? `${options.title} · Anemone` : "Anemone"),
       }}

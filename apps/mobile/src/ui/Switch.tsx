@@ -6,6 +6,7 @@ import { Host, Switch as NativeSwitch } from "@expo/ui";
 import { StyleSheet, View } from "react-native";
 import { nativeControls } from "./nativeControls";
 import { theme } from "./theme";
+import { useAccent } from "../settings";
 
 const TRACK_WIDTH = 48;
 const TRACK_HEIGHT = 28;
@@ -23,16 +24,20 @@ export function Switch({
   value: boolean;
   onValueChange: (value: boolean) => void;
 }) {
+  const accent = useAccent();
   if (nativeControls) {
     return (
-      <Host matchContents colorScheme="dark" seedColor={theme.colors.accent}>
+      <Host matchContents colorScheme="dark" seedColor={accent.switchTrack}>
         <NativeSwitch value={value} onValueChange={onValueChange} />
       </Host>
     );
   }
   return (
-    <View style={[styles.track, value ? styles.trackOn : null]}>
-      <View style={[styles.thumb, value ? styles.thumbOn : null]} />
+    <View style={[styles.track, value ? { backgroundColor: accent.switchTrack } : null]}>
+      <View
+        // On, the thumb takes the colour that reads on the accent (dark on light accents).
+        style={[styles.thumb, value ? [styles.thumbOn, { backgroundColor: accent.onColor }] : null]}
+      />
     </View>
   );
 }
@@ -44,9 +49,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radii.pill,
     padding: (TRACK_HEIGHT - THUMB_SIZE) / 2,
     backgroundColor: theme.colors.placeholder,
-  },
-  trackOn: {
-    backgroundColor: theme.colors.accent,
   },
   thumb: {
     width: THUMB_SIZE,

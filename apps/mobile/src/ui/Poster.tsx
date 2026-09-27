@@ -18,6 +18,7 @@ import { Icon } from "./Icon";
 import { useCardWidths } from "./contentLayout";
 import { space, theme } from "./theme";
 import { imagePixelWidth } from "./imageSize";
+import { useAccent } from "../settings";
 
 /** Top-right badge: unplayed-episode count for a series, else a check (rendered as an icon). */
 function watchedBadge(item: BaseItemDto): string | "played" | undefined {
@@ -49,6 +50,7 @@ export function Poster({
   const image = itemImageSource(api, item, ImageType.Primary, { maxWidth: imagePixelWidth(width) });
   const title = displayTitle(item);
   const badge = watchedBadge(item);
+  const accent = useAccent();
   const imageSize = { width, height: width / theme.poster.aspectRatio };
 
   return (
@@ -71,11 +73,11 @@ export function Poster({
               <Artwork uri={image.url} blurHash={image.blurHash} style={styles.cover} />
             ) : null}
             {badge ? (
-              <View style={styles.badge}>
+              <View style={[styles.badge, { backgroundColor: accent.color }]}>
                 {badge === "played" ? (
-                  <Icon name="checkmark" size={14} color={theme.colors.white} />
+                  <Icon name="checkmark" size={14} color={accent.onColor} />
                 ) : (
-                  <Text style={styles.badgeText}>{badge}</Text>
+                  <Text style={[styles.badgeText, { color: accent.onColor }]}>{badge}</Text>
                 )}
               </View>
             ) : null}
@@ -123,7 +125,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radii.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.accent,
   },
   badgeText: {
     ...theme.type.footnote,

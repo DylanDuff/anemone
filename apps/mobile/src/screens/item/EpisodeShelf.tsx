@@ -13,12 +13,13 @@ import {
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { ReactNode } from "react";
-import { ActivityIndicator, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { useCardWidths } from "../../ui/contentLayout";
 import { LandscapeCard } from "../../ui/LandscapeCard";
 import { Shelf } from "../../ui/Shelf";
 import { space, theme } from "../../ui/theme";
 import { imagePixelWidth } from "../../ui/imageSize";
+import { Spinner } from "../../ui/Spinner";
 
 /**
  * A horizontal row of episode cards (Swiftfin `EpisodeHStack`) with loading/empty states. `header`
@@ -48,7 +49,7 @@ export function EpisodeShelf({
   return (
     <Shelf title={title} accessory={header} trailing={trailing}>
       {isLoading ? (
-        <ActivityIndicator color={theme.colors.accent} style={[styles.status, { height: statusHeight }]} />
+        <Spinner style={[styles.status, { height: statusHeight }]} />
       ) : episodes.length === 0 ? (
         <Text style={[styles.status, styles.empty, { height: statusHeight }]}>No episodes.</Text>
       ) : (

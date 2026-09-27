@@ -17,17 +17,34 @@ import {
   LazyColumn,
   ListItem,
   RNHostView,
+  Row as ComposeRow,
   Switch,
   Text,
 } from "@expo/ui/jetpack-compose";
-import { clickable, clip, fillMaxWidth, padding, Shapes } from "@expo/ui/jetpack-compose/modifiers";
+import {
+  background,
+  clickable,
+  clip,
+  fillMaxWidth,
+  padding,
+  Shapes,
+  size,
+} from "@expo/ui/jetpack-compose/modifiers";
 import { type ReactNode, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useContentLayout } from "../contentLayout";
 import { Icon } from "../Icon";
 import { space, theme } from "../theme";
 import { PAGE_PADDING_BOTTOM, PageHeader } from "../PageHeader";
-import { SETTINGS_MAX_WIDTH } from "./layout";
+import {
+  SETTING_ICON_FRAME,
+  SETTING_ICON_SIZE,
+  SETTINGS_MAX_WIDTH,
+  SWATCH_GAP,
+  SWATCH_RING_WIDTH,
+  SWATCH_SIZE,
+  SWATCH_SLOT,
+} from "./layout";
 import {
   type ActionSettingProps,
   type ChoiceSettingProps,
@@ -37,9 +54,11 @@ import {
   sectionRows,
   type SettingsListProps,
   type SettingsSectionProps,
+  type SwatchSettingProps,
   type TextSettingProps,
   type ToggleSettingProps,
 } from "./types";
+import { useAccent } from "../../settings";
 
 const ROW_COLORS = {
   containerColor: theme.colors.surface,
@@ -49,10 +68,6 @@ const ROW_COLORS = {
   trailingContentColor: theme.colors.muted,
 };
 
-const SWITCH_COLORS = {
-  checkedTrackColor: theme.colors.accent,
-  checkedThumbColor: theme.colors.white,
-};
 
 /** Material's connected-list corners: fully round at a section's ends, slightly between rows. */
 const OUTER_RADIUS = 20;
@@ -70,11 +85,12 @@ function rowShape(index: number, count: number) {
  */
 export function SettingsList({ title, back, children }: SettingsListProps) {
   const { insetLeft, insetRight, insetBottom } = useContentLayout();
+  const accent = useAccent().color;
   return (
     <View style={styles.screen}>
       <Host
         colorScheme="dark"
-        seedColor={theme.colors.accent}
+        seedColor={accent}
         style={[styles.list, { marginLeft: insetLeft, marginRight: insetRight }]}
       >
         <LazyColumn
@@ -161,12 +177,13 @@ function Row({
 }
 
 export function ToggleSetting({ label, description, value, onChange }: ToggleSettingProps) {
+  const accent = useAccent();
   return (
     <Row
       label={label}
       description={description}
       onPress={() => onChange(!value)}
-      trailing={<Switch value={value} onCheckedChange={onChange} colors={SWITCH_COLORS} />}
+      trailing={<Switch value={value} onCheckedChange={onChange} colors={{ checkedTrackColor: accent.switchTrack, checkedThumbColor: accent.onColor }} />}
     />
   );
 }
@@ -180,6 +197,7 @@ export function ChoiceSetting<Value extends string>({
   onChange,
 }: ChoiceSettingProps<Value>) {
   const [open, setOpen] = useState(false);
+  const accent = useAccent().color;
   return (
     <Row
       label={label}
@@ -192,7 +210,7 @@ export function ChoiceSetting<Value extends string>({
           color={theme.colors.surface}
         >
           <DropdownMenu.Trigger>
-            <Text color={theme.colors.accent}>{optionLabel(options, value)}</Text>
+            <Text color={accent}>{optionLabel(options, value)}</Text>
           </DropdownMenu.Trigger>
           <DropdownMenu.Items>
             {options.map((option) => (
@@ -208,7 +226,7 @@ export function ChoiceSetting<Value extends string>({
                 </DropdownMenuItem.Text>
                 {option.value === value ? (
                   <DropdownMenuItem.TrailingIcon>
-                    <Text color={theme.colors.accent}>✓</Text>
+                    <Text color={accent}>✓</Text>
                   </DropdownMenuItem.TrailingIcon>
                 ) : null}
               </DropdownMenuItem>
@@ -221,6 +239,7 @@ export function ChoiceSetting<Value extends string>({
 }
 
 export function LinkSetting({ label, icon, detail, onPress }: LinkSettingProps) {
+  const accent = useAccent().color;
   return (
     <Row
       label={label}
@@ -228,7 +247,9 @@ export function LinkSetting({ label, icon, detail, onPress }: LinkSettingProps) 
       leading={
         icon ? (
           <RNHostView matchContents>
-            <Icon name={icon.icon} color={theme.colors.accent} />
+            <View style={styles.icon}>
+              <Icon name={icon.icon} size={SETTING_ICON_SIZE} color={accent} />
+            </View>
           </RNHostView>
         ) : undefined
       }
@@ -254,11 +275,12 @@ export function ActionSetting({
   busy = false,
   disabled = false,
 }: ActionSettingProps) {
+  const accent = useAccent().color;
   return (
     <Row
       label={label}
       labelColor={
-        disabled ? theme.colors.muted : destructive ? theme.colors.error : theme.colors.accent
+        disabled ? theme.colors.muted : destructive ? theme.colors.error : accent
       }
       onPress={busy || disabled ? undefined : onPress}
       trailing={busy ? <CircularProgressIndicator color={theme.colors.muted} /> : undefined}
@@ -274,6 +296,7 @@ export function TextSetting({
   secureTextEntry,
   autoCapitalize,
 }: TextSettingProps) {
+  const accent = useAccent().color;
   return (
     <ListItem colors={ROW_COLORS} modifiers={[fillMaxWidth()]}>
       <ListItem.HeadlineContent>
@@ -285,10 +308,60 @@ export function TextSetting({
           autoCapitalize={autoCapitalize}
           autoCorrect={false}
           placeholderTextColor={theme.colors.muted}
-          cursorColor={theme.colors.accent}
+          cursorColor={accent}
           textStyle={{ color: theme.colors.text }}
         />
       </ListItem.HeadlineContent>
+    </ListItem>
+  );
+}
+
+/** Ink wells under the label: nested circles — a white ring (chosen) or none, a gap, the colour. */
+export function SwatchSetting<Value extends string>({
+  label,
+  description,
+  options,
+  value,
+  onChange,
+}: SwatchSettingProps<Value>) {
+  const inner = SWATCH_SLOT - SWATCH_RING_WIDTH * 2;
+  return (
+    <ListItem colors={ROW_COLORS} modifiers={[fillMaxWidth()]}>
+      <ListItem.HeadlineContent>
+        <Text color={theme.colors.text}>{label}</Text>
+      </ListItem.HeadlineContent>
+      <ListItem.SupportingContent>
+        <Column verticalArrangement={{ spacedBy: 8 }}>
+          {description ? <Text color={theme.colors.muted}>{description}</Text> : null}
+          <ComposeRow horizontalArrangement={{ spacedBy: SWATCH_GAP }}>
+            {options.map((option) => (
+              <Box
+                key={option.value}
+                contentAlignment="center"
+                modifiers={[
+                  size(SWATCH_SLOT, SWATCH_SLOT),
+                  clip(Shapes.Circle),
+                  background(option.value === value ? theme.colors.white : theme.colors.surface),
+                  clickable(() => onChange(option.value)),
+                ]}
+              >
+                <Box
+                  contentAlignment="center"
+                  modifiers={[size(inner, inner), clip(Shapes.Circle), background(theme.colors.surface)]}
+                >
+                  <Box
+                    modifiers={[
+                      size(SWATCH_SIZE, SWATCH_SIZE),
+                      clip(Shapes.Circle),
+                      background(option.color),
+                    ]}
+                  />
+                </Box>
+              </Box>
+            ))}
+          </ComposeRow>
+        </Column>
+      </ListItem.SupportingContent>
     </ListItem>
   );
 }
@@ -297,6 +370,10 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  icon: {
+    width: SETTING_ICON_FRAME,
+    alignItems: "center",
   },
   list: {
     flex: 1,

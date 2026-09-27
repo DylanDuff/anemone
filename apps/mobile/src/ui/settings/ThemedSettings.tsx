@@ -9,14 +9,22 @@ import { Fragment, type ReactNode } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Chip } from "../Chip";
 import { useContentLayout } from "../contentLayout";
-import { Focusable } from "../Focusable";
+import { Focusable, focusLift } from "../Focusable";
 import { Icon } from "../Icon";
 import { usePageScrollHandler } from "../pageScroll";
 import { Switch } from "../Switch";
 import { TextField } from "../TextField";
 import { space, theme } from "../theme";
 import { PAGE_PADDING_BOTTOM, PageHeader } from "../PageHeader";
-import { SETTINGS_MAX_WIDTH } from "./layout";
+import {
+  SETTING_ICON_FRAME,
+  SETTING_ICON_SIZE,
+  SETTINGS_MAX_WIDTH,
+  SWATCH_GAP,
+  SWATCH_RING_WIDTH,
+  SWATCH_SIZE,
+  SWATCH_SLOT,
+} from "./layout";
 import {
   type ActionSettingProps,
   type ChoiceSettingProps,
@@ -25,9 +33,11 @@ import {
   sectionRows,
   type SettingsListProps,
   type SettingsSectionProps,
+  type SwatchSettingProps,
   type TextSettingProps,
   type ToggleSettingProps,
 } from "./types";
+import { useAccent } from "../../settings";
 
 export function SettingsList({ title, back, children }: SettingsListProps) {
   const { insetLeft, insetRight, insetBottom } = useContentLayout();
@@ -187,10 +197,13 @@ export function LinkSetting({ label, icon, detail, onPress }: LinkSettingProps) 
         return (
           <>
             {icon ? (
-              <Icon
-                name={icon.icon}
-                color={focused ? theme.colors.chipActiveText : theme.colors.text}
-              />
+              <View style={styles.icon}>
+                <Icon
+                  name={icon.icon}
+                  size={SETTING_ICON_SIZE}
+                  color={focused ? theme.colors.chipActiveText : theme.colors.text}
+                />
+              </View>
             ) : null}
             <RowText label={label} focused={focused} />
             {detail ? <Text style={[styles.detail, { color: muted }]}>{detail}</Text> : null}
@@ -223,6 +236,7 @@ export function ActionSetting({
   disabled = false,
   preferFocus,
 }: ActionSettingProps) {
+  const accent = useAccent().color;
   return (
     <PressableRow
       onPress={onPress}
@@ -236,7 +250,7 @@ export function ActionSetting({
             label={label}
             focused={focused}
             labelColor={
-              disabled ? theme.colors.muted : destructive ? theme.colors.error : theme.colors.accent
+              disabled ? theme.colors.muted : destructive ? theme.colors.error : accent
             }
           />
           {busy ? (
@@ -248,6 +262,47 @@ export function ActionSetting({
         </>
       )}
     />
+  );
+}
+
+/**
+ * Ink wells beside (or, when narrow, under) the label, each its own focus target: the chosen one
+ * ringed in white whatever the accent; a focused one lifts, with a faint ring so D-pad focus shows.
+ */
+export function SwatchSetting<Value extends string>({
+  label,
+  description,
+  options,
+  value,
+  onChange,
+}: SwatchSettingProps<Value>) {
+  return (
+    <View style={[styles.row, styles.wrapping]}>
+      <RowText label={label} description={description} wraps />
+      <View style={styles.swatches}>
+        {options.map((option) => {
+          const selected = option.value === value;
+          return (
+            <Focusable
+              key={option.value}
+              onPress={() => onChange(option.value)}
+              accessibilityRole="radio"
+              accessibilityLabel={option.label}
+              accessibilityState={{ checked: selected }}
+              style={({ focused, pressed }) => [
+                styles.swatchSlot,
+                focused && !selected ? styles.swatchSlotFocused : null,
+                selected ? styles.swatchSlotSelected : null,
+                focused ? focusLift : null,
+                pressed ? styles.pressed : null,
+              ]}
+            >
+              <View style={[styles.swatch, { backgroundColor: option.color }]} />
+            </Focusable>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 
@@ -347,6 +402,35 @@ const styles = StyleSheet.create({
     color: theme.colors.muted,
     flexShrink: 1,
     textAlign: "right",
+  },
+  icon: {
+    width: SETTING_ICON_FRAME,
+    alignItems: "center",
+  },
+  swatches: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: SWATCH_GAP,
+  },
+  swatchSlot: {
+    width: SWATCH_SLOT,
+    height: SWATCH_SLOT,
+    borderRadius: theme.radii.pill,
+    borderWidth: SWATCH_RING_WIDTH,
+    borderColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  swatchSlotSelected: {
+    borderColor: theme.colors.white,
+  },
+  swatchSlotFocused: {
+    borderColor: theme.colors.borderStrong,
+  },
+  swatch: {
+    width: SWATCH_SIZE,
+    height: SWATCH_SIZE,
+    borderRadius: theme.radii.pill,
   },
   fieldRow: {
     padding: space(1),

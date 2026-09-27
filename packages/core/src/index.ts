@@ -36,11 +36,15 @@ export {
 } from "./data/storedValues";
 export { AppDefaults } from "./data/keys/appDefaults";
 export {
+    type AccentColor,
+    accentColorValues,
     AppSettingsKeys,
     type FocusIndicator,
     focusIndicatorValues,
     type NavigationPlacement,
     navigationPlacementValues,
+    type SearchFieldPlacement,
+    searchFieldPlacementValues,
 } from "./data/keys/appSettingsKeys";
 export { ServerKeys } from "./data/keys/serverKeys";
 export { UserKeys } from "./data/keys/userKeys";
@@ -378,6 +382,7 @@ export {
 
 // Search
 export {
+    filterSearchGroups,
     groupSearchItems,
     RECENT_SEARCH_LIMIT,
     type RecentSearchItems,

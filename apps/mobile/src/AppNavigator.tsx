@@ -4,12 +4,13 @@
 
 import { type ServerState, useCurrentSession } from "@anemone/core";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { theme } from "./ui/theme";
 import { ConnectServerScreen } from "./screens/ConnectServerScreen";
 import { RootStack } from "./navigation/RootStack";
 import { SelectUserScreen } from "./screens/SelectUserScreen";
 import { SignInScreen } from "./screens/SignInScreen";
+import { Spinner } from "./ui/Spinner";
 
 /** Where the signed-out flow is. `connect` can go back only when it was opened from the picker. */
 type AuthStep =
@@ -70,7 +71,7 @@ export function AppNavigator() {
 export function LoadingScreen() {
     return (
         <View style={styles.loading}>
-            <ActivityIndicator color={theme.colors.accent} />
+            <Spinner />
         </View>
     );
 }

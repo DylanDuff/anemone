@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Chip } from "./Chip";
 import { type ChoiceMenuProps, currentChoice } from "./choiceMenuTypes";
 import { theme } from "./theme";
+import { useAccent } from "../settings";
 
 /**
  * Android phones: a Material dropdown opened from a chip showing the current choice, with a check
@@ -21,6 +22,7 @@ export function ChoiceMenu<Value extends string>({
 }: ChoiceMenuProps<Value>) {
   const [open, setOpen] = useState(false);
   const current = currentChoice(choices, value);
+  const accent = useAccent().color;
   if (!current) {
     return null;
   }
@@ -56,7 +58,7 @@ export function ChoiceMenu<Value extends string>({
               </DropdownMenuItem.Text>
               {choice.value === value ? (
                 <DropdownMenuItem.TrailingIcon>
-                  <Text color={theme.colors.accent}>✓</Text>
+                  <Text color={accent}>✓</Text>
                 </DropdownMenuItem.TrailingIcon>
               ) : null}
             </DropdownMenuItem>

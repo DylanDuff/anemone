@@ -6,6 +6,7 @@ import { ActivityIndicator, StyleSheet, Text } from "react-native";
 import { Focusable, focusLift } from "./Focusable";
 import { Icon, type IconName } from "./Icon";
 import { space, theme } from "./theme";
+import { useAccent } from "../settings";
 
 type ButtonVariant = "primary" | "secondary" | "destructive" | "plain";
 
@@ -34,6 +35,11 @@ export function Button({
   preferFocus?: boolean;
 }) {
   const inactive = busy || disabled;
+  const accent = useAccent();
+  const variantStyle =
+    variant === "primary"
+      ? { button: { backgroundColor: accent.color }, color: accent.onColor }
+      : VARIANT_STYLES[variant];
   return (
     <Focusable
       onPress={onPress}
@@ -44,13 +50,13 @@ export function Button({
       accessibilityState={{ disabled: inactive, busy }}
       style={({ pressed, focused }) => [
         styles.button,
-        VARIANT_STYLES[variant].button,
+        variantStyle.button,
         focused ? [styles.focused, focusLift] : null,
         pressed || inactive ? styles.dimmed : null,
       ]}
     >
       {({ focused }) => {
-        const color = focused ? theme.colors.chipActiveText : VARIANT_STYLES[variant].color;
+        const color = focused ? theme.colors.chipActiveText : variantStyle.color;
         return (
           <>
             {busy ? (
@@ -88,8 +94,9 @@ const styles = StyleSheet.create({
   },
 });
 
+/** `primary` is filled with the accent at render time (see `Button`), so it's live. */
 const VARIANT_STYLES: Record<ButtonVariant, { button: object; color: string }> = {
-  primary: { button: { backgroundColor: theme.colors.accent }, color: theme.colors.white },
+  primary: { button: {}, color: theme.colors.white },
   secondary: { button: { backgroundColor: theme.colors.surface }, color: theme.colors.text },
   destructive: { button: { backgroundColor: theme.colors.surface }, color: theme.colors.error },
   plain: { button: {}, color: theme.colors.muted },

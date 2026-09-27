@@ -3,7 +3,7 @@
 //
 
 import { createContext, useContext } from "react";
-import { useWindowDimensions } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 import { theme } from "./theme";
 import { isTV } from "./tv";
 
@@ -14,6 +14,15 @@ const COMPACT_MAX_WIDTH = 700;
 export function useIsCompact(): boolean {
   const { width } = useWindowDimensions();
   return !isTV && width < COMPACT_MAX_WIDTH;
+}
+
+/**
+ * Whether this is a phone: the native app at compact width (not web — even a narrow window — nor
+ * tablets or TV). Touch-only, and with phone-only affordances like the docked search field.
+ */
+export function useIsPhone(): boolean {
+  const compact = useIsCompact();
+  return Platform.OS !== "web" && compact;
 }
 
 /** The page's side margin: tighter on phones / narrow web. */

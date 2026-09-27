@@ -11,7 +11,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { useGlassButtons } from "../settings";
+import { useAccent, useGlassButtons } from "../settings";
 import { hoverTransition } from "./Focusable";
 import { GlassFill, glassFillHost } from "./Glass";
 import { Icon, type IconName } from "./Icon";
@@ -49,6 +49,7 @@ export function TextField({ onSubmit, glass = false, icon, pill = false, ...prop
   const [focused, setFocused] = useState(false);
   const radius = pill ? theme.radii.pill : theme.radii.lg;
   const frosted = useGlassButtons() && glass;
+  const accent = useAccent().color;
   const fill = frosted ? glassFillHost.backgroundColor : theme.colors.surface;
   // A fixed height (text centred in it) rather than padding: the native field's host can't be
   // trusted to size itself to the padded field, and the glass fill takes the host's size.
@@ -61,7 +62,7 @@ export function TextField({ onSubmit, glass = false, icon, pill = false, ...prop
   const field = nativeControls ? (
     <Host
       colorScheme="dark"
-      seedColor={theme.colors.accent}
+      seedColor={accent}
       // The field never avoids the keyboard itself: SwiftUI would shift it inside its host (off its
       // glass) while a `KeyboardDock` is already lifting the whole field above the keyboard.
       ignoreSafeArea="keyboard"
@@ -71,7 +72,7 @@ export function TextField({ onSubmit, glass = false, icon, pill = false, ...prop
         {...props}
         onSubmitEditing={onSubmit}
         placeholderTextColor={theme.colors.muted}
-        cursorColor={theme.colors.accent}
+        cursorColor={accent}
         textStyle={{ fontSize: theme.type.label.fontSize, color: theme.colors.text }}
         style={{ ...padding, backgroundColor: fill, borderRadius: radius }}
       />
@@ -83,13 +84,13 @@ export function TextField({ onSubmit, glass = false, icon, pill = false, ...prop
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       placeholderTextColor={theme.colors.muted}
-      selectionColor={theme.colors.accent}
+      selectionColor={accent}
       style={[
         styles.field,
         padding,
         { backgroundColor: fill, borderRadius: radius },
         hoverTransition,
-        focused ? styles.fieldFocused : null,
+        focused ? { borderColor: accent } : null,
       ]}
     />
   );
@@ -143,7 +144,4 @@ const styles = StyleSheet.create({
     // Web draws its own focus outline; the border is the indicator here.
     outlineStyle: "none",
   } as object,
-  fieldFocused: {
-    borderColor: theme.colors.accent,
-  },
 });

@@ -11,7 +11,7 @@ import {
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { BaseItemKind } from "@jellyfin/sdk/lib/generated-client/models/base-item-kind";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "../../ui/BackButton";
 import { useContentLayout, useIsCompact } from "../../ui/contentLayout";
@@ -20,6 +20,7 @@ import { PersonPhoto } from "../../ui/PersonCard";
 import { PosterRow } from "../../ui/PosterRow";
 import { space, theme } from "../../ui/theme";
 import { ItemOverview } from "./ItemOverview";
+import { Spinner } from "../../ui/Spinner";
 
 const PHOTO_SIZE = 200;
 const COMPACT_PHOTO_SIZE = 140;
@@ -72,7 +73,7 @@ export function PersonDetail({
 
       <ItemOverview item={person} />
 
-      {isLoading ? <ActivityIndicator style={styles.loader} color={theme.colors.accent} /> : null}
+      {isLoading ? <Spinner style={styles.loader} /> : null}
       <PosterRow title="Movies" api={api} items={movies} onPressItem={onPressItem} />
       <PosterRow title="Shows" api={api} items={shows} onPressItem={onPressItem} />
     </>

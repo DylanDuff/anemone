@@ -16,6 +16,7 @@ import { space, theme } from "./theme";
 import { FocusGuide, isTV, type RemoteEvent, useHardwareBack, useRemoteEvents } from "./tv";
 import { type ScrollMinimizeStore, useScrollMinimized } from "./pageScroll";
 import { useKeyboardShown } from "./useKeyboardShown";
+import { useAccent } from "../settings";
 
 const RAIL_MARGIN = space(2);
 /** Phones: the least room left below the pill (screens without a home indicator). */
@@ -161,6 +162,8 @@ export function SectionRail({
   /** Return focus to the page (Back, or the direction of the page, while the pill is focused). */
   onDismiss: () => void;
 }) {
+  // The active item is a white pill, so it takes the accent's on-white form (dark for White).
+  const accent = useAccent().onWhite;
   const { placement, compact } = form;
   const minimized = useScrollMinimized(scrollMinimize);
   const { width } = useWindowDimensions();
@@ -259,7 +262,7 @@ export function SectionRail({
                 size={ICON_SIZE}
                 color={
                   entry.active
-                    ? theme.colors.accent
+                    ? accent
                     : focused
                       ? theme.colors.chipActiveText
                       : theme.colors.text
@@ -273,7 +276,7 @@ export function SectionRail({
                   vertical ? styles.sideLabel : styles.underLabel,
                   placement === "right" ? styles.sideLabelReversed : null,
                   focused ? styles.labelFocused : null,
-                  entry.active ? styles.labelActive : null,
+                  entry.active ? { color: accent } : null,
                 ]}
               >
                 {entry.label}
@@ -454,9 +457,6 @@ const styles = StyleSheet.create({
   underLabel: {
     ...theme.type.micro,
     color: theme.colors.muted,
-  },
-  labelActive: {
-    color: theme.colors.accent,
   },
   labelFocused: {
     color: theme.colors.chipActiveText,

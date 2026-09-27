@@ -22,6 +22,12 @@ export const {
   InfoSetting,
   ActionSetting,
   TextSetting,
+  SwatchSetting,
 } = kit;
 
-export { optionLabel, type SettingIcon, type SettingOption } from "./types";
+export {
+  optionLabel,
+  type SettingIcon,
+  type SettingOption,
+  type SwatchOption,
+} from "./types";

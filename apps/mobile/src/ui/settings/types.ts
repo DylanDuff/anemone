@@ -49,6 +49,23 @@ export interface ChoiceSettingProps<Value extends string> {
   readonly onChange: (value: Value) => void;
 }
 
+/** One colour a `SwatchSetting` offers. */
+export interface SwatchOption<Value extends string> {
+  readonly value: Value;
+  /** For screen readers (the well itself is just colour). */
+  readonly label: string;
+  readonly color: string;
+}
+
+/** Pick a colour from a row of ink wells; the chosen one is ringed in white. */
+export interface SwatchSettingProps<Value extends string> {
+  readonly label: string;
+  readonly description?: string;
+  readonly options: readonly SwatchOption<Value>[];
+  readonly value: Value;
+  readonly onChange: (value: Value) => void;
+}
+
 /** A row that opens another page. */
 export interface LinkSettingProps {
   readonly label: string;
@@ -103,6 +120,7 @@ export interface SettingsKit {
   readonly InfoSetting: (props: InfoSettingProps) => ReactElement;
   readonly ActionSetting: (props: ActionSettingProps) => ReactElement;
   readonly TextSetting: (props: TextSettingProps) => ReactElement;
+  readonly SwatchSetting: <Value extends string>(props: SwatchSettingProps<Value>) => ReactElement;
 }
 
 /** The label of the option matching `value`. */

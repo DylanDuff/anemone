@@ -13,7 +13,7 @@ import {
   useStatefulEvents,
 } from "@anemone/core";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Avatar } from "../ui/Avatar";
 import { Button } from "../ui/Button";
 import { useIsCompact } from "../ui/contentLayout";
@@ -22,6 +22,7 @@ import { Icon } from "../ui/Icon";
 import { imagePixelWidth } from "../ui/imageSize";
 import { Screen, ScreenNote } from "../ui/Screen";
 import { space, theme } from "../ui/theme";
+import { Spinner } from "../ui/Spinner";
 
 const AVATAR_SIZE = 110;
 const COMPACT_AVATAR_SIZE = 88;
@@ -71,7 +72,7 @@ export function SelectUserScreen({
   if (!loaded || empty) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator color={theme.colors.accent} />
+        <Spinner />
       </View>
     );
   }
