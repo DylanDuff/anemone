@@ -27,6 +27,7 @@ export { getVideoApi } from "@jellyfin/sdk/lib/utils/api/video-api";
 export { getMediaInfoApi } from "@jellyfin/sdk/lib/utils/api/media-info-api";
 export { getSessionApi } from "@jellyfin/sdk/lib/utils/api/session-api";
 export { getPersonApi } from "@jellyfin/sdk/lib/utils/api/person-api";
+export { getDeviceApi } from "@jellyfin/sdk/lib/utils/api/device-api";
 
 export { ImageUrlsApi };
 

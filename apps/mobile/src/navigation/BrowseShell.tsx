@@ -5,6 +5,19 @@
 import { createNativeStackNavigator, type NativeStackScreenProps } from "@react-navigation/native-stack";
 import { type ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  ActivityEntryScreen,
+  ActivityScreen,
+  AddUserScreen,
+  DeviceScreen,
+  DevicesScreen,
+  SessionScreen,
+  SessionsScreen,
+  UserPasswordScreen,
+  UserPermissionsScreen,
+  UserScreen,
+  UsersScreen,
+} from "../screens/admin";
 import { HomeScreen } from "../screens/HomeScreen";
 import { LibraryScreen } from "../screens/LibraryScreen";
 import { SearchScreen } from "../screens/SearchScreen";
@@ -20,6 +33,7 @@ import { FocusGuide } from "../ui/tv";
 import {
   type BrowseParamList,
   type RootStackParamList,
+  isSettingsRoute,
   type Section,
   useOpenSection,
 } from "./routes";
@@ -46,7 +60,7 @@ function activeSection(route: BrowseProps["route"]): Section {
     : route.params
       ? { name: route.params.screen, params: route.params.params }
       : undefined;
-  if (focused?.name === "Settings" || focused?.name === "SettingsPage") {
+  if (focused?.name && isSettingsRoute(focused.name)) {
     return { kind: "settings" };
   }
   if (focused?.name === "Search") {
@@ -97,6 +111,17 @@ export function BrowseShell({ route }: BrowseProps) {
       <SectionStack.Screen name="Settings" component={SettingsScreen} />
       <SectionStack.Group screenOptions={SETTINGS_PAGE_OPTIONS}>
         <SectionStack.Screen name="SettingsPage" component={SettingsPageScreen} />
+        <SectionStack.Screen name="AdminSessions" component={SessionsScreen} />
+        <SectionStack.Screen name="AdminSession" component={SessionScreen} />
+        <SectionStack.Screen name="AdminActivity" component={ActivityScreen} />
+        <SectionStack.Screen name="AdminActivityEntry" component={ActivityEntryScreen} />
+        <SectionStack.Screen name="AdminDevices" component={DevicesScreen} />
+        <SectionStack.Screen name="AdminDevice" component={DeviceScreen} />
+        <SectionStack.Screen name="AdminUsers" component={UsersScreen} />
+        <SectionStack.Screen name="AdminAddUser" component={AddUserScreen} />
+        <SectionStack.Screen name="AdminUser" component={UserScreen} />
+        <SectionStack.Screen name="AdminUserPermissions" component={UserPermissionsScreen} />
+        <SectionStack.Screen name="AdminUserPassword" component={UserPasswordScreen} />
       </SectionStack.Group>
     </SectionStack.Navigator>
   );
@@ -132,7 +157,7 @@ const SECTION_SCREEN_OPTIONS = {
   contentStyle: { backgroundColor: theme.colors.background },
 } as const;
 
-/** Settings sub-pages push like any drill-down (with the back swipe on iOS). */
+/** Settings and admin pages push like any drill-down (with the back swipe on iOS). */
 const SETTINGS_PAGE_OPTIONS = { animation: "default" } as const;
 
 const styles = StyleSheet.create({

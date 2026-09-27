@@ -13,7 +13,9 @@ The **business logic layer is built and tested**; the UI comes next.
   (device profiles, stream negotiation, track switching, progress reporting).
 - ✅ Video playback on iOS/Android/Android TV (react-native-video) and web (hls.js) — see
   [`docs/playback.md`](docs/playback.md).
-- 🚧 Remaining UI, tvOS, playback follow-ups, downloads, admin — see
+- ✅ Admin dashboard (sessions, activity, devices, users) for server administrators — see
+  [`docs/admin-dashboard.md`](docs/admin-dashboard.md).
+- 🚧 Remaining UI, tvOS, playback follow-ups, downloads, deeper admin — see
   [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
 ## Layout
@@ -54,7 +56,8 @@ const container = await configureAnemone();
 
 See **[`docs/architecture.md`](docs/architecture.md)** for the full design (DI, persistence, the
 `@Stateful` reducer pattern, the query layer, and the Swiftfin→TypeScript mapping),
-**[`docs/playback.md`](docs/playback.md)** for the player (engines, negotiation, subtitles), and
+**[`docs/playback.md`](docs/playback.md)** for the player (engines, negotiation, subtitles),
+**[`docs/admin-dashboard.md`](docs/admin-dashboard.md)** for server administration, and
 **[`CLAUDE.md`](CLAUDE.md)** for conventions.
 
 ## License

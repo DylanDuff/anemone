@@ -317,3 +317,57 @@ export {
     type UserSignInViewState,
     type UserSignInViewModel,
 } from "./viewmodels/userSignInViewModel";
+
+// Admin dashboard
+export {
+    createServerUser,
+    deleteDevice,
+    deleteServerUser,
+    renameDevice,
+    renameServerUser,
+    setServerUserPassword,
+    updateServerUserPolicy,
+} from "./admin/adminActions";
+export {
+    useActiveSession,
+    useActiveSessions,
+    useActivityLog,
+    useCreateServerUser,
+    useCurrentUser,
+    useDeleteDevice,
+    useDeleteServerUser,
+    useDevice,
+    useDevices,
+    useIsAdministrator,
+    useLoadedActivityEntry,
+    useRenameDevice,
+    useRenameServerUser,
+    useServerUser,
+    useServerUsers,
+    useSetServerUserPassword,
+    useUpdateServerUserPolicy,
+} from "./admin/adminHooks";
+export {
+    ACTIVITY_PAGE_SIZE,
+    type ActivityFilter,
+    activeSessionsQuery,
+    activityLogInfiniteQuery,
+    currentUserQuery,
+    deviceQuery,
+    devicesQuery,
+    SESSIONS_REFRESH_INTERVAL,
+    serverUserQuery,
+    serverUsersQuery,
+} from "./admin/adminQueries";
+export { formatDateTime, formatLastSeen } from "./admin/lastSeen";
+export {
+    compareSessions,
+    dashboardSessions,
+    filterSessions,
+    humanizeEnumValue,
+    isSessionPlaying,
+    playMethodTitle,
+    type SessionFilter,
+    type SessionProgress,
+    sessionProgress,
+} from "./admin/sessions";

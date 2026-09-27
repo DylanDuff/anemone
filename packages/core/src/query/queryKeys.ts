@@ -16,6 +16,26 @@ export const jellyfinKeys = {
 
     serverInfo: (userID: string) => [...jellyfinKeys.user(userID), "serverInfo"] as const,
 
+    /** The signed-in user's own `UserDto` (policy decides whether admin pages show). */
+    currentUser: (userID: string) => [...jellyfinKeys.user(userID), "currentUser"] as const,
+
+    /** Prefix of every admin dashboard query. */
+    admin: (userID: string) => [...jellyfinKeys.user(userID), "admin"] as const,
+    adminSessions: (userID: string, activeWithinSeconds: number | undefined) =>
+        [...jellyfinKeys.admin(userID), "sessions", activeWithinSeconds ?? null] as const,
+    /** Prefix of every activity log query. */
+    adminAllActivity: (userID: string) => [...jellyfinKeys.admin(userID), "activity"] as const,
+    adminActivity: (userID: string, params: unknown) =>
+        [...jellyfinKeys.adminAllActivity(userID), params] as const,
+    /** Prefix of the device list and every device's details. */
+    adminDevices: (userID: string) => [...jellyfinKeys.admin(userID), "devices"] as const,
+    adminDevice: (userID: string, deviceID: string) =>
+        [...jellyfinKeys.adminDevices(userID), deviceID] as const,
+    /** Prefix of the user list and every user's details. */
+    adminUsers: (userID: string) => [...jellyfinKeys.admin(userID), "users"] as const,
+    adminUser: (userID: string, serverUserID: string) =>
+        [...jellyfinKeys.adminUsers(userID), serverUserID] as const,
+
     resumeItems: (userID: string) => [...jellyfinKeys.user(userID), "resumeItems"] as const,
 
     nextUp: (userID: string) => [...jellyfinKeys.user(userID), "nextUp"] as const,

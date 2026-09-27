@@ -19,7 +19,31 @@ export type BrowseParamList = {
   Settings: undefined;
   /** A page opened from the Settings hub. */
   SettingsPage: { page: SettingsPageName };
+  // Server administration (Settings → Administration), for administrators only.
+  AdminSessions: undefined;
+  AdminSession: { sessionID: string };
+  AdminActivity: undefined;
+  AdminActivityEntry: { entryID: number };
+  AdminDevices: undefined;
+  AdminDevice: { deviceID: string };
+  AdminUsers: undefined;
+  AdminAddUser: undefined;
+  AdminUser: { userID: string };
+  AdminUserPermissions: { userID: string };
+  AdminUserPassword: { userID: string };
 };
+
+/** Browse routes that belong to the Settings section (the hub, its pages, administration). */
+export function isSettingsRoute(name: string): boolean {
+  return name.startsWith("Settings") || name.startsWith("Admin");
+}
+
+/** Navigation within the section stack (Settings pages push onto it). */
+export type BrowseNavigation = NativeStackNavigationProp<BrowseParamList>;
+
+export function useBrowseNavigation(): BrowseNavigation {
+  return useNavigation<BrowseNavigation>();
+}
 
 /** The Settings hub's sub-pages. */
 export type SettingsPageName = "navigation" | "appearance" | "about";

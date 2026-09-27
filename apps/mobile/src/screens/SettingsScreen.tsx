@@ -7,13 +7,14 @@ import type { BrowseParamList, SettingsPageName } from "../navigation/routes";
 import { useNavigationPlacementSetting } from "../settings";
 import { useIsCompact } from "../ui/contentLayout";
 import { LinkSetting, optionLabel, SettingsList, SettingsSection } from "../ui/settings";
+import { AdministrationSection } from "./admin";
 import { AccountSection } from "./settings/AccountSection";
 import { NAVIGATION_PLACEMENT_OPTIONS } from "./settings/options";
 
 /**
  * The Settings hub (a top-level section): the account, then links to each page of device settings
- * (`SettingsPage`). Values persist per device and apply immediately. Server administration pages
- * will join as their own section here.
+ * (`SettingsPage`), then server administration for administrators. Device settings persist per
+ * device and apply immediately.
  */
 export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowseParamList, "Settings">) {
   const placement = useNavigationPlacementSetting().value;
@@ -38,6 +39,8 @@ export function SettingsScreen({ navigation }: NativeStackScreenProps<BrowsePara
           onPress={() => openPage("appearance")}
         />
       </SettingsSection>
+
+      <AdministrationSection />
 
       <SettingsSection>
         <LinkSetting

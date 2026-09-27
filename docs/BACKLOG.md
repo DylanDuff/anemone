@@ -40,8 +40,8 @@ up later. Grouped by area. Update this as items are completed or added.
 
 These exist in Swiftfin `Shared/` but are out of scope for the foundation + core-VM run:
 
-- [ ] **Admin dashboard** (`ViewModels/AdminDashboard/*`): active sessions, API keys, devices,
-  server activity/logs, server tasks, user management.
+- 🚧 **Admin dashboard** (`ViewModels/AdminDashboard/*`): sessions, activity, devices and user
+  management are done (`docs/admin-dashboard.md`); API keys, server logs and tasks remain.
 - [ ] **Item administration / editors** (`ViewModels/ItemAdministration/*`): identify item, metadata
   editor, genres/people/studios/tags editors, subtitle search, remote images.
 - [ ] **Downloads** (`Services/DownloadManager`, `DownloadTask`, `DownloadListViewModel`): offline
@@ -143,7 +143,15 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
   Material connected rows on Android phones — and themed rows on web/Android TV (`nativeControls`).
   Hub = Account (inline) + Preferences (Navigation, Appearance) + About (app version, server name,
   Jellyfin version, address), sub-pages via `SettingsPage` (`/settings/:page`).
-- [ ] Settings → Administration section (server dashboard) for admin users, as its own sub-pages.
+- ✅ **Admin dashboard** (`docs/admin-dashboard.md`): Settings → Administration (administrators
+  only) → Sessions (live list + detail), Activity (paged log + detail), Devices (rename, delete),
+  Users (add, rename, permissions, password, delete).
+- [ ] Admin: per-user media / device / Live TV access, parental ratings, access schedules and tags,
+  Quick Connect authorise, user profile image (Swiftfin `ServerUserSettings/*`).
+- [ ] Admin: API keys, server logs, scheduled tasks (Swiftfin's "Advanced" dashboard section).
+- [ ] Admin: session remote control (pause/stop/message), multi-select delete for devices/users.
+- [ ] Switch artwork to `expo-image` for its memory + disk cache (previously seen images appear
+  without waiting on the server). After the admin work; needs install approval.
 - [ ] iOS/Android settings lists stop above the phone pill (a native list can't scroll under it)
   and don't report page scroll, so the phone pill doesn't shrink on Settings.
 - [ ] Verify the native settings lists on device: iPhone, iPad, tvOS (menu picker + focus), Android

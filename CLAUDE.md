@@ -89,6 +89,11 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   list (`NativeSettings.ios|android.tsx`), else themed rows (`ThemedSettings.tsx`). Pages never
   branch on it; new row kinds must be added to all three kits (`SettingsKit` in `types.ts`). The hub
   (`SettingsScreen`) links to sub-pages through the `SettingsPage` route (`screens/settings/`).
+- Admin dashboard (`docs/admin-dashboard.md`): Settings → Administration, only when
+  `useIsAdministrator()`. Core in `packages/core/src/admin/` (queries/actions/hooks under
+  `jellyfinKeys.admin`); screens in `screens/admin/`. Lists use `AdminListPage`/`AdminRow` (themed
+  everywhere — rich rows); details/edits use the settings kit. Routes are `Admin*` in the section
+  stack (`isSettingsRoute`), linked under `/settings/…`.
 - Phone vs wide layouts: `useIsCompact()` (`src/ui/contentLayout.tsx`, <700pt and not TV).
 - Theme (`src/ui/theme.ts`) drives every colour, font size/weight and corner radius: compose
   `theme.type.*` (+ `theme.weight.*` overrides), `theme.colors.*`, `theme.radii.*`, `space()`. No
