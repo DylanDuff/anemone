@@ -8,7 +8,7 @@ import { PersonKind } from "@jellyfin/sdk/lib/generated-client/models/person-kin
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useContentLayout } from "../../ui/contentLayout";
-import { Focusable, focusGlow, FocusRing, useFocusIndicator } from "../../ui/Focusable";
+import { Focusable, focusGlow, FocusRing, focusRoom, useFocusIndicator } from "../../ui/Focusable";
 import { SectionHeader } from "../../ui/Shelf";
 import { space, theme } from "../../ui/theme";
 
@@ -124,10 +124,13 @@ const styles = StyleSheet.create({
   section: {
     marginTop: space(3),
   },
+  // `SectionHeader` pulls what follows up by `focusRoom` (a shelf row pads its top by that much);
+  // match it, which also leaves room for a focused card's glow.
   cards: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: space(2),
+    paddingTop: focusRoom,
   },
   card: {
     flexGrow: 1,
