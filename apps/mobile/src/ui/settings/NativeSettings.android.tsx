@@ -26,12 +26,8 @@ import { StyleSheet, View } from "react-native";
 import { useContentLayout } from "../contentLayout";
 import { Icon } from "../Icon";
 import { space, theme } from "../theme";
-import {
-  SETTINGS_MAX_WIDTH,
-  SETTINGS_PADDING_BOTTOM,
-  SETTINGS_PADDING_TOP,
-  SettingsHeader,
-} from "./SettingsHeader";
+import { PAGE_PADDING_BOTTOM, PageHeader } from "../PageHeader";
+import { SETTINGS_MAX_WIDTH } from "./layout";
 import {
   type ActionSettingProps,
   type ChoiceSettingProps,
@@ -68,19 +64,14 @@ function rowShape(index: number, count: number) {
   return Shapes.RoundedCorner({ topStart: top, topEnd: top, bottomStart: bottom, bottomEnd: bottom });
 }
 
-/** The page header stays in React Native; the rows scroll in a Compose list beneath it. */
+/**
+ * The whole page is one Compose list running under the navigation pill, like every other page:
+ * the `PageHeader` is its first item (so it scrolls away with the content), then the sections.
+ */
 export function SettingsList({ title, back, children }: SettingsListProps) {
-  const { insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
+  const { insetLeft, insetRight, insetBottom } = useContentLayout();
   return (
     <View style={styles.screen}>
-      <View
-        style={[
-          styles.header,
-          { paddingTop: SETTINGS_PADDING_TOP + insetTop, paddingLeft: insetLeft, paddingRight: insetRight },
-        ]}
-      >
-        <SettingsHeader title={title} back={back} />
-      </View>
       <Host
         colorScheme="dark"
         seedColor={theme.colors.accent}
@@ -88,8 +79,12 @@ export function SettingsList({ title, back, children }: SettingsListProps) {
       >
         <LazyColumn
           verticalArrangement={{ spacedBy: space(3) }}
-          contentPadding={{ top: space(3), bottom: SETTINGS_PADDING_BOTTOM + insetBottom }}
+          contentPadding={{ bottom: PAGE_PADDING_BOTTOM + insetBottom }}
         >
+          <RNHostView matchContents>
+            {/* The list's own spacing separates it from the first section. */}
+            <PageHeader title={title} back={back} style={{ marginBottom: 0 }} />
+          </RNHostView>
           {children}
         </LazyColumn>
       </Host>
@@ -302,9 +297,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  header: {
-    maxWidth: SETTINGS_MAX_WIDTH,
   },
   list: {
     flex: 1,

@@ -6,7 +6,9 @@ import type { Api } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { BackButton } from "../../ui/BackButton";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useContentLayout } from "../../ui/contentLayout";
+import { PAGE_PADDING_TOP } from "../../ui/PageHeader";
 import { GlassScope } from "../../ui/Glass";
 import { heroGeometry, SlideArtwork } from "../../ui/HeroSlide";
 import { ItemTitleBlock } from "../../ui/ItemTitleBlock";
@@ -35,6 +37,7 @@ export function ItemHeader({
 }) {
   const { width } = useWindowDimensions();
   const { insetLeft, insetRight } = useContentLayout();
+  const safeArea = useSafeAreaInsets();
   const geometry = heroGeometry(width);
 
   // One scope: the artwork is the backdrop the title block's glass buttons blur (Glass buttons).
@@ -43,8 +46,9 @@ export function ItemHeader({
       <View>
         <View style={{ height: geometry.slideHeight }}>
           <SlideArtwork api={api} item={item} width={width} geometry={geometry} />
-          <View style={[styles.back, { left: insetLeft }]}>
-            <BackButton />
+          {/* Placed like a sub-page's Back (`PageHeader`), clear of the status bar. */}
+          <View style={[styles.back, { left: insetLeft, top: safeArea.top + PAGE_PADDING_TOP }]}>
+            <BackButton compact />
           </View>
         </View>
 
@@ -65,6 +69,5 @@ export function ItemHeader({
 const styles = StyleSheet.create({
   back: {
     position: "absolute",
-    top: space(3),
   },
 });

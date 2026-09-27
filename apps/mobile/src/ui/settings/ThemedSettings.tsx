@@ -15,12 +15,8 @@ import { usePageScrollHandler } from "../pageScroll";
 import { Switch } from "../Switch";
 import { TextField } from "../TextField";
 import { space, theme } from "../theme";
-import {
-  SETTINGS_MAX_WIDTH,
-  SETTINGS_PADDING_BOTTOM,
-  SETTINGS_PADDING_TOP,
-  SettingsHeader,
-} from "./SettingsHeader";
+import { PAGE_PADDING_BOTTOM, PageHeader } from "../PageHeader";
+import { SETTINGS_MAX_WIDTH } from "./layout";
 import {
   type ActionSettingProps,
   type ChoiceSettingProps,
@@ -34,7 +30,7 @@ import {
 } from "./types";
 
 export function SettingsList({ title, back, children }: SettingsListProps) {
-  const { insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
+  const { insetLeft, insetRight, insetBottom } = useContentLayout();
   const onPageScroll = usePageScrollHandler();
   return (
     <ScrollView
@@ -42,18 +38,14 @@ export function SettingsList({ title, back, children }: SettingsListProps) {
       onScroll={onPageScroll}
       scrollEventThrottle={16}
       style={styles.screen}
-      contentContainerStyle={[
-        styles.content,
-        {
-          paddingLeft: insetLeft,
-          paddingRight: insetRight,
-          paddingTop: SETTINGS_PADDING_TOP + insetTop,
-          paddingBottom: SETTINGS_PADDING_BOTTOM + insetBottom,
-        },
-      ]}
+      contentContainerStyle={{
+        paddingLeft: insetLeft,
+        paddingRight: insetRight,
+        paddingBottom: PAGE_PADDING_BOTTOM + insetBottom,
+      }}
     >
-      <SettingsHeader title={title} back={back} />
-      {children}
+      <PageHeader title={title} back={back} />
+      <View style={styles.sections}>{children}</View>
     </ScrollView>
   );
 }
@@ -286,7 +278,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  content: {
+  sections: {
     gap: space(3),
     maxWidth: SETTINGS_MAX_WIDTH,
   },

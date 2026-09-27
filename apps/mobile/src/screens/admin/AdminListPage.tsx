@@ -7,12 +7,8 @@ import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } f
 import { useContentLayout } from "../../ui/contentLayout";
 import { ErrorState } from "../../ui/ErrorState";
 import { usePageScrollHandler } from "../../ui/pageScroll";
-import {
-  SETTINGS_MAX_WIDTH,
-  SETTINGS_PADDING_BOTTOM,
-  SETTINGS_PADDING_TOP,
-  SettingsHeader,
-} from "../../ui/settings/SettingsHeader";
+import { PAGE_PADDING_BOTTOM, PageHeader } from "../../ui/PageHeader";
+import { SETTINGS_MAX_WIDTH } from "../../ui/settings/layout";
 import { space, theme } from "../../ui/theme";
 import { FocusGuide, isTV } from "../../ui/tv";
 
@@ -61,17 +57,16 @@ export function AdminListPage<Item>({
   keyExtractor: (item: Item, index: number) => string;
   renderItem: (item: Item) => ReactElement;
 }) {
-  const { insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
+  const { insetLeft, insetRight, insetBottom } = useContentLayout();
   const onPageScroll = usePageScrollHandler();
   // react-native-tvos wraps the list in a focus guide that `flex: 1` can't fill (see CLAUDE.md).
   const [listHeight, setListHeight] = useState<number>();
   const { items, isLoading, isRefetching, error, refetch, hasNextPage, isFetchingNextPage } = query;
 
   const header = (
-    <View style={styles.header}>
-      <SettingsHeader title={title} back />
+    <PageHeader title={title} back>
       {toolbar ? <FocusGuide autoFocus>{toolbar}</FocusGuide> : null}
-    </View>
+    </PageHeader>
   );
 
   const empty = isLoading ? (
@@ -94,16 +89,13 @@ export function AdminListPage<Item>({
         style={isTV && listHeight != null ? { height: listHeight } : styles.list}
         data={items}
         keyExtractor={keyExtractor}
-        contentContainerStyle={[
-          styles.content,
-          {
-            paddingLeft: insetLeft,
-            paddingRight: insetRight,
-            paddingTop: SETTINGS_PADDING_TOP + insetTop,
-            paddingBottom: SETTINGS_PADDING_BOTTOM + insetBottom,
-          },
-        ]}
+        contentContainerStyle={{
+          paddingLeft: insetLeft,
+          paddingRight: insetRight,
+          paddingBottom: PAGE_PADDING_BOTTOM + insetBottom,
+        }}
         ListHeaderComponent={header}
+        ItemSeparatorComponent={RowSeparator}
         ListEmptyComponent={empty}
         ListFooterComponent={
           isFetchingNextPage ? (
@@ -129,10 +121,14 @@ export function AdminListPage<Item>({
             void query.fetchNextPage?.();
           }
         }}
-        renderItem={({ item }) => renderItem(item)}
+        renderItem={({ item }) => <View style={styles.row}>{renderItem(item)}</View>}
       />
     </View>
   );
+}
+
+function RowSeparator() {
+  return <View style={styles.separator} />;
 }
 
 const styles = StyleSheet.create({
@@ -143,13 +139,12 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
   },
-  content: {
-    gap: space(1),
+  // Rows stop at the settings width on large screens; the header spans the page.
+  row: {
     maxWidth: SETTINGS_MAX_WIDTH,
   },
-  header: {
-    gap: space(2),
-    marginBottom: space(2),
+  separator: {
+    height: space(1),
   },
   message: {
     paddingVertical: space(4),

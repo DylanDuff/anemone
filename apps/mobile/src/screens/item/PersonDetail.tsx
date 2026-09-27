@@ -15,6 +15,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "../../ui/BackButton";
 import { useContentLayout, useIsCompact } from "../../ui/contentLayout";
+import { PAGE_PADDING_TOP } from "../../ui/PageHeader";
 import { PersonPhoto } from "../../ui/PersonCard";
 import { PosterRow } from "../../ui/PosterRow";
 import { space, theme } from "../../ui/theme";
@@ -48,10 +49,10 @@ export function PersonDetail({
       <View
         style={[
           styles.header,
-          { paddingTop: safeArea.top + space(3), paddingLeft: insetLeft, paddingRight: insetRight },
+          { paddingTop: safeArea.top + PAGE_PADDING_TOP, paddingLeft: insetLeft, paddingRight: insetRight },
         ]}
       >
-        <BackButton />
+        <BackButton compact />
         <View style={[styles.identity, compact ? styles.identityStacked : null]}>
           <PersonPhoto
             api={api}

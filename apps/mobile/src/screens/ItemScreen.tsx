@@ -13,7 +13,9 @@ import { BackButton } from "../ui/BackButton";
 import { ErrorState } from "../ui/ErrorState";
 import { PosterRow } from "../ui/PosterRow";
 import { space, theme } from "../ui/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useContentLayout } from "../ui/contentLayout";
+import { PAGE_PADDING_TOP } from "../ui/PageHeader";
 import { AboutSection } from "./item/AboutSection";
 import { CastRow } from "./item/CastRow";
 import { CollectionItems } from "./item/CollectionItems";
@@ -34,6 +36,7 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
   const openItem = useOpenItem();
   const { data: item, isLoading, error, refetch } = useItem(itemID);
   const { insetLeft } = useContentLayout();
+  const safeArea = useSafeAreaInsets();
 
   useEffect(() => {
     if (item) {
@@ -44,8 +47,8 @@ export function ItemScreen({ route }: NativeStackScreenProps<RootStackParamList,
   if (!item?.Id) {
     return (
       <View style={styles.status}>
-        <View style={[styles.statusBack, { left: insetLeft }]}>
-          <BackButton />
+        <View style={[styles.statusBack, { left: insetLeft, top: safeArea.top + PAGE_PADDING_TOP }]}>
+          <BackButton compact />
         </View>
         {isLoading ? <ActivityIndicator color={theme.colors.accent} /> : null}
         {error ? <ErrorState error={error} onRetry={() => void refetch()} /> : null}
@@ -141,7 +144,6 @@ const styles = StyleSheet.create({
   },
   statusBack: {
     position: "absolute",
-    top: space(3),
   },
   statusText: {
     ...theme.type.callout,

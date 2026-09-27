@@ -70,6 +70,11 @@ and side effects emit `Event`s. Ported as a framework-agnostic reducer store (se
   primitives), keep navigator options constant, and keep high-frequency UI state (scroll-driven pill
   shrink) in an external store that only its consumer subscribes to (`ui/pageScroll.tsx`) — never
   in `BrowseShell` state. Missing this made iPhone page changes visibly laggy.
+- Every browse page starts with `PageHeader` (`src/ui/PageHeader.tsx`): title (+ detail) in a
+  fixed-height row (on sub-pages a glass Back chevron replaces the title, except on TV), the page's controls
+  (search field, toolbar, filters) as its children. It owns the top spacing (`PAGE_PADDING_TOP` +
+  `insetTop`) and scrolls with the page — pages add only horizontal insets and
+  `PAGE_PADDING_BOTTOM`. Native settings lists host it as their first row.
 - Page ScrollViews hide their scroll indicators (`showsVerticalScrollIndicator={false}`) on every
   platform: Safari's classic scrollbar takes a gutter from the window and breaks the full-bleed
   hero/rows, and elsewhere they're clutter.

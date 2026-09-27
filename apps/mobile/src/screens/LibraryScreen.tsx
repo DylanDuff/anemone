@@ -16,7 +16,7 @@ import {
 } from "@anemone/core";
 import type { BaseItemDto } from "@jellyfin/sdk/lib/generated-client/models/base-item-dto";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -29,6 +29,7 @@ import { useCardWidths, useContentLayout } from "../ui/contentLayout";
 import { usePageScrollHandler } from "../ui/pageScroll";
 import { Collapsible } from "../ui/Collapsible";
 import { ErrorState } from "../ui/ErrorState";
+import { PAGE_PADDING_BOTTOM, PageHeader } from "../ui/PageHeader";
 import { Poster } from "../ui/Poster";
 import { space, theme } from "../ui/theme";
 import { FocusGuide, isTV } from "../ui/tv";
@@ -53,10 +54,7 @@ function gridLayout(available: number, targetWidth: number): { columns: number; 
  * persisted per library (Swiftfin `PagingLibraryView`). A top-level section, opened from the
  * section switcher. Resolves the library from the cached user views so it works from a deep link.
  */
-export function LibraryScreen({
-  route,
-  navigation,
-}: NativeStackScreenProps<BrowseParamList, "Library">) {
+export function LibraryScreen({ route }: NativeStackScreenProps<BrowseParamList, "Library">) {
   const { libraryID } = route.params;
   const ctx = useQueryContext();
   const userViews = useUserViews();
@@ -64,12 +62,6 @@ export function LibraryScreen({
   const library = views?.find((view) => view.Id === libraryID);
   const filters = useStoredValue(UserKeys.libraryFilters(ctx.userID, libraryID));
   const displayType = useStoredValue(UserKeys.libraryDisplayType(ctx.userID, libraryID));
-
-  useEffect(() => {
-    if (library) {
-      navigation.setOptions({ title: displayTitle(library) });
-    }
-  }, [library, navigation]);
 
   if (viewsLoading || !filters.isLoaded || !displayType.isLoaded) {
     return <CenteredMessage loading />;
@@ -113,7 +105,7 @@ function LibraryContent({
 }) {
   const ctx = useQueryContext();
   const openItem = useOpenItem();
-  const { width, insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
+  const { width, insetLeft, insetRight, insetBottom } = useContentLayout();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const onPageScroll = usePageScrollHandler();
   // On TV, react-native-tvos wraps a list's ScrollView in an unstyled TVFocusGuideView, so
@@ -129,11 +121,7 @@ function LibraryContent({
   const { columns, posterWidth } = gridLayout(width - insetLeft - insetRight, useCardWidths().poster);
 
   const header = (
-    <View style={styles.header}>
-      <View style={styles.titleRow}>
-        <Text style={styles.title}>{displayTitle(library)}</Text>
-        {total != null ? <Text style={styles.count}>{total} items</Text> : null}
-      </View>
+    <PageHeader title={displayTitle(library)} detail={total != null ? `${total} items` : undefined}>
       <FocusGuide autoFocus>
         <LibraryToolbar
           filters={filters}
@@ -149,7 +137,7 @@ function LibraryContent({
           </Collapsible>
         ) : null}
       </FocusGuide>
-    </View>
+    </PageHeader>
   );
 
   const footer = isLoading || isFetchingNextPage ? <CenteredMessage loading compact /> : null;
@@ -179,8 +167,7 @@ function LibraryContent({
         contentContainerStyle={{
           paddingLeft: insetLeft,
           paddingRight: insetRight,
-          paddingTop: insetTop,
-          paddingBottom: CONTENT_PADDING_BOTTOM + insetBottom,
+          paddingBottom: PAGE_PADDING_BOTTOM + insetBottom,
         }}
         ListHeaderComponent={header}
         ListFooterComponent={footer}
@@ -225,7 +212,6 @@ function CenteredMessage({
   );
 }
 
-const CONTENT_PADDING_BOTTOM = space(6);
 
 const styles = StyleSheet.create({
   screen: {
@@ -238,24 +224,6 @@ const styles = StyleSheet.create({
   // The gap above the panel grows with it (see `Collapsible`).
   filterPanel: {
     paddingTop: space(2),
-  },
-  header: {
-    paddingTop: space(3),
-    paddingBottom: space(3),
-    gap: space(2),
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: space(1.5),
-  },
-  title: {
-    ...theme.type.title,
-    color: theme.colors.text,
-  },
-  count: {
-    ...theme.type.callout,
-    color: theme.colors.muted,
   },
   gridRow: {
     gap: GRID_GAP,

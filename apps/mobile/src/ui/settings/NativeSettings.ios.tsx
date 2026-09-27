@@ -14,6 +14,7 @@ import {
   Image,
   LabeledContent,
   Picker,
+  RNHostView,
   Section,
   Spacer,
   Text,
@@ -25,19 +26,19 @@ import {
   font,
   foregroundStyle,
   listRowBackground,
+  listRowInsets,
+  onGeometryChange,
   pickerStyle,
   scrollContentBackground,
   scrollIndicators,
   tag,
 } from "@expo/ui/swift-ui/modifiers";
+import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useContentLayout } from "../contentLayout";
 import { space, theme } from "../theme";
-import {
-  SETTINGS_MAX_WIDTH,
-  SETTINGS_PADDING_TOP,
-  SettingsHeader,
-} from "./SettingsHeader";
+import { PAGE_PADDING_BOTTOM, PAGE_PADDING_TOP, PageHeader } from "../PageHeader";
+import { SETTINGS_MAX_WIDTH } from "./layout";
 import type {
   ActionSettingProps,
   ChoiceSettingProps,
@@ -57,36 +58,96 @@ const ROW = listRowBackground(theme.colors.surface);
 const MUTED = foregroundStyle(theme.colors.muted);
 const PRIMARY = foregroundStyle(theme.colors.text);
 
+/** Where the `Form` puts its first section header inside its host, once measured. */
+interface FormOffset {
+  readonly x: number;
+  readonly y: number;
+}
+
 /**
- * The page header stays in React Native (it matches the other pages); the `Form` below it scrolls
- * natively. The form can't scroll under a floating pill, so it stops short of it.
+ * The `Form` adds its own top space (and the header's side inset) that SwiftUI doesn't expose.
+ * The first settings page measures it; every later one reuses it, so it doesn't re-measure.
+ */
+let measuredFormOffset: FormOffset | undefined;
+
+/** Lets section headers and footers hug their React Native content. */
+const BARE_HEADER = [listRowInsets({ top: 0, leading: 0, bottom: 0, trailing: 0 })];
+
+/**
+ * The whole page is one native `Form` running under the navigation pill, like every other page.
+ * The `PageHeader` is an empty first section's header — a section *row* would be clipped by the
+ * card's rounded corners — so it scrolls away with the content, and an empty last section's footer
+ * lets the last card clear the pill. The header is padded from the measured `Form` offset so the
+ * title lands exactly where it does on Search and the libraries; it stays hidden until then.
  */
 export function SettingsList({ title, back, children }: SettingsListProps) {
   const { insetLeft, insetRight, insetTop, insetBottom } = useContentLayout();
+  const hostMarginLeft = Math.max(0, insetLeft - FORM_MARGIN);
+  const host = useRef<View>(null);
+  const [offset, setOffset] = useState(measuredFormOffset);
+
+  // The header's frame comes from SwiftUI (window coordinates): React Native measurements inside
+  // an `RNHostView` are relative to the host view, not the window.
+  const measure = (frame: { x: number; y: number }) => {
+    if (offset) {
+      return;
+    }
+    host.current?.measureInWindow((hostX, hostY) => {
+      measuredFormOffset = { x: frame.x - hostX, y: frame.y - hostY };
+      setOffset(measuredFormOffset);
+    });
+  };
+
   return (
     <View style={styles.screen}>
       <View
-        style={[
-          styles.header,
-          { paddingTop: SETTINGS_PADDING_TOP + insetTop, paddingLeft: insetLeft, paddingRight: insetRight },
-        ]}
-      >
-        <SettingsHeader title={title} back={back} />
-      </View>
-      <Host
-        colorScheme="dark"
-        seedColor={theme.colors.accent}
+        ref={host}
+        collapsable={false}
         style={[
           styles.form,
-          {
-            marginLeft: Math.max(0, insetLeft - FORM_MARGIN),
-            marginRight: Math.max(0, insetRight - FORM_MARGIN),
-            marginBottom: insetBottom,
-          },
+          { marginLeft: hostMarginLeft, marginRight: Math.max(0, insetRight - FORM_MARGIN) },
         ]}
       >
-        <Form modifiers={FORM_MODIFIERS}>{children}</Form>
+      <Host colorScheme="dark" seedColor={theme.colors.accent} ignoreSafeArea="container" style={styles.host}>
+        <Form modifiers={FORM_MODIFIERS}>
+          <Section
+            header={
+              <VStack modifiers={[...BARE_HEADER, onGeometryChange(measure)]}>
+                <RNHostView matchContents>
+                  <View style={offset ? null : styles.measuring}>
+                    <PageHeader
+                      title={title}
+                      back={back}
+                      style={{
+                        paddingTop: Math.max(0, PAGE_PADDING_TOP + insetTop - (offset?.y ?? 0)),
+                        // The header slot keeps its own leading inset; shift the header back
+                        // (or on) so the title starts at `insetLeft`, as on every other page.
+                        transform: [{ translateX: insetLeft - hostMarginLeft - (offset?.x ?? 0) }],
+                        marginBottom: 0,
+                      }}
+                    />
+                  </View>
+                </RNHostView>
+              </VStack>
+            }
+          >
+            {null}
+          </Section>
+          {children}
+          <Section
+            footer={
+              <VStack modifiers={BARE_HEADER}>
+                <RNHostView matchContents>
+                  <View style={{ height: PAGE_PADDING_BOTTOM + insetBottom }} />
+                </RNHostView>
+              </VStack>
+            }
+          >
+            {null}
+          </Section>
+        </Form>
       </Host>
+      </View>
     </View>
   );
 }
@@ -208,8 +269,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  header: {
-    maxWidth: SETTINGS_MAX_WIDTH,
+  // Laid out (to be measured) but not shown until the header can be placed.
+  measuring: {
+    opacity: 0,
+  },
+  host: {
+    flex: 1,
   },
   form: {
     flex: 1,
