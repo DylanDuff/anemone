@@ -155,10 +155,16 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - [ ] Drop the temporary `minimumReleaseAgeExclude: [expo]` in `pnpm-workspace.yaml` after 9 Oct
   2026 (expo 57.0.25 then meets the 15-day rule).
 - [ ] BlurHash placeholders for landscape cards (callers pass a URL only today).
-- [ ] iOS/Android settings lists stop above the phone pill (a native list can't scroll under it)
-  and don't report page scroll, so the phone pill doesn't shrink on Settings.
+- [ ] Native settings lists don't report page scroll, so the phone pill doesn't shrink on Settings
+  (iOS now scrolls under the pill via a spacer; Android's Compose list pads by `insetBottom`).
 - [ ] Verify the native settings lists on device: iPhone, iPad, tvOS (menu picker + focus), Android
   phone (dropdown anchoring, row corner clipping).
+- ✅ **Accent colour** (Appearance): 9 presets picked from ink wells (`SwatchSetting`), live via
+  `useAccent()`; each preset has on-colour / on-white / switch-track variants.
+- [ ] Accent: check Yellow's native switch (white thumb on yellow) — give it a grey track if faint;
+  the 9-well swatch row doesn't wrap on native, so it can clip on phones narrower than ~340pt.
+- [ ] Android phones: verify the docked search field (window resize vs overlap with the keyboard
+  could lift it twice) and the Compose text field's own keyboard avoidance (`KeyboardDock`).
 - [ ] Revisit TV blur cost: blur only while the rail is expanded, or a static pre-blurred backdrop;
   measure on a release build.
 - [ ] Release-build memory check on TV: debug build sits at ~200 MB native heap / ~400 MB PSS on a
@@ -184,9 +190,10 @@ These exist in Swiftfin `Shared/` but are out of scope for the foundation + core
 - ✅ Hover/focus states: `Focusable` (hover-driven + eased on web, D-pad on TV).
 - ✅ Home hero reuses the item page's `ItemTitleBlock` (title art, facts, Play/played/favorite) and `backdropImageSource`.
 - ✅ Native stack verified on iOS (iPhone 14 Pro), Android and Android TV.
-- ✅ **Search** section in the pill: debounced field, then Movies / Shows / Episodes / Collections
-  / People shelves (`useSearchResults`, `searchItemScopes`, `searchPeopleQuery`).
-- [ ] Search: recent searches, and filters (genre, year) like Swiftfin.
+- ✅ **Search** section in the pill: debounced field, results as grouped list rows (`ItemListRow`),
+  "recently viewed" before typing (per user), a category filter that also limits what's fetched,
+  and a field docked above the keyboard on phones (Settings → Navigation → Search field).
+- [ ] Search: genre / year filters like Swiftfin; a home for "Clear recents" (parked, `recent.clear`).
 - [ ] PIN / biometric access-policy capture on sign-in (currently always `none`).
 
 - [ ] Verify image auth on servers that require `api_key` (hero/backdrops use `backdropImageSource`).
